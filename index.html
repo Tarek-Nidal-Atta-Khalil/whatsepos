@@ -1,40 +1,79 @@
 <!DOCTYPE html>
-<html lang="la">
-<head>
-  <meta charset="UTF-8">
-  <title>Whatsepos</title>
+      const user = data.user;
 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      text-align: center;
-    }
+      if (!user) {
+        document.getElementById("register_status").textContent =
+          "Konto erstellt. Bitte bestätige ggf. deine E-Mail.";
+        return;
+      }
 
-    .container {
-      width: calc(100% - 10cm);
-      max-width: 1200px;
-      margin: 40px auto;
-    }
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .insert({
+          id: user.id,
+          username
+        });
 
-    .tabs {
-      margin-bottom: 30px;
-    }
+      document.getElementById("register_status").textContent =
+        profileError
+          ? profileError.message
+          : "Konto erfolgreich erstellt.";
+    };
 
-    .tabs button,
-    button {
-      font-size: 20px;
-      padding: 10px 20px;
-      margin: 5px;
-      cursor: pointer;
-    }
+    // Anmeldung
+    window.einloggen = async function () {
+      const identifier = document
+        .getElementById("login_identifier")
+        .value
+        .trim();
 
-    input {
-      font-size: 20px;
-      padding: 10px;
-      margin: 5px;
-    }
+      const password = document
+        .getElementById("login_password")
+        .value;
 
+      if (identifier === "") {
+        document.getElementById("login_status").textContent =
+          "Bitte Benutzername oder E-Mail eingeben.";
+        return;
+      }
+
+      // Der Login per Benutzername ist noch nicht implementiert.
+      // Bitte vorerst mit E-Mail-Adresse anmelden.
+      if (!identifier.includes("@")) {
+        document.getElementById("login_status").textContent =
+          "Bitte vorerst mit E-Mail-Adresse anmelden.";
+        return;
+      }
+
+      const { error } = await supabase.auth.signInWithPassword({
+        email: identifier,
+        password
+      });
+
+      if (error) {
+        document.getElementById("login_status").textContent = error.message;
+        return;
+      }
+
+      document.getElementById("login_status").textContent = "Eingeloggt.";
+      document.getElementById("status").textContent = "Eingeloggt.";
+
+      // Automatisch zum Hexameter-Reiter wechseln
+      zeigeTab("hexameter");
+    };
+
+    // Ausloggen
+    window.ausloggen = async function () {
+      await supabase.auth.signOut();
+
+      document.getElementById("status").textContent = "Ausgeloggt.";
+
+      // Zur Anmeldung zurückkehren
+      zeigeTab("login");
+    };
+  </script>
+</body>
+</html>
     textarea {
       width: 100%;
       min-height: 300px;
