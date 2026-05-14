@@ -106,12 +106,6 @@
       font-size: 24px;
     }
 
-    #editor {
-      width: 100%; 
-      min-height: 400px;
-      margin-top: 20px;
-    }
-
     #menuButton {
       position: fixed;
       top: 20px;
@@ -256,7 +250,6 @@
     const nuntii = document.getElementById("nuntii");
     const poemTitle = document.getElementById("poemTitle");
     const meineTexteListe = document.getElementById("meineTexteListe");
-    const editor = document.getElementById("editor");
 
     let aktuellerUser = null;
     let aktuellesGedicht = null;
@@ -412,30 +405,6 @@
       zeigeGedicht(gedicht.textus);
       setStatus("Gedicht geöffnet.");
     }
-
-    // Editor speichern
-    window.speichereEditor = async function() {
-      if (!aktuellesGedicht) {
-        setStatus("Kein Gedicht ausgewählt.");
-        return;
-      }
-
-      const neuerText = editor.value;
-
-      const { error } = await supabase
-        .from("poemata")
-        .update({
-          titulus: poemTitle.value.trim() || aktuellesGedicht.titulus,
-          textus: neuerText,
-          updated_at: new Date().toISOString()
-        })
-        .eq("id", aktuellesGedicht.id)
-        .eq("user_id", aktuellerUser.id);
-
-      if (error) {
-        setStatus(error.message);
-        return;
-      }
 
       aktuellesGedicht.titulus = poemTitle.value.trim() || aktuellesGedicht.titulus;
       aktuellesGedicht.textus = neuerText;
