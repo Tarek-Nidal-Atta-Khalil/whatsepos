@@ -50,6 +50,41 @@
     <div class="container">
         <h1>Scriptorium</h1>
 
+<div style="margin-bottom: 30px;">
+    <input
+        id="email"
+        type="email"
+        placeholder="E-Mail"
+        style="font-size: 20px; padding: 10px; margin: 5px;"
+    >
+
+    <input
+        id="password"
+        type="password"
+        placeholder="Passwort"
+        style="font-size: 20px; padding: 10px; margin: 5px;"
+    >
+
+    <br>
+
+    <button onclick="registrieren()"
+            style="font-size: 20px; padding: 10px; margin: 5px;">
+        Konto erstellen
+    </button>
+
+    <button onclick="einloggen()"
+            style="font-size: 20px; padding: 10px; margin: 5px;">
+        Einloggen
+    </button>
+
+    <button onclick="ausloggen()"
+            style="font-size: 20px; padding: 10px; margin: 5px;">
+        Ausloggen
+    </button>
+
+    <p id="status"></p>
+</div>
+        
         <textarea
             id="campus"
             placeholder="Hic scribe et preme Enter..."
@@ -58,37 +93,76 @@
         <div id="nuntii"></div>
     </div>
 
-    <script>
-        const campus = document.getElementById("campus");
-        const nuntii = document.getElementById("nuntii");
+   <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-        // Wenn Enter gedrückt wird, Nachricht speichern
-        campus.addEventListener("keydown", function(event) {
-            if (event.key === "Enter" && !event.shiftKey) {
-                event.preventDefault(); // verhindert Zeilenumbruch
-                addeNuntium();
-            }
+    /*
+      HIER DEINE WERTE EINTRAGEN
+    */
+    const supabase = createClient(
+        "https://sdjhpovsechtfdwwakmm.supabase.co",
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNkamhwb3ZzZWNodGZkd3dha21tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NjIyNTIsImV4cCI6MjA5NDMzODI1Mn0.cyWJGEdA84bGAKyBcNYAXtJBLcf9Lo12oYn5CEAPhf4"
+    );
+
+    const campus = document.getElementById("campus");
+    const nuntii = document.getElementById("nuntii");
+
+    // ===== Nachrichten speichern bei Enter =====
+    campus.addEventListener("keydown", function(event) {
+        if (event.key === "Enter" && !event.shiftKey) {
+            event.preventDefault();
+            addeNuntium();
+        }
+    });
+
+    function addeNuntium() {
+        const textus = campus.value.trim();
+
+        if (textus === "") {
+            return;
+        }
+
+        const div = document.createElement("div");
+        div.className = "nuntius";
+        div.textContent = textus;
+
+        nuntii.appendChild(div);
+        campus.value = "";
+    }
+
+    // ===== Benutzerkonten =====
+    // Damit die Buttons im HTML funktionieren, machen wir die Funktionen global.
+    window.registrieren = async function () {
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+
+        const { error } = await supabase.auth.signUp({
+            email,
+            password
         });
 
-        function addeNuntium() {
-            const textus = campus.value.trim();
+        document.getElementById("status").textContent =
+            error ? error.message : "Konto erstellt.";
+    };
 
-            if (textus === "") {
-                return;
-            }
+    window.einloggen = async function () {
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
 
-            // Neues Element erzeugen
-            const div = document.createElement("div");
-            div.className = "nuntius";
-            div.textContent = textus;
+        const { error } = await supabase.auth.signInWithPassword({
+            email,
+            password
+        });
 
-            // Unter die bisherigen Nachrichten setzen
-            nuntii.appendChild(div);
+        document.getElementById("status").textContent =
+            error ? error.message : "Eingeloggt.";
+    };
 
-            // Eingabefeld leeren
-            campus.value = "";
-        }
-    </script>
+    window.ausloggen = async function () {
+        await supabase.auth.signOut();
+        document.getElementById("status").textContent = "Ausgeloggt.";
+    };
+</script>
 
 </body>
 </html>
