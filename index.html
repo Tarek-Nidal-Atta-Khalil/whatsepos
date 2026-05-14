@@ -169,6 +169,50 @@
       margin: 10px 0;
       text-align: left;
     }
+
+    .vers-zeile,
+    .titel-zeile {
+      position: relative;
+      padding: 8px 48px 8px 12px;
+      font-size: 24px;
+      cursor: pointer;
+      border-radius: 6px;
+    }
+    
+    .vers-zeile:hover,
+    .titel-zeile:hover {
+      background: #dbeafe;
+    }
+    
+    .loesch-knopf {
+      display: none;
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: none;
+      background: red;
+      color: black;
+      font-weight: bold;
+      padding: 0;
+      line-height: 28px;
+      text-align: center;
+      cursor: pointer;
+    }
+    
+    .vers-zeile:hover .loesch-knopf,
+    .titel-zeile:hover .loesch-knopf {
+      display: inline-block;
+    }
+    
+    .vers-editor {
+      width: 100%;
+      font-size: 24px;
+      text-align: center;
+    }
     
   </style>
 </head>
@@ -283,17 +327,96 @@
     function zeigeGedicht(textus) {
       nuntii.innerHTML = "";
       if (!textus) return;
-
-      textus.split("\n").forEach(vers => {
+    
+      const verse = textus.split("\n");
+    
+      verse.forEach((vers, index) => {
         const div = document.createElement("div");
-        div.className = "nuntius";
-        div.textContent = vers;
+        div.className = "vers-zeile";
+    
+        const span = document.createElement("span");
+        span.textContent = vers;
+    
+        const deleteButton = document.createElement("button");
+        deleteButton.className = "loesch-knopf";
+        deleteButton.textContent = "×";
+    
+        deleteButton.onclick = async function (event) {
+          event.stopPropagation();
+          await loescheVers(index);
+        };
+    
+        div.onclick = function () {
+          bearbeiteVers(index, vers);
+        };
+    
+        div.appendChild(span);
+        div.appendChild(deleteButton);
         nuntii.appendChild(div);
       });
-
+    
       nuntii.scrollTop = nuntii.scrollHeight;
     }
 
+      async function speichereGedichtText(neuerText) {
+      if (!aktuellesGedicht || !aktuellerUser) return;
+    
+      const { error } = await supabase
+        .from("poemata")
+        .update({
+          textus: neuerText,
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", aktuellesGedicht.id)
+        .eq("user_id", aktuellerUser.id);
+    
+      if (error) {
+        setStatus(error.message);
+        return;
+      }
+    
+      aktuellesGedicht.textus = neuerText;
+      zeigeGedicht(neuerText);
+    }
+    
+    async function loescheVers(index) {
+      if (!aktuellesGedicht) return;
+    
+      const verse = aktuellesGedicht.textus.split("\n");
+      verse.splice(index, 1);
+    
+      await speichereGedichtText(verse.join("\n"));
+      setStatus("Vers gelöscht.");
+    }
+    
+    function bearbeiteVers(index, alterVers) {
+      const zeilen = document.querySelectorAll(".vers-zeile");
+      const zeile = zeilen[index];
+    
+      zeile.innerHTML = "";
+    
+      const input = document.createElement("input");
+      input.className = "vers-editor";
+      input.value = alterVers;
+    
+      zeile.appendChild(input);
+      input.focus();
+
+  input.addEventListener("keydown", async function (event) {
+    if (event.key === "Enter") {
+      const verse = aktuellesGedicht.textus.split("\n");
+      verse[index] = input.value.trim();
+
+      await speichereGedichtText(verse.join("\n"));
+      setStatus("Vers bearbeitet.");
+    }
+
+    if (event.key === "Escape") {
+      zeigeGedicht(aktuellesGedicht.textus);
+    }
+  });
+}
+    
     // Neues Gedicht
     window.neuesGedicht = async function() {
       const titulus = poemTitle.value.trim();
@@ -381,19 +504,51 @@
 
       data.forEach(gedicht => {
         const div = document.createElement("div");
-        div.className = "poem-item";
-
-        const title = document.createElement("strong");
-        title.textContent = gedicht.titulus;
-
-        const openButton = document.createElement("button");
-        openButton.textContent = "Öffnen";
-        openButton.onclick = () => oeffneGedicht(gedicht);
-
-        div.appendChild(title);
-        div.appendChild(document.createTextNode(" "));
-        div.appendChild(openButton);
-
+        div.className = "titel-zeile";
+      
+        const span = document.createElement("span");
+        span.textContent = gedicht.titulus;
+      
+        span.onclick = function () {
+          oeffneGedicht(gedicht);
+        };
+      
+        const deleteButton = document.createElement("button");
+        deleteButton.className = "loesch-knopf";
+        deleteButton.textContent = "×";
+      
+        deleteButton.onclick = async function (event) {
+          event.stopPropagation();
+      
+          const bestaetigt = confirm(
+            `Das Gedicht "${gedicht.titulus}" wirklich löschen?`
+          );
+      
+          if (!bestaetigt) return;
+      
+          const { error } = await supabase
+            .from("poemata")
+            .delete()
+            .eq("id", gedicht.id)
+            .eq("user_id", aktuellerUser.id);
+      
+          if (error) {
+            setStatus(error.message);
+            return;
+          }
+      
+          if (aktuellesGedicht && aktuellesGedicht.id === gedicht.id) {
+            aktuellesGedicht = null;
+            poemTitle.value = "";
+            nuntii.innerHTML = "";
+          }
+      
+          await ladeGedichtsliste();
+          setStatus("Gedicht gelöscht.");
+        };
+      
+        div.appendChild(span);
+        div.appendChild(deleteButton);
         meineTexteListe.appendChild(div);
       });
     };
