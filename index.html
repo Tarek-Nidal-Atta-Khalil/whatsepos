@@ -42,13 +42,6 @@
       width: min(100%, 320px);
     }
 
-    #poemTitle {
-      width: min(100%, 600px);
-      margin-bottom: 20px;
-      text-align: center;
-      font-size: 28px;
-    }
-
     #poemArea {
       position: relative;
       height: calc(100vh - 220px);
@@ -326,42 +319,14 @@
     
       <br>
     
-      <button onclick="neuesGedichtAusListe()">
-        Neues Gedicht anlegen
-      </button>
-    
       <button onclick="ladeGedichtsliste()">
         Aktualisieren
       </button>
     
       <div id="meineTexteListe"></div>
     </div>
-  </div>
 
-  <script type="module">
-  import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-  window.toggleMenu = function () {
-    document.getElementById("sideMenu").classList.toggle("open");
-  };
-
-  const supabase = createClient(
-    "https://sdjhpovsechtfdwwakmm.supabase.co",
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNkamhwb3ZzZWNodGZkd3dha21tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NjIyNTIsImV4cCI6MjA5NDMzODI1Mn0.cyWJGEdA84bGAKyBcNYAXtJBLcf9Lo12oYn5CEAPhf4"
-  );
-
-    const campus = document.getElementById("campus");
-    const nuntii = document.getElementById("nuntii");
-    aktuellerTitel.textContent = "";
-    scriptoriumStart.style.display = "block";
-    titelEingabeBereich.style.display = "none";
-    arbeitsbereich.style.display = "none";
-    const meineTexteListe = document.getElementById("meineTexteListe");
-
-    let aktuellerUser = null;
-    let aktuellesGedicht = null;
-
-    // Profil
+   <!-- Profil -->
     <div id="profil" class="tab-content" style="display: none;">
       <h2>Profil</h2>
     
@@ -379,6 +344,91 @@
     
       <p id="profil_status" class="status"></p>
     </div>
+    
+  </div>
+
+  <script type="module">
+  import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+  window.toggleMenu = function () {
+    document.getElementById("sideMenu").classList.toggle("open");
+  };
+    
+    async function legeGedichtMitTitelAn() {
+      const titulus = titelEingabe.value.trim();
+    
+      if (!aktuellerUser) {
+        setStatus("Bitte zuerst einloggen.");
+        return;
+      }
+    
+      if (titulus === "") {
+        setStatus("Bitte einen Titel eingeben.");
+        return;
+      }
+    
+      const { data, error } = await supabase
+        .from("poemata")
+        .insert({
+          user_id: aktuellerUser.id,
+          titulus,
+          textus: ""
+        })
+        .select()
+        .single();
+    
+      if (error) {
+        if (error.code === "23505") {
+          setStatus("Du hast bereits ein Gedicht mit diesem Titel.");
+        } else {
+          setStatus(error.message);
+        }
+        return;
+      }
+    
+      aktuellesGedicht = data;
+      aktuellerTitel.textContent = data.titulus;
+      nuntii.innerHTML = "";
+    
+      titelEingabeBereich.style.display = "none";
+      arbeitsbereich.style.display = "block";
+    
+      setStatus("Gedicht angelegt.");
+      campus.focus();
+    }  
+
+  const supabase = createClient(
+    "https://sdjhpovsechtfdwwakmm.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNkamhwb3ZzZWNodGZkd3dha21tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NjIyNTIsImV4cCI6MjA5NDMzODI1Mn0.cyWJGEdA84bGAKyBcNYAXtJBLcf9Lo12oYn5CEAPhf4"
+  );
+
+    const campus = document.getElementById("campus");
+    const nuntii = document.getElementById("nuntii");
+    const meineTexteListe = document.getElementById("meineTexteListe");
+    const scriptoriumStart = document.getElementById("scriptoriumStart");
+    const titelEingabeBereich = document.getElementById("titelEingabeBereich");
+    const titelEingabe = document.getElementById("titelEingabe");
+    const arbeitsbereich = document.getElementById("arbeitsbereich");
+    const aktuellerTitel = document.getElementById("aktuellerTitel");
+
+    window.starteNeuesGedicht = function () {
+        scriptoriumStart.style.display = "none";
+        titelEingabeBereich.style.display = "block";
+        arbeitsbereich.style.display = "none";
+      
+        titelEingabe.value = "";
+        titelEingabe.focus();
+      };  
+
+    titelEingabe.addEventListener("keydown", async function (event) {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          await legeGedichtMitTitelAn();
+        }
+      });
+
+    let aktuellerUser = null;
+    let aktuellesGedicht = null;
     
     // Tabs
     window.zeigeTab = function(tabName) {
@@ -497,60 +547,6 @@
     }
   });
 }
-    
-    // Neues Gedicht
-    window.neuesGedicht = async function() {
-      const titulus = poemTitle.value.trim();
-
-      if (!aktuellerUser) {
-        setStatus("Bitte zuerst einloggen.");
-        return;
-      }
-
-      if (titulus === "") {
-        setStatus("Bitte einen Titel eingeben.");
-        return;
-      }
-
-      const { data, error } = await supabase
-        .from("poemata")
-        .insert({
-          user_id: aktuellerUser.id,
-          titulus,
-          textus: ""
-        })
-        .select()
-        .single();
-
-      if (error) {
-        setStatus(error.message);
-        return;
-      }
-
-      aktuellesGedicht = data;
-      nuntii.innerHTML = "";
-      campus.value = "";
-      setStatus("Gedicht angelegt.");
-    };
-
-    window.neuesGedichtAusListe = async function () {
-      const feld = document.getElementById("neuerTitel");
-      const titel = feld.value.trim();
-    
-      if (titel === "") {
-        setStatus("Bitte einen Titel eingeben.");
-        return;
-      }
-    
-      poemTitle.value = titel;
-      await neuesGedicht();
-    
-      feld.value = "";
-    
-      if (aktuellesGedicht) {
-        zeigeTab("hexameter");
-      }
-    };
 
     // Vers anhängen
     async function fuegeVersHinzu() {
@@ -639,7 +635,6 @@
       
           if (aktuellesGedicht && aktuellesGedicht.id === gedicht.id) {
             aktuellesGedicht = null;
-            poemTitle.value = "";
             nuntii.innerHTML = "";
           }
       
@@ -655,12 +650,18 @@
 
     function oeffneGedicht(gedicht) {
       aktuellesGedicht = gedicht;
-      poemTitle.value = gedicht.titulus;
+      aktuellerTitel.textContent = gedicht.titulus;
+    
+      scriptoriumStart.style.display = "none";
+      titelEingabeBereich.style.display = "none";
+      arbeitsbereich.style.display = "block";
+    
       zeigeGedicht(gedicht.textus);
       zeigeTab("hexameter");
       setStatus("Gedicht geöffnet.");
+      campus.focus();
     }
-
+    
     // Löschen
     window.loescheAktuellesGedicht = async function() {
       if (!aktuellesGedicht) {
@@ -683,7 +684,6 @@
       }
 
       aktuellesGedicht = null;
-      poemTitle.value = "";
       nuntii.innerHTML = "";
 
       await ladeGedichtsliste();
@@ -760,7 +760,6 @@
       await aktualisiereMenuButton();
       aktuellesGedicht = null;
 
-      poemTitle.value = "";
       campus.value = "";
       nuntii.innerHTML = "";
       meineTexteListe.innerHTML = "";
