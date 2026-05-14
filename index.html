@@ -6,47 +6,103 @@
   <title>Whatsepos</title>
 
   <style>
-    body { font-family: Arial, sans-serif; margin: 0; text-align: center; }
-    .container { width: calc(100% - 10cm); max-width: 1200px; margin: 40px auto; }
-    .tabs { margin-bottom: 30px; }
-    .tabs button, button { font-size: 20px; padding: 10px 20px; margin: 5px; cursor: pointer; }
-    input { font-size: 20px; padding: 10px; margin: 5px; width: min(100%, 320px); box-sizing: border-box; }
-    
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      text-align: center;
+    }
+
+    .container {
+      width: calc(100% - 10cm);
+      max-width: 1200px;
+      margin: 40px auto;
+    }
+
+    .tabs {
+      margin-bottom: 30px;
+    }
+
+    .tabs button,
+    button {
+      font-size: 20px;
+      padding: 10px 20px;
+      margin: 5px;
+      cursor: pointer;
+    }
+
+    input,
+    textarea {
+      font-size: 20px;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+
+    input {
+      margin: 5px;
+      width: min(100%, 320px);
+    }
+
+    #poemTitle {
+      width: min(100%, 600px);
+      margin-bottom: 20px;
+      text-align: center;
+      font-size: 28px;
+    }
+
     #poemArea {
-  height: calc(100vh - 220px);
-  display: flex;
-  flex-direction: column;
-}
+      height: calc(100vh - 260px);
+      display: flex;
+      flex-direction: column;
+    }
 
-     #nuntii {
-  flex: 1;
-  overflow-y: auto;
-  text-align: center;
-  padding-bottom: 20px;
-}
+    #nuntii {
+      flex: 1;
+      overflow-y: auto;
+      text-align: center;
+      padding-bottom: 20px;
+    }
 
-      .nuntius {
-  padding: 6px 0;
-  font-size: 24px;
-  white-space: pre-wrap;
-}
+    #campus {
+      width: 100%; 
+      height: 56px;
+      resize: none;
+      text-align: center;
+      font-size: 24px;
+      margin-bottom: 3cm;
+    }
 
-       textarea {
-  width: 100%;
-  height: 48px;
-  min-height: 48px;
-  max-height: 48px;
-  font-size: 24px;
-  padding: 10px 14px;
-  box-sizing: border-box;
-  resize: none;
-  margin-bottom: 3cm;
-  text-align: center;
-}
-    .status { min-height: 1.5em; margin-top: 10px; }
+    .nuntius {
+      padding: 6px 0;
+      font-size: 24px;
+      white-space: pre-wrap;
+    }
+
+    .status {
+      min-height: 1.5em;
+      margin-top: 10px;
+    }
+
+    #meineTexteListe {
+      margin-top: 30px;
+      text-align: left;
+    }
+
+    .poem-item {
+      border-bottom: 1px solid #ccc;
+      padding: 12px 0;
+    }
+
+    .poem-item strong {
+      font-size: 24px;
+    }
+
+    #editor {
+      width: 100%; 
+      min-height: 400px;
+      margin-top: 20px;
+    }
   </style>
 </head>
-
 <body>
   <div class="container">
     <h1>Scriptorium</h1>
@@ -58,6 +114,7 @@
       <button onclick="zeigeTab('meineTexte')">Meine Texte</button>
     </div>
 
+    <!-- Anmeldung -->
     <div id="login" class="tab-content">
       <input id="login_identifier" type="text" placeholder="Benutzername oder E-Mail">
       <input id="login_password" type="password" placeholder="Passwort">
@@ -66,6 +123,7 @@
       <p id="login_status" class="status"></p>
     </div>
 
+    <!-- Registrierung -->
     <div id="register" class="tab-content" style="display: none;">
       <input id="register_username" type="text" placeholder="Benutzername">
       <input id="register_email" type="email" placeholder="E-Mail">
@@ -75,25 +133,35 @@
       <p id="register_status" class="status"></p>
     </div>
 
+    <!-- Hexameter -->
     <div id="hexameter" class="tab-content" style="display: none;">
-  <button onclick="ausloggen()">Ausloggen</button>
-  <p id="status" class="status"></p>
+      <button onclick="ausloggen()">Ausloggen</button>
+      <p id="status" class="status"></p>
 
-  <div id="poemArea">
-    <div id="nuntii"></div>
+      <input id="poemTitle" type="text" placeholder="Titel des Gedichts">
+      <br>
+      <button onclick="neuesGedicht()">Neues Gedicht anlegen</button>
 
-    <textarea
-      id="campus"
-      rows="1"
-      placeholder="Vers schreiben und Enter drücken..."
-    ></textarea>
-  </div>
-</div>
+      <div id="poemArea">
+        <div id="nuntii"></div>
+        <textarea
+          id="campus"
+          rows="1"
+          placeholder="Vers schreiben und Enter drücken..."
+        ></textarea>
+      </div>
+    </div>
 
+    <!-- Meine Texte -->
     <div id="meineTexte" class="tab-content" style="display: none;">
       <h2>Meine Texte</h2>
-      <button onclick="ladeVerse()">Aktualisieren</button>
+      <button onclick="ladeGedichtsliste()">Aktualisieren</button>
       <div id="meineTexteListe"></div>
+
+      <textarea id="editor" placeholder="Gedicht bearbeiten..."></textarea>
+      <br>
+      <button onclick="speichereEditor()">Speichern</button>
+      <button onclick="loescheAktuellesGedicht()">Löschen</button>
     </div>
   </div>
 
@@ -107,168 +175,224 @@
 
     const campus = document.getElementById("campus");
     const nuntii = document.getElementById("nuntii");
+    const poemTitle = document.getElementById("poemTitle");
     const meineTexteListe = document.getElementById("meineTexteListe");
+    const editor = document.getElementById("editor");
 
     let aktuellerUser = null;
+    let aktuellesGedicht = null;
 
-    window.zeigeTab = function (tabName) {
-      document.getElementById("login").style.display = "none";
-      document.getElementById("register").style.display = "none";
-      document.getElementById("hexameter").style.display = "none";
-      document.getElementById("meineTexte").style.display = "none";
+    // Tabs
+    window.zeigeTab = function(tabName) {
+      ["login", "register", "hexameter", "meineTexte"].forEach(id => {
+        document.getElementById(id).style.display = "none";
+      });
       document.getElementById(tabName).style.display = "block";
+
+      if (tabName === "meineTexte") {
+        ladeGedichtsliste();
+      }
     };
 
-    campus.addEventListener("keydown", function (event) {
+    // Vers eingeben
+    campus.addEventListener("keydown", async function(event) {
       if (event.key === "Enter" && !event.shiftKey) {
         event.preventDefault();
-        speichereVers();
+        await fuegeVersHinzu();
       }
     });
 
-    function zeigeVers(textus) {
-      const div = document.createElement("div");
-      div.className = "nuntius";
-      div.textContent = textus;
-      nuntii.appendChild(div);
+    function zeigeGedicht(textus) {
+      nuntii.innerHTML = "";
+      if (!textus) return;
+
+      textus.split("\n").forEach(vers => {
+        const div = document.createElement("div");
+        div.className = "nuntius";
+        div.textContent = vers;
+        nuntii.appendChild(div);
+      });
+
       nuntii.scrollTop = nuntii.scrollHeight;
     }
 
-    function zeigeEigenenText(id, textus) {
-  const div = document.createElement("div");
-  div.className = "nuntius";
-
-  const textarea = document.createElement("textarea");
-  textarea.value = textus;
-  textarea.style.minHeight = "120px";
-
-  const saveButton = document.createElement("button");
-  saveButton.textContent = "Speichern";
-  saveButton.onclick = function () {
-    bearbeiteVers(id, textarea.value);
-  };
-
-  const deleteButton = document.createElement("button");
-  deleteButton.textContent = "Löschen";
-  deleteButton.onclick = function () {
-    loescheVers(id);
-  };
-
-  div.appendChild(textarea);
-  div.appendChild(document.createElement("br"));
-  div.appendChild(saveButton);
-  div.appendChild(deleteButton);
-
-  meineTexteListe.appendChild(div);
-}
-
-    window.bearbeiteVers = async function (id, neuerText) {
-  if (!aktuellerUser) {
-    document.getElementById("status").textContent =
-      "Bitte zuerst einloggen.";
-    return;
-  }
-
-  if (neuerText.trim() === "") {
-    document.getElementById("status").textContent =
-      "Der Text darf nicht leer sein.";
-    return;
-  }
-
-  const { error } = await supabase
-    .from("versus")
-    .update({ textus: neuerText.trim() })
-    .eq("id", id)
-    .eq("user_id", aktuellerUser.id);
-
-  if (error) {
-    document.getElementById("status").textContent = error.message;
-    return;
-  }
-
-  document.getElementById("status").textContent = "Vers bearbeitet.";
-  await ladeVerse();
-};
-
-    window.loescheVers = async function (id) {
-  if (!aktuellerUser) {
-    document.getElementById("status").textContent =
-      "Bitte zuerst einloggen.";
-    return;
-  }
-
-  const { error } = await supabase
-    .from("versus")
-    .delete()
-    .eq("id", id)
-    .eq("user_id", aktuellerUser.id);
-
-  if (error) {
-    document.getElementById("status").textContent = error.message;
-    return;
-  }
-
-  document.getElementById("status").textContent = "Vers gelöscht.";
-
-  await ladeVerse();
-};
-
-    window.ladeVerse = async function () {
-  nuntii.innerHTML = "";
-  meineTexteListe.innerHTML = "";
-
-  if (!aktuellerUser) {
-    document.getElementById("status").textContent =
-      "Bitte zuerst einloggen.";
-    return;
-  }
-
-  const { data, error } = await supabase
-    .from("versus")
-    .select("id, textus, created_at")
-    .eq("user_id", aktuellerUser.id)
-    .order("created_at", { ascending: true });
-
-  if (error) {
-    document.getElementById("status").textContent = error.message;
-    return;
-  }
-
-data.forEach(vers => {
-    zeigeVers(vers.textus);
-    zeigeEigenenText(vers.id, vers.textus);
-  });
-};
-
-    async function speichereVers() {
-      const textus = campus.value.trim();
-      if (textus === "") return;
+    // Neues Gedicht
+    window.neuesGedicht = async function() {
+      const titulus = poemTitle.value.trim();
 
       if (!aktuellerUser) {
-        document.getElementById("status").textContent =
-          "Bitte zuerst einloggen.";
+        setStatus("Bitte zuerst einloggen.");
         return;
       }
 
-      const { error } = await supabase
-        .from("versus")
+      if (titulus === "") {
+        setStatus("Bitte einen Titel eingeben.");
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from("poemata")
         .insert({
           user_id: aktuellerUser.id,
-          textus: textus
-        });
+          titulus,
+          textus: ""
+        })
+        .select()
+        .single();
 
       if (error) {
-        document.getElementById("status").textContent = error.message;
+        setStatus(error.message);
         return;
       }
 
-      zeigeVers(textus);
-      zeigeEigenenText(textus);
+      aktuellesGedicht = data;
+      nuntii.innerHTML = "";
       campus.value = "";
-      document.getElementById("status").textContent = "Vers gespeichert.";
+      setStatus("Gedicht angelegt.");
+    };
+
+    // Vers anhängen
+    async function fuegeVersHinzu() {
+      const vers = campus.value.trim();
+      if (vers === "") return;
+
+      if (!aktuellesGedicht) {
+        setStatus("Bitte zuerst ein Gedicht anlegen oder öffnen.");
+        return;
+      }
+
+      const neuerText = aktuellesGedicht.textus
+        ? aktuellesGedicht.textus + "\n" + vers
+        : vers;
+
+      const { error } = await supabase
+        .from("poemata")
+        .update({
+          textus: neuerText,
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", aktuellesGedicht.id)
+        .eq("user_id", aktuellerUser.id);
+
+      if (error) {
+        setStatus(error.message);
+        return;
+      }
+
+      aktuellesGedicht.textus = neuerText;
+      zeigeGedicht(neuerText);
+      campus.value = "";
+      setStatus("Vers gespeichert.");
     }
 
-    window.registrieren = async function () {
+    // Gedichtsliste
+    window.ladeGedichtsliste = async function() {
+      meineTexteListe.innerHTML = "";
+      if (!aktuellerUser) return;
+
+      const { data, error } = await supabase
+        .from("poemata")
+        .select("id, titulus, textus, updated_at")
+        .eq("user_id", aktuellerUser.id)
+        .order("updated_at", { ascending: false });
+
+      if (error) {
+        setStatus(error.message);
+        return;
+      }
+
+      data.forEach(gedicht => {
+        const div = document.createElement("div");
+        div.className = "poem-item";
+
+        const title = document.createElement("strong");
+        title.textContent = gedicht.titulus;
+
+        const openButton = document.createElement("button");
+        openButton.textContent = "Öffnen";
+        openButton.onclick = () => oeffneGedicht(gedicht);
+
+        div.appendChild(title);
+        div.appendChild(document.createTextNode(" "));
+        div.appendChild(openButton);
+
+        meineTexteListe.appendChild(div);
+      });
+    };
+
+    function oeffneGedicht(gedicht) {
+      aktuellesGedicht = gedicht;
+      poemTitle.value = gedicht.titulus;
+      editor.value = gedicht.textus;
+      zeigeGedicht(gedicht.textus);
+      zeigeTab("meineTexte");
+      setStatus("Gedicht geöffnet.");
+    }
+
+    // Editor speichern
+    window.speichereEditor = async function() {
+      if (!aktuellesGedicht) {
+        setStatus("Kein Gedicht ausgewählt.");
+        return;
+      }
+
+      const neuerText = editor.value;
+
+      const { error } = await supabase
+        .from("poemata")
+        .update({
+          titulus: poemTitle.value.trim() || aktuellesGedicht.titulus,
+          textus: neuerText,
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", aktuellesGedicht.id)
+        .eq("user_id", aktuellerUser.id);
+
+      if (error) {
+        setStatus(error.message);
+        return;
+      }
+
+      aktuellesGedicht.titulus = poemTitle.value.trim() || aktuellesGedicht.titulus;
+      aktuellesGedicht.textus = neuerText;
+
+      zeigeGedicht(neuerText);
+      await ladeGedichtsliste();
+      setStatus("Gedicht gespeichert.");
+    };
+
+    // Löschen
+    window.loescheAktuellesGedicht = async function() {
+      if (!aktuellesGedicht) {
+        setStatus("Kein Gedicht ausgewählt.");
+        return;
+      }
+
+      const bestaetigt = confirm("Dieses Gedicht wirklich löschen?");
+      if (!bestaetigt) return;
+
+      const { error } = await supabase
+        .from("poemata")
+        .delete()
+        .eq("id", aktuellesGedicht.id)
+        .eq("user_id", aktuellerUser.id);
+
+      if (error) {
+        setStatus(error.message);
+        return;
+      }
+
+      aktuellesGedicht = null;
+      poemTitle.value = "";
+      editor.value = "";
+      nuntii.innerHTML = "";
+
+      await ladeGedichtsliste();
+      setStatus("Gedicht gelöscht.");
+    };
+
+    // Registrierung
+    window.registrieren = async function() {
       const username = document.getElementById("register_username").value.trim();
       const email = document.getElementById("register_email").value.trim();
       const password = document.getElementById("register_password").value;
@@ -286,44 +410,31 @@ data.forEach(vers => {
         return;
       }
 
-      const user = data.user;
-
-      if (!user) {
-        document.getElementById("register_status").textContent =
-          "Konto erstellt. Bitte bestätige ggf. deine E-Mail.";
-        return;
-      }
-
-      const { error: profileError } = await supabase
-        .from("profiles")
-        .insert({
-          id: user.id,
-          username: username
+      if (data.user) {
+        await supabase.from("profiles").insert({
+          id: data.user.id,
+          username
         });
+      }
 
       document.getElementById("register_status").textContent =
-        profileError ? profileError.message : "Konto erfolgreich erstellt.";
+        "Konto erfolgreich erstellt.";
     };
 
-    window.einloggen = async function () {
-      const identifier = document.getElementById("login_identifier").value.trim();
+    // Anmeldung
+    window.einloggen = async function() {
+      const email = document.getElementById("login_identifier").value.trim();
       const password = document.getElementById("login_password").value;
 
-      if (identifier === "") {
-        document.getElementById("login_status").textContent =
-          "Bitte Benutzername oder E-Mail eingeben.";
-        return;
-      }
-
-      if (!identifier.includes("@")) {
+      if (!email.includes("@")) {
         document.getElementById("login_status").textContent =
           "Bitte vorerst mit E-Mail-Adresse anmelden.";
         return;
       }
 
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: identifier,
-        password: password
+        email,
+        password
       });
 
       if (error) {
@@ -333,36 +444,43 @@ data.forEach(vers => {
 
       aktuellerUser = data.user;
       document.getElementById("login_status").textContent = "Eingeloggt.";
-      document.getElementById("status").textContent = "Eingeloggt.";
 
-      await ladeVerse();
+      await ladeGedichtsliste();
       zeigeTab("hexameter");
+      setStatus("Eingeloggt.");
     };
 
-    window.ausloggen = async function () {
+    // Ausloggen
+    window.ausloggen = async function() {
       await supabase.auth.signOut();
 
       aktuellerUser = null;
+      aktuellesGedicht = null;
+
+      poemTitle.value = "";
+      campus.value = "";
+      editor.value = "";
       nuntii.innerHTML = "";
       meineTexteListe.innerHTML = "";
-      campus.value = "";
 
-      document.getElementById("status").textContent = "Ausgeloggt.";
       zeigeTab("login");
+      setStatus("Ausgeloggt.");
     };
 
+    // Sitzung wiederherstellen
     async function pruefeSitzung() {
       const { data } = await supabase.auth.getSession();
 
-      if (data.session && data.session.user) {
+      if (data.session?.user) {
         aktuellerUser = data.session.user;
-
-        document.getElementById("status").textContent = "Eingeloggt.";
-        document.getElementById("login_status").textContent = "Bereits eingeloggt.";
-
-        await ladeVerse();
+        await ladeGedichtsliste();
         zeigeTab("hexameter");
+        setStatus("Bereits eingeloggt.");
       }
+    }
+
+    function setStatus(text) {
+      document.getElementById("status").textContent = text;
     }
 
     pruefeSitzung();
