@@ -244,6 +244,7 @@
   <div id="sideMenu" class="side-menu">
   <button onclick="zeigeTab('hexameter')">Hexameter</button>
   <button onclick="zeigeTab('meineTexte')">Meine Texte</button>
+  <button onclick="zeigeTab('profil')">Profil</button>
 
   <div id="authLoggedOut" class="auth-bottom">
     <button onclick="zeigeTab('login')">Anmeldung</button>
@@ -359,10 +360,29 @@
 
     let aktuellerUser = null;
     let aktuellesGedicht = null;
+
+    // Profil
+    <div id="profil" class="tab-content" style="display: none;">
+      <h2>Profil</h2>
+    
+      <input
+        id="profilUsername"
+        type="text"
+        placeholder="Benutzername"
+      >
+    
+      <br>
+    
+      <button onclick="speichereProfil()">
+        Benutzernamen speichern
+      </button>
+    
+      <p id="profil_status" class="status"></p>
+    </div>
     
     // Tabs
     window.zeigeTab = function(tabName) {
-      ["login", "register", "hexameter", "meineTexte"].forEach(id => {
+      ["login", "register", "hexameter", "meineTexte", "profil"].forEach(id => {
         document.getElementById(id).style.display = "none";
       });
       document.getElementById(tabName).style.display = "block";
@@ -371,6 +391,10 @@
       if (tabName === "meineTexte") {
         ladeGedichtsliste();
       }
+      
+      if (tabName === "profil") {
+        ladeProfil();
+      }      
     };
 
     // Vers eingeben
@@ -800,6 +824,62 @@ async function aktualisiereMenuButton() {
       document.getElementById("authLoggedIn").style.display =
         aktuellerUser ? "block" : "none";
     }
+
+    // Benutzernamen ändern
+    async function ladeProfil() {
+      if (!aktuellerUser) {
+        document.getElementById("profil_status").textContent =
+          "Bitte zuerst einloggen.";
+        return;
+      }
+    
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("username")
+        .eq("id", aktuellerUser.id)
+        .single();
+    
+      if (error) {
+        document.getElementById("profil_status").textContent = error.message;
+        return;
+      }
+    
+      document.getElementById("profilUsername").value = data.username;
+    }
+    
+    window.speichereProfil = async function () {
+      if (!aktuellerUser) {
+        document.getElementById("profil_status").textContent =
+          "Bitte zuerst einloggen.";
+        return;
+      }
+    
+      const username = document
+        .getElementById("profilUsername")
+        .value
+        .trim();
+    
+      if (username === "") {
+        document.getElementById("profil_status").textContent =
+          "Der Benutzername darf nicht leer sein.";
+        return;
+      }
+    
+      const { error } = await supabase
+        .from("profiles")
+        .update({ username })
+        .eq("id", aktuellerUser.id);
+    
+      if (error) {
+        document.getElementById("profil_status").textContent = error.message;
+        return;
+      }
+    
+      document.getElementById("profil_status").textContent =
+        "Benutzername gespeichert.";
+    
+      await aktualisiereMenuButton();
+    };
 
     pruefeSitzung();
   </script>
