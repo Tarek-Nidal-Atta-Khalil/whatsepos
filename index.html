@@ -61,26 +61,79 @@
 
 <body>
   <div class="container">
-    <h1>Scriptorium</h1>
+  <h1>Scriptorium</h1>
 
-    <div class="tabs">
-      <button onclick="zeigeTab('login')">Anmeldung</button>
-      <button onclick="zeigeTab('hexameter')">Hexameter</button>
-    </div>
+  <div class="tabs">
+    <button onclick="zeigeTab('login')">Anmeldung</button>
+    <button onclick="zeigeTab('register')">Registrierung</button>
+    <button onclick="zeigeTab('hexameter')">Hexameter</button>
+  </div>
 
-    <div id="login" class="tab-content">
-      <input id="username" type="text" placeholder="Benutzername">
-      <input id="email" type="email" placeholder="E-Mail">
-      <input id="password" type="password" placeholder="Passwort">
+  <!-- Anmeldung -->
+  <div id="login" class="tab-content">
+    <input
+      id="login_identifier"
+      type="text"
+      placeholder="Benutzername oder E-Mail"
+    >
 
-      <br>
+    <input
+      id="login_password"
+      type="password"
+      placeholder="Passwort"
+    >
 
-      <button onclick="registrieren()">Konto erstellen</button>
-      <button onclick="einloggen()">Einloggen</button>
-      <button onclick="ausloggen()">Ausloggen</button>
+    <br>
 
-      <p id="status"></p>
-    </div>
+    <button onclick="einloggen()">
+      Einloggen
+    </button>
+
+    <p id="login_status"></p>
+  </div>
+
+  <!-- Registrierung -->
+  <div id="register" class="tab-content" style="display: none;">
+    <input
+      id="register_username"
+      type="text"
+      placeholder="Benutzername"
+    >
+
+    <input
+      id="register_email"
+      type="email"
+      placeholder="E-Mail"
+    >
+
+    <input
+      id="register_password"
+      type="password"
+      placeholder="Passwort"
+    >
+
+    <br>
+
+    <button onclick="registrieren()">
+      Konto erstellen
+    </button>
+
+    <p id="register_status"></p>
+  </div>
+
+  <!-- Hexameter -->
+  <div id="hexameter" class="tab-content" style="display: none;">
+    <button onclick="ausloggen()">Ausloggen</button>
+    <p id="status"></p>
+
+    <textarea
+      id="campus"
+      placeholder="Hic scribe et preme Enter..."
+    ></textarea>
+
+    <div id="nuntii"></div>
+  </div>
+</div>
 
     <div id="hexameter" class="tab-content" style="display: none;">
       <textarea id="campus" placeholder="Hic scribe et preme Enter..."></textarea>
@@ -126,50 +179,88 @@
     }
 
     window.registrieren = async function () {
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-  const username = document.getElementById("username").value.trim();
+  const username = document.getElementById("register_username").value.trim();
+  const email = document.getElementById("register_email").value;
+  const password = document.getElementById("register_password").value;
 
   if (username === "") {
-    document.getElementById("status").textContent = "Bitte Benutzernamen eingeben.";
+    document.getElementById("register_status").textContent =
+      "Bitte Benutzernamen eingeben.";
     return;
   }
 
-  const { data, error } = await supabase.auth.signUp({ email, password });
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password
+  });
 
   if (error) {
-    document.getElementById("status").textContent = error.message;
+    document.getElementById("register_status").textContent =
+      error.message;
     return;
   }
 
   const user = data.user;
 
-      if (!user) {
-  document.getElementById("status").textContent =
-    "Konto erstellt. Bitte bestätige ggf. deine E-Mail.";
-  return;
-}
-
-  if (user) {
-    const { error: profileError } = await supabase
-      .from("profiles")
-      .insert({ id: user.id, username });
-
-    document.getElementById("status").textContent =
-      profileError ? profileError.message : "Konto mit Benutzername erstellt.";
+  if (!user) {
+    document.getElementById("register_status").textContent =
+      "Konto erstellt. Bitte bestätige ggf. deine E-Mail.";
+    return;
   }
+
+  const { error: profileError } = await supabase
+    .from("profiles")
+    .insert({
+      id: user.id,
+      username
+    });
+
+  document.getElementById("register_status").textContent =
+    profileError
+      ? profileError.message
+      : "Konto erfolgreich erstellt.";
 };
     
     window.einloggen = async function () {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
+  const identifier =
+    document.getElementById("login_identifier").value.trim();
 
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+  const password =
+    document.getElementById("login_password").value;
 
-      document.getElementById("status").textContent =
-        error ? error.message : "Eingeloggt.";
-    };
+  let email = identifier;
 
+  // Wenn kein @ vorhanden ist, als Benutzername interpretieren
+  if (!identifier.includes("@")) {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("id")
+      .eq("username", identifier)
+      .single();
+
+    if (error || !data) {
+      document.getElementById("login_status").textContent =
+        "Benutzername nicht gefunden.";
+      return;
+    }
+
+    // E-Mail des Benutzers aus auth.users ist nicht direkt verfügbar.
+    // Für den Login über Benutzername müsste zusätzlich die E-Mail
+    // in der profiles-Tabelle gespeichert werden.
+    document.getElementById("login_status").textContent =
+      "Bitte vorerst mit E-Mail-Adresse anmelden.";
+    return;
+  }
+
+  const { error } = await supabase.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  document.getElementById("login_status").textContent =
+    error ? error.message : "Eingeloggt.";
+};
+    
     window.ausloggen = async function () {
       await supabase.auth.signOut();
       document.getElementById("status").textContent = "Ausgeloggt.";
