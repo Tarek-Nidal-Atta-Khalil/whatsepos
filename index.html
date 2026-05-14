@@ -5,7 +5,6 @@
     <title>Whatsepos</title>
 
     <style>
-        /* Totam paginam centrat */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -13,21 +12,36 @@
             text-align: center;
         }
 
-        /* Container qui semper 5 cm a marginibus abest */
+        /* Container mit 5 cm Abstand links und rechts */
         .container {
-            width: calc(100% - 10cm); /* 5 cm sinistra + 5 cm dextra */
-            max-width: 1200px;        /* ne nimis late extendatur */
-            margin: 40px auto;        /* auto = centrum horizontale */
+            width: calc(100% - 10cm);
+            max-width: 1200px;
+            margin: 40px auto;
         }
 
-        /* Magna area scribendi */
+        /* Großes Eingabefeld */
         textarea {
-            width: 100%;              /* totam latitudinem containeris occupat */
-            min-height: 300px;        /* satis alta */
-            font-size: 24px;          /* litterae maiores */
+            width: 100%;
+            min-height: 300px;
+            font-size: 24px;
             padding: 20px;
-            box-sizing: border-box;   /* padding in latitudine computatur */
-            resize: vertical;         /* usor altitudinem mutare potest */
+            box-sizing: border-box;
+            resize: vertical;
+        }
+
+        /* Bereich für gespeicherte Nachrichten */
+        #nuntii {
+            margin-top: 30px;
+            text-align: left;
+        }
+
+        /* Einzelne Nachricht */
+        .nuntius {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #ccc;
+            font-size: 24px;
+            white-space: pre-wrap;
         }
     </style>
 </head>
@@ -36,8 +50,45 @@
     <div class="container">
         <h1>Scriptorium</h1>
 
-        <textarea placeholder="Hic scribe..."></textarea>
+        <textarea
+            id="campus"
+            placeholder="Hic scribe et preme Enter..."
+        ></textarea>
+
+        <div id="nuntii"></div>
     </div>
+
+    <script>
+        const campus = document.getElementById("campus");
+        const nuntii = document.getElementById("nuntii");
+
+        // Wenn Enter gedrückt wird, Nachricht speichern
+        campus.addEventListener("keydown", function(event) {
+            if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault(); // verhindert Zeilenumbruch
+                addeNuntium();
+            }
+        });
+
+        function addeNuntium() {
+            const textus = campus.value.trim();
+
+            if (textus === "") {
+                return;
+            }
+
+            // Neues Element erzeugen
+            const div = document.createElement("div");
+            div.className = "nuntius";
+            div.textContent = textus;
+
+            // Unter die bisherigen Nachrichten setzen
+            nuntii.appendChild(div);
+
+            // Eingabefeld leeren
+            campus.value = "";
+        }
+    </script>
 
 </body>
 </html>
