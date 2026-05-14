@@ -263,8 +263,6 @@
       <p id="status" class="status"></p>
 
       <input id="poemTitle" type="text" placeholder="Titel des Gedichts">
-      <br>
-      <button onclick="neuesGedicht()">Neues Gedicht anlegen</button>
 
       <div id="poemArea">
         <div id="nuntii"></div>
@@ -279,7 +277,23 @@
     <!-- Meine Texte -->
     <div id="meineTexte" class="tab-content" style="display: none;">
       <h2>Meine Texte</h2>
-      <button onclick="ladeGedichtsliste()">Aktualisieren</button>
+    
+      <input
+        id="neuerTitel"
+        type="text"
+        placeholder="Titel des neuen Gedichts"
+      >
+    
+      <br>
+    
+      <button onclick="neuesGedichtAusListe()">
+        Neues Gedicht anlegen
+      </button>
+    
+      <button onclick="ladeGedichtsliste()">
+        Aktualisieren
+      </button>
+    
       <div id="meineTexteListe"></div>
     </div>
   </div>
