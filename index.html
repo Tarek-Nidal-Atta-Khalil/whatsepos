@@ -110,18 +110,52 @@
       min-height: 400px;
       margin-top: 20px;
     }
+
+    #menuButton {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1001;
+    }
+    
+    .side-menu {
+      position: fixed;
+      top: 0;
+      left: -260px;
+      width: 240px;
+      height: 100vh;
+      background: white;
+      border-right: 1px solid #ccc;
+      padding-top: 80px;
+      transition: left 0.3s ease;
+      z-index: 1000;
+    }
+    
+    .side-menu.open {
+      left: 0;
+    }
+    
+    .side-menu button {
+      display: block;
+      width: 200px;
+      margin: 10px auto;
+      text-align: left;
+    }
+    
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Scriptorium</h1>
 
-    <div class="tabs">
-      <button onclick="zeigeTab('login')">Anmeldung</button>
-      <button onclick="zeigeTab('register')">Registrierung</button>
-      <button onclick="zeigeTab('hexameter')">Hexameter</button>
-      <button onclick="zeigeTab('meineTexte')">Meine Texte</button>
-    </div>
+  <button id="menuButton" onclick="toggleMenu()">☰ Menü</button>
+
+  <div id="sideMenu" class="side-menu">
+    <button onclick="zeigeTab('login')">Anmeldung</button>
+    <button onclick="zeigeTab('register')">Registrierung</button>
+    <button onclick="zeigeTab('hexameter')">Hexameter</button>
+    <button onclick="zeigeTab('meineTexte')">Meine Texte</button>
+  </div>
 
     <!-- Anmeldung -->
     <div id="login" class="tab-content">
@@ -190,13 +224,14 @@
 
     let aktuellerUser = null;
     let aktuellesGedicht = null;
-
+    
     // Tabs
     window.zeigeTab = function(tabName) {
       ["login", "register", "hexameter", "meineTexte"].forEach(id => {
         document.getElementById(id).style.display = "none";
       });
       document.getElementById(tabName).style.display = "block";
+      document.getElementById("sideMenu").classList.remove("open");
 
       if (tabName === "meineTexte") {
         ladeGedichtsliste();
