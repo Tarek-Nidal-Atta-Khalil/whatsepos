@@ -48,6 +48,25 @@
 <body>
 
     <div class="container">
+
+<div class="tabs">
+    <button onclick="zeigeTab('login')">Anmeldung</button>
+    <button onclick="zeigeTab('hexameter')">Hexameter</button>
+</div>
+
+<div id="login" class="tab-content">
+    <!-- HIER kommt dein bestehender Login-Bereich hinein -->
+</div>
+
+<div id="hexameter" class="tab-content" style="display: none;">
+    <textarea
+        id="campus"
+        placeholder="Hic scribe et preme Enter..."
+    ></textarea>
+
+    <div id="nuntii"></div>
+</div>
+        
         <h1>Scriptorium</h1>
 
 <div style="margin-bottom: 30px;">
