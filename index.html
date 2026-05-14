@@ -21,47 +21,41 @@
     margin-top: 20px;
 }
         
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            text-align: center;
-        }
+        <body>
+    <div class="container">
+        <!-- Reiter -->
+        <div class="tabs">
+            <button onclick="zeigeTab('login')">Anmeldung</button>
+            <button onclick="zeigeTab('hexameter')">Hexameter</button>
+        </div>
 
-        /* Container mit 5 cm Abstand links und rechts */
-        .container {
-            width: calc(100% - 10cm);
-            max-width: 1200px;
-            margin: 40px auto;
-        }
+        <!-- Anmeldung -->
+        <div id="login" class="tab-content">
+            <h1>Scriptorium</h1>
 
-        /* Großes Eingabefeld */
-        textarea {
-            width: 100%;
-            min-height: 300px;
-            font-size: 24px;
-            padding: 20px;
-            box-sizing: border-box;
-            resize: vertical;
-        }
+            <input id="email" type="email" placeholder="E-Mail">
+            <input id="password" type="password" placeholder="Passwort">
 
-        /* Bereich für gespeicherte Nachrichten */
-        #nuntii {
-            margin-top: 30px;
-            text-align: left;
-        }
+            <br>
 
-        /* Einzelne Nachricht */
-        .nuntius {
-            padding: 10px;
-            margin-bottom: 10px;
-            border-bottom: 1px solid #ccc;
-            font-size: 24px;
-            white-space: pre-wrap;
-        }
-    </style>
-</head>
-<body>
+            <button onclick="registrieren()">Konto erstellen</button>
+            <button onclick="einloggen()">Einloggen</button>
+            <button onclick="ausloggen()">Ausloggen</button>
+
+            <p id="status"></p>
+        </div>
+
+        <!-- Hexameter -->
+        <div id="hexameter" class="tab-content" style="display: none;">
+            <textarea
+                id="campus"
+                placeholder="Hic scribe et preme Enter..."
+            ></textarea>
+
+            <div id="nuntii"></div>
+        </div>
+    </div>
+</body>
 
     <div class="container">
 
