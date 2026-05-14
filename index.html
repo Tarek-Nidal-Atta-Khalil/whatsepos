@@ -11,32 +11,36 @@
     .tabs { margin-bottom: 30px; }
     .tabs button, button { font-size: 20px; padding: 10px 20px; margin: 5px; cursor: pointer; }
     input { font-size: 20px; padding: 10px; margin: 5px; width: min(100%, 320px); box-sizing: border-box; }
-    textarea {
+    
+    #poemArea {
+  height: calc(100vh - 220px);
+  display: flex;
+  flex-direction: column;
+}
+
+     #nuntii {
+  flex: 1;
+  overflow-y: auto;
+  text-align: left;
+  padding-bottom: 20px;
+}
+
+      .nuntius {
+  padding: 6px 0;
+  font-size: 24px;
+  white-space: pre-wrap;
+}
+
+       textarea {
   width: 100%;
+  height: 48px;
   min-height: 48px;
-  max-height: 120px;
+  max-height: 48px;
   font-size: 24px;
   padding: 10px 14px;
   box-sizing: border-box;
   resize: none;
-}
-
-#poemArea {
-  min-height: 60vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-#nuntii {
-  margin-bottom: 20px;
-  text-align: left;
-}
-
-.nuntius {
-  padding: 6px 0;
-  font-size: 24px;
-  white-space: pre-wrap;
+  margin-bottom: 3cm;
 }
     .status { min-height: 1.5em; margin-top: 10px; }
   </style>
