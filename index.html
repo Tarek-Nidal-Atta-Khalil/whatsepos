@@ -515,13 +515,17 @@
     // Sitzung wiederherstellen
     async function pruefeSitzung() {
       const { data } = await supabase.auth.getSession();
-
+    
       if (data.session?.user) {
         aktuellerUser = data.session.user;
         aktualisiereAuthMenu();
         await ladeGedichtsliste();
         zeigeTab("hexameter");
         setStatus("Bereits eingeloggt.");
+      } else {
+        aktuellerUser = null;
+        aktualisiereAuthMenu();
+        zeigeTab("login");
       }
     }
 
