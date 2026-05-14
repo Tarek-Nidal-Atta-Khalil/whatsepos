@@ -239,6 +239,11 @@
   </div>
 
   <script type="module">
+  window.toggleMenu = function () {
+    document.getElementById("sideMenu").classList.toggle("open");
+  };
+
+  import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
     const supabase = createClient(
@@ -274,11 +279,6 @@
         await fuegeVersHinzu();
       }
     });
-
-    //menü ausklappen
-    window.toggleMenu = function () {
-      document.getElementById("sideMenu").classList.toggle("open");
-    };
 
     function zeigeGedicht(textus) {
       nuntii.innerHTML = "";
