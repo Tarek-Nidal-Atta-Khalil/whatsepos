@@ -129,6 +129,14 @@
     </div>
 
    <script type="module">
+
+       window.zeigeTab = function(tabName) {
+    document.getElementById("login").style.display = "none";
+    document.getElementById("hexameter").style.display = "none";
+
+    document.getElementById(tabName).style.display = "block";
+};
+       
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
     /*
