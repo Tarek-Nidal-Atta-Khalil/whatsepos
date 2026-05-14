@@ -1,205 +1,153 @@
 <!DOCTYPE html>
 <html lang="la">
 <head>
-    <meta charset="UTF-8">
-    <title>Whatsepos</title>
+  <meta charset="UTF-8">
+  <title>Whatsepos</title>
 
-    <style>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      text-align: center;
+    }
 
-.tabs {
-    margin-bottom: 30px;
-}
+    .container {
+      width: calc(100% - 10cm);
+      max-width: 1200px;
+      margin: 40px auto;
+    }
 
-.tabs button {
-    font-size: 22px;
-    padding: 10px 20px;
-    margin: 5px;
-    cursor: pointer;
-}
+    .tabs {
+      margin-bottom: 30px;
+    }
 
-.tab-content {
-    margin-top: 20px;
-}
-        
-        <body>
-    <div class="container">
-        <!-- Reiter -->
-        <div class="tabs">
-            <button onclick="zeigeTab('login')">Anmeldung</button>
-            <button onclick="zeigeTab('hexameter')">Hexameter</button>
-        </div>
+    .tabs button,
+    button {
+      font-size: 20px;
+      padding: 10px 20px;
+      margin: 5px;
+      cursor: pointer;
+    }
 
-        <!-- Anmeldung -->
-        <div id="login" class="tab-content">
-            <h1>Scriptorium</h1>
+    input {
+      font-size: 20px;
+      padding: 10px;
+      margin: 5px;
+    }
 
-            <input id="email" type="email" placeholder="E-Mail">
-            <input id="password" type="password" placeholder="Passwort">
+    textarea {
+      width: 100%;
+      min-height: 300px;
+      font-size: 24px;
+      padding: 20px;
+      box-sizing: border-box;
+      resize: vertical;
+    }
 
-            <br>
+    #nuntii {
+      margin-top: 30px;
+      text-align: left;
+    }
 
-            <button onclick="registrieren()">Konto erstellen</button>
-            <button onclick="einloggen()">Einloggen</button>
-            <button onclick="ausloggen()">Ausloggen</button>
+    .nuntius {
+      padding: 10px;
+      margin-bottom: 10px;
+      border-bottom: 1px solid #ccc;
+      font-size: 24px;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
 
-            <p id="status"></p>
-        </div>
+<body>
+  <div class="container">
+    <h1>Scriptorium</h1>
 
-        <!-- Hexameter -->
-        <div id="hexameter" class="tab-content" style="display: none;">
-            <textarea
-                id="campus"
-                placeholder="Hic scribe et preme Enter..."
-            ></textarea>
-
-            <div id="nuntii"></div>
-        </div>
-    </div>
-</body>
-
-    <div class="container">
-
-<div class="tabs">
-    <button onclick="zeigeTab('login')">Anmeldung</button>
-    <button onclick="zeigeTab('hexameter')">Hexameter</button>
-</div>
-
-<div id="login" class="tab-content">
-    <!-- HIER kommt dein bestehender Login-Bereich hinein -->
-</div>
-
-<div id="hexameter" class="tab-content" style="display: none;">
-    <textarea
-        id="campus"
-        placeholder="Hic scribe et preme Enter..."
-    ></textarea>
-
-    <div id="nuntii"></div>
-</div>
-        
-        <h1>Scriptorium</h1>
-
-<div style="margin-bottom: 30px;">
-    <input
-        id="email"
-        type="email"
-        placeholder="E-Mail"
-        style="font-size: 20px; padding: 10px; margin: 5px;"
-    >
-
-    <input
-        id="password"
-        type="password"
-        placeholder="Passwort"
-        style="font-size: 20px; padding: 10px; margin: 5px;"
-    >
-
-    <br>
-
-    <button onclick="registrieren()"
-            style="font-size: 20px; padding: 10px; margin: 5px;">
-        Konto erstellen
-    </button>
-
-    <button onclick="einloggen()"
-            style="font-size: 20px; padding: 10px; margin: 5px;">
-        Einloggen
-    </button>
-
-    <button onclick="ausloggen()"
-            style="font-size: 20px; padding: 10px; margin: 5px;">
-        Ausloggen
-    </button>
-
-    <p id="status"></p>
-</div>
-        
-        <textarea
-            id="campus"
-            placeholder="Hic scribe et preme Enter..."
-        ></textarea>
-
-        <div id="nuntii"></div>
+    <div class="tabs">
+      <button onclick="zeigeTab('login')">Anmeldung</button>
+      <button onclick="zeigeTab('hexameter')">Hexameter</button>
     </div>
 
-   <script type="module">
+    <div id="login" class="tab-content">
+      <input id="email" type="email" placeholder="E-Mail">
+      <input id="password" type="password" placeholder="Passwort">
 
-       window.zeigeTab = function(tabName) {
-    document.getElementById("login").style.display = "none";
-    document.getElementById("hexameter").style.display = "none";
+      <br>
 
-    document.getElementById(tabName).style.display = "block";
-};
-       
+      <button onclick="registrieren()">Konto erstellen</button>
+      <button onclick="einloggen()">Einloggen</button>
+      <button onclick="ausloggen()">Ausloggen</button>
+
+      <p id="status"></p>
+    </div>
+
+    <div id="hexameter" class="tab-content" style="display: none;">
+      <textarea id="campus" placeholder="Hic scribe et preme Enter..."></textarea>
+      <div id="nuntii"></div>
+    </div>
+  </div>
+
+  <script type="module">
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-    /*
-      HIER DEINE WERTE EINTRAGEN
-    */
     const supabase = createClient(
-        "https://sdjhpovsechtfdwwakmm.supabase.co",
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNkamhwb3ZzZWNodGZkd3dha21tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NjIyNTIsImV4cCI6MjA5NDMzODI1Mn0.cyWJGEdA84bGAKyBcNYAXtJBLcf9Lo12oYn5CEAPhf4"
+      "https://sdjhpovsechtfdwwakmm.supabase.co",
+      "DEIN_ANON_PUBLIC_KEY_HIER_EINFÜGEN"
     );
 
     const campus = document.getElementById("campus");
     const nuntii = document.getElementById("nuntii");
 
-    // ===== Nachrichten speichern bei Enter =====
+    window.zeigeTab = function(tabName) {
+      document.getElementById("login").style.display = "none";
+      document.getElementById("hexameter").style.display = "none";
+      document.getElementById(tabName).style.display = "block";
+    };
+
     campus.addEventListener("keydown", function(event) {
-        if (event.key === "Enter" && !event.shiftKey) {
-            event.preventDefault();
-            addeNuntium();
-        }
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        addeNuntium();
+      }
     });
 
     function addeNuntium() {
-        const textus = campus.value.trim();
+      const textus = campus.value.trim();
 
-        if (textus === "") {
-            return;
-        }
+      if (textus === "") return;
 
-        const div = document.createElement("div");
-        div.className = "nuntius";
-        div.textContent = textus;
+      const div = document.createElement("div");
+      div.className = "nuntius";
+      div.textContent = textus;
 
-        nuntii.appendChild(div);
-        campus.value = "";
+      nuntii.appendChild(div);
+      campus.value = "";
     }
 
-    // ===== Benutzerkonten =====
-    // Damit die Buttons im HTML funktionieren, machen wir die Funktionen global.
     window.registrieren = async function () {
-        const email = document.getElementById("email").value;
-        const password = document.getElementById("password").value;
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
 
-        const { error } = await supabase.auth.signUp({
-            email,
-            password
-        });
+      const { error } = await supabase.auth.signUp({ email, password });
 
-        document.getElementById("status").textContent =
-            error ? error.message : "Konto erstellt.";
+      document.getElementById("status").textContent =
+        error ? error.message : "Konto erstellt.";
     };
 
     window.einloggen = async function () {
-        const email = document.getElementById("email").value;
-        const password = document.getElementById("password").value;
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
 
-        const { error } = await supabase.auth.signInWithPassword({
-            email,
-            password
-        });
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
 
-        document.getElementById("status").textContent =
-            error ? error.message : "Eingeloggt.";
+      document.getElementById("status").textContent =
+        error ? error.message : "Eingeloggt.";
     };
 
     window.ausloggen = async function () {
-        await supabase.auth.signOut();
-        document.getElementById("status").textContent = "Ausgeloggt.";
+      await supabase.auth.signOut();
+      document.getElementById("status").textContent = "Ausgeloggt.";
     };
-</script>
-
+  </script>
 </body>
 </html>
