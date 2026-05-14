@@ -11,9 +11,33 @@
     .tabs { margin-bottom: 30px; }
     .tabs button, button { font-size: 20px; padding: 10px 20px; margin: 5px; cursor: pointer; }
     input { font-size: 20px; padding: 10px; margin: 5px; width: min(100%, 320px); box-sizing: border-box; }
-    textarea { width: 100%; min-height: 300px; font-size: 24px; padding: 20px; box-sizing: border-box; resize: vertical; }
-    #nuntii, #meineTexteListe { margin-top: 30px; text-align: left; }
-    .nuntius { padding: 10px; margin-bottom: 10px; border-bottom: 1px solid #ccc; font-size: 24px; white-space: pre-wrap; }
+    textarea {
+  width: 100%;
+  min-height: 48px;
+  max-height: 120px;
+  font-size: 24px;
+  padding: 10px 14px;
+  box-sizing: border-box;
+  resize: none;
+}
+
+#poemArea {
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+#nuntii {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.nuntius {
+  padding: 6px 0;
+  font-size: 24px;
+  white-space: pre-wrap;
+}
     .status { min-height: 1.5em; margin-top: 10px; }
   </style>
 </head>
@@ -47,11 +71,19 @@
     </div>
 
     <div id="hexameter" class="tab-content" style="display: none;">
-      <button onclick="ausloggen()">Ausloggen</button>
-      <p id="status" class="status"></p>
-      <textarea id="campus" placeholder="Hic scribe et preme Enter..."></textarea>
-      <div id="nuntii"></div>
-    </div>
+  <button onclick="ausloggen()">Ausloggen</button>
+  <p id="status" class="status"></p>
+
+  <div id="poemArea">
+    <div id="nuntii"></div>
+
+    <textarea
+      id="campus"
+      rows="1"
+      placeholder="Vers schreiben und Enter drücken..."
+    ></textarea>
+  </div>
+</div>
 
     <div id="meineTexte" class="tab-content" style="display: none;">
       <h2>Meine Texte</h2>
