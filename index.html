@@ -96,39 +96,74 @@
       nuntii.appendChild(div);
     }
 
-    function zeigeEigenenText(textus) {
-      const div = document.createElement("div");
-      div.className = "nuntius";
-      div.textContent = textus;
-      meineTexteListe.appendChild(div);
-    }
+    function zeigeEigenenText(id, textus) {
+  const div = document.createElement("div");
+  div.className = "nuntius";
+
+  const textElement = document.createElement("div");
+  textElement.textContent = textus;
+
+  const deleteButton = document.createElement("button");
+  deleteButton.textContent = "Löschen";
+  deleteButton.onclick = function () {
+    loescheVers(id);
+  };
+
+  div.appendChild(textElement);
+  div.appendChild(deleteButton);
+
+  meineTexteListe.appendChild(div);
+};
+
+    window.loescheVers = async function (id) {
+  if (!aktuellerUser) {
+    document.getElementById("status").textContent =
+      "Bitte zuerst einloggen.";
+    return;
+  }
+
+  const { error } = await supabase
+    .from("versus")
+    .delete()
+    .eq("id", id)
+    .eq("user_id", aktuellerUser.id);
+
+  if (error) {
+    document.getElementById("status").textContent = error.message;
+    return;
+  }
+
+  document.getElementById("status").textContent = "Vers gelöscht.";
+
+  await ladeVerse();
+};
 
     window.ladeVerse = async function () {
-      nuntii.innerHTML = "";
-      meineTexteListe.innerHTML = "";
+  nuntii.innerHTML = "";
+  meineTexteListe.innerHTML = "";
 
-      if (!aktuellerUser) {
-        document.getElementById("status").textContent =
-          "Bitte zuerst einloggen.";
-        return;
-      }
+  if (!aktuellerUser) {
+    document.getElementById("status").textContent =
+      "Bitte zuerst einloggen.";
+    return;
+  }
 
-      const { data, error } = await supabase
-        .from("versus")
-        .select("textus, created_at")
-        .eq("user_id", aktuellerUser.id)
-        .order("created_at", { ascending: true });
+  const { data, error } = await supabase
+    .from("versus")
+    .select("id, textus, created_at")
+    .eq("user_id", aktuellerUser.id)
+    .order("created_at", { ascending: true });
 
-      if (error) {
-        document.getElementById("status").textContent = error.message;
-        return;
-      }
+  if (error) {
+    document.getElementById("status").textContent = error.message;
+    return;
+  }
 
-      data.forEach(vers => {
-        zeigeVers(vers.textus);
-        zeigeEigenenText(vers.textus);
-      });
-    };
+  data.forEach(vers => {
+    zeigeVers(vers.textus);
+    zeigeEigenenText(vers.id, vers.textus);
+  });
+};
 
     async function speichereVers() {
       const textus = campus.value.trim();
