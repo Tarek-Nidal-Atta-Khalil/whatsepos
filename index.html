@@ -401,18 +401,10 @@
     function oeffneGedicht(gedicht) {
       aktuellesGedicht = gedicht;
       poemTitle.value = gedicht.titulus;
-      editor.value = gedicht.textus;
       zeigeGedicht(gedicht.textus);
+      zeigeTab("hexameter");
       setStatus("Gedicht geöffnet.");
     }
-
-      aktuellesGedicht.titulus = poemTitle.value.trim() || aktuellesGedicht.titulus;
-      aktuellesGedicht.textus = neuerText;
-
-      zeigeGedicht(neuerText);
-      await ladeGedichtsliste();
-      setStatus("Gedicht gespeichert.");
-    };
 
     // Löschen
     window.loescheAktuellesGedicht = async function() {
@@ -437,7 +429,6 @@
 
       aktuellesGedicht = null;
       poemTitle.value = "";
-      editor.value = "";
       nuntii.innerHTML = "";
 
       await ladeGedichtsliste();
@@ -514,7 +505,6 @@
 
       poemTitle.value = "";
       campus.value = "";
-      editor.value = "";
       nuntii.innerHTML = "";
       meineTexteListe.innerHTML = "";
 
