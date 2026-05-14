@@ -247,6 +247,11 @@
       }
     });
 
+    //menü ausklappen
+    window.toggleMenu = function () {
+      document.getElementById("sideMenu").classList.toggle("open");
+    };
+
     function zeigeGedicht(textus) {
       nuntii.innerHTML = "";
       if (!textus) return;
