@@ -6,64 +6,15 @@
   <title>Whatsepos</title>
 
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      text-align: center;
-    }
-
-    .container {
-      width: calc(100% - 10cm);
-      max-width: 1200px;
-      margin: 40px auto;
-    }
-
-    .tabs {
-      margin-bottom: 30px;
-    }
-
-    .tabs button,
-    button {
-      font-size: 20px;
-      padding: 10px 20px;
-      margin: 5px;
-      cursor: pointer;
-    }
-
-    input {
-      font-size: 20px;
-      padding: 10px;
-      margin: 5px;
-      width: min(100%, 320px);
-      box-sizing: border-box;
-    }
-
-    textarea {
-      width: 100%;
-      min-height: 300px;
-      font-size: 24px;
-      padding: 20px;
-      box-sizing: border-box;
-      resize: vertical;
-    }
-
-    #nuntii {
-      margin-top: 30px;
-      text-align: left;
-    }
-
-    .nuntius {
-      padding: 10px;
-      margin-bottom: 10px;
-      border-bottom: 1px solid #ccc;
-      font-size: 24px;
-      white-space: pre-wrap;
-    }
-
-    .status {
-      min-height: 1.5em;
-      margin-top: 10px;
-    }
+    body { font-family: Arial, sans-serif; margin: 0; text-align: center; }
+    .container { width: calc(100% - 10cm); max-width: 1200px; margin: 40px auto; }
+    .tabs { margin-bottom: 30px; }
+    .tabs button, button { font-size: 20px; padding: 10px 20px; margin: 5px; cursor: pointer; }
+    input { font-size: 20px; padding: 10px; margin: 5px; width: min(100%, 320px); box-sizing: border-box; }
+    textarea { width: 100%; min-height: 300px; font-size: 24px; padding: 20px; box-sizing: border-box; resize: vertical; }
+    #nuntii { margin-top: 30px; text-align: left; }
+    .nuntius { padding: 10px; margin-bottom: 10px; border-bottom: 1px solid #ccc; font-size: 24px; white-space: pre-wrap; }
+    .status { min-height: 1.5em; margin-top: 10px; }
   </style>
 </head>
 
@@ -77,64 +28,28 @@
       <button onclick="zeigeTab('hexameter')">Hexameter</button>
     </div>
 
-    <!-- Anmeldung -->
     <div id="login" class="tab-content">
-      <input
-        id="login_identifier"
-        type="text"
-        placeholder="Benutzername oder E-Mail"
-      >
-
-      <input
-        id="login_password"
-        type="password"
-        placeholder="Passwort"
-      >
-
+      <input id="login_identifier" type="text" placeholder="Benutzername oder E-Mail">
+      <input id="login_password" type="password" placeholder="Passwort">
       <br>
-
       <button onclick="einloggen()">Einloggen</button>
-
       <p id="login_status" class="status"></p>
     </div>
 
-    <!-- Registrierung -->
     <div id="register" class="tab-content" style="display: none;">
-      <input
-        id="register_username"
-        type="text"
-        placeholder="Benutzername"
-      >
-
-      <input
-        id="register_email"
-        type="email"
-        placeholder="E-Mail"
-      >
-
-      <input
-        id="register_password"
-        type="password"
-        placeholder="Passwort"
-      >
-
+      <input id="register_username" type="text" placeholder="Benutzername">
+      <input id="register_email" type="email" placeholder="E-Mail">
+      <input id="register_password" type="password" placeholder="Passwort">
       <br>
-
       <button onclick="registrieren()">Konto erstellen</button>
-
       <p id="register_status" class="status"></p>
     </div>
 
-    <!-- Hexameter -->
     <div id="hexameter" class="tab-content" style="display: none;">
       <button onclick="ausloggen()">Ausloggen</button>
-
       <p id="status" class="status"></p>
 
-      <textarea
-        id="campus"
-        placeholder="Hic scribe et preme Enter..."
-      ></textarea>
+      <textarea id="campus" placeholder="Hic scribe et preme Enter..."></textarea>
 
       <div id="nuntii"></div>
     </div>
@@ -151,37 +66,76 @@
     const campus = document.getElementById("campus");
     const nuntii = document.getElementById("nuntii");
 
-    // Tabs umschalten
+    let aktuellerUser = null;
+
     window.zeigeTab = function (tabName) {
       document.getElementById("login").style.display = "none";
       document.getElementById("register").style.display = "none";
       document.getElementById("hexameter").style.display = "none";
-
       document.getElementById(tabName).style.display = "block";
     };
 
-    // Enter speichert Text (Shift+Enter für Zeilenumbruch)
     campus.addEventListener("keydown", function (event) {
       if (event.key === "Enter" && !event.shiftKey) {
         event.preventDefault();
-        addeNuntium();
+        speichereVers();
       }
     });
 
-    function addeNuntium() {
+    function zeigeVers(textus) {
+      const div = document.createElement("div");
+      div.className = "nuntius";
+      div.textContent = textus;
+      nuntii.appendChild(div);
+    }
+
+    async function ladeVerse() {
+      nuntii.innerHTML = "";
+
+      if (!aktuellerUser) return;
+
+      const { data, error } = await supabase
+        .from("versus")
+        .select("textus, created_at")
+        .eq("user_id", aktuellerUser.id)
+        .order("created_at", { ascending: true });
+
+      if (error) {
+        document.getElementById("status").textContent = error.message;
+        return;
+      }
+
+      data.forEach(vers => zeigeVers(vers.textus));
+    }
+
+    async function speichereVers() {
       const textus = campus.value.trim();
 
       if (textus === "") return;
 
-      const div = document.createElement("div");
-      div.className = "nuntius";
-      div.textContent = textus;
+      if (!aktuellerUser) {
+        document.getElementById("status").textContent =
+          "Bitte zuerst einloggen.";
+        return;
+      }
 
-      nuntii.appendChild(div);
+      const { error } = await supabase
+        .from("versus")
+        .insert({
+          user_id: aktuellerUser.id,
+          textus: textus
+        });
+
+      if (error) {
+        document.getElementById("status").textContent = error.message;
+        return;
+      }
+
+      zeigeVers(textus);
       campus.value = "";
+      document.getElementById("status").textContent = "Vers gespeichert.";
     }
 
-    // Registrierung
     window.registrieren = async function () {
       const username = document.getElementById("register_username").value.trim();
       const email = document.getElementById("register_email").value.trim();
@@ -193,10 +147,7 @@
         return;
       }
 
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password
-      });
+      const { data, error } = await supabase.auth.signUp({ email, password });
 
       if (error) {
         document.getElementById("register_status").textContent = error.message;
@@ -215,25 +166,16 @@
         .from("profiles")
         .insert({
           id: user.id,
-          username
+          username: username
         });
 
       document.getElementById("register_status").textContent =
-        profileError
-          ? profileError.message
-          : "Konto erfolgreich erstellt.";
+        profileError ? profileError.message : "Konto erfolgreich erstellt.";
     };
 
-    // Anmeldung
     window.einloggen = async function () {
-      const identifier = document
-        .getElementById("login_identifier")
-        .value
-        .trim();
-
-      const password = document
-        .getElementById("login_password")
-        .value;
+      const identifier = document.getElementById("login_identifier").value.trim();
+      const password = document.getElementById("login_password").value;
 
       if (identifier === "") {
         document.getElementById("login_status").textContent =
@@ -241,17 +183,15 @@
         return;
       }
 
-      // Der Login per Benutzername ist noch nicht implementiert.
-      // Bitte vorerst mit E-Mail-Adresse anmelden.
       if (!identifier.includes("@")) {
         document.getElementById("login_status").textContent =
           "Bitte vorerst mit E-Mail-Adresse anmelden.";
         return;
       }
 
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email: identifier,
-        password
+        password: password
       });
 
       if (error) {
@@ -259,20 +199,23 @@
         return;
       }
 
+      aktuellerUser = data.user;
+
       document.getElementById("login_status").textContent = "Eingeloggt.";
       document.getElementById("status").textContent = "Eingeloggt.";
 
-      // Automatisch zum Hexameter-Reiter wechseln
+      await ladeVerse();
       zeigeTab("hexameter");
     };
 
-    // Ausloggen
     window.ausloggen = async function () {
       await supabase.auth.signOut();
 
-      document.getElementById("status").textContent = "Ausgeloggt.";
+      aktuellerUser = null;
+      nuntii.innerHTML = "";
+      campus.value = "";
 
-      // Zur Anmeldung zurückkehren
+      document.getElementById("status").textContent = "Ausgeloggt.";
       zeigeTab("login");
     };
   </script>
