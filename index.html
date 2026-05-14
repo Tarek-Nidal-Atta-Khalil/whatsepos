@@ -50,25 +50,31 @@
     }
 
     #poemArea {
-      height: calc(100vh - 260px);
-      display: flex;
-      flex-direction: column;
+      position: relative;
+      height: calc(100vh - 220px);
     }
 
     #nuntii {
-      flex: 1;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: calc(3cm + 56px + 20px);
       overflow-y: auto;
       text-align: center;
       padding-bottom: 20px;
     }
 
     #campus {
-      width: 100%; 
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 3cm;
+      width: 100%;
       height: 56px;
       resize: none;
       text-align: center;
       font-size: 24px;
-      margin-bottom: 3cm;
     }
 
     .nuntius {
