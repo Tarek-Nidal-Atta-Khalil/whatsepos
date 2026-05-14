@@ -467,6 +467,25 @@
       setStatus("Gedicht angelegt.");
     };
 
+    window.neuesGedichtAusListe = async function () {
+      const feld = document.getElementById("neuerTitel");
+      const titel = feld.value.trim();
+    
+      if (titel === "") {
+        setStatus("Bitte einen Titel eingeben.");
+        return;
+      }
+    
+      poemTitle.value = titel;
+      await neuesGedicht();
+    
+      feld.value = "";
+    
+      if (aktuellesGedicht) {
+        zeigeTab("hexameter");
+      }
+    };
+
     // Vers anhängen
     async function fuegeVersHinzu() {
       const vers = campus.value.trim();
