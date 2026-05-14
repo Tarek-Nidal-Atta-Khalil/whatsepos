@@ -55,7 +55,7 @@
     </div>
   </div>
 
-  <script type="module">
+  < type="module">
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
     const supabase = createClient(
@@ -218,6 +218,24 @@
       document.getElementById("status").textContent = "Ausgeloggt.";
       zeigeTab("login");
     };
+    
+    // Beim Laden der Seite prüfen, ob schon eine Sitzung existiert
+async function pruefeSitzung() {
+  const { data } = await supabase.auth.getSession();
+
+  if (data.session && data.session.user) {
+    aktuellerUser = data.session.user;
+
+    document.getElementById("status").textContent = "Eingeloggt.";
+    document.getElementById("login_status").textContent = "Bereits eingeloggt.";
+
+    await ladeVerse();
+    zeigeTab("hexameter");
+  }
+}
+
+pruefeSitzung();
+
   </script>
 </body>
 </html>
