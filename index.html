@@ -526,7 +526,10 @@
     }
 
     function setStatus(text) {
-      document.getElementById("status").textContent = text;
+      const status = document.getElementById("status");
+      if (status) {
+        status.textContent = text;
+      }
     }
 
     //seitenleiste an logging-status anpassen
@@ -538,8 +541,8 @@
         aktuellerUser ? "block" : "none";
     }
 
-    pruefeSitzung();
     aktualisiereAuthMenu();
+    pruefeSitzung();
   </script>
 </body>
 </html>
