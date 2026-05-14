@@ -161,6 +161,20 @@
       background: white;
       padding: 5px 10px;
     }
+
+    .auth-bottom {
+      position: absolute;
+      left: 20px;
+      bottom: 20px;
+      width: 200px;
+    }
+    
+    .auth-bottom button {
+      display: block;
+      width: 200px;
+      margin: 10px 0;
+      text-align: left;
+    }
     
   </style>
 </head>
@@ -171,13 +185,18 @@
   <button id="menuButton" onclick="toggleMenu()">☰ Menü</button>
 
   <div id="sideMenu" class="side-menu">
+  <button onclick="zeigeTab('hexameter')">Hexameter</button>
+  <button onclick="zeigeTab('meineTexte')">Meine Texte</button>
+
+  <div id="authLoggedOut" class="auth-bottom">
     <button onclick="zeigeTab('login')">Anmeldung</button>
     <button onclick="zeigeTab('register')">Registrierung</button>
-    <button onclick="zeigeTab('hexameter')">Hexameter</button>
-    <button onclick="zeigeTab('meineTexte')">Meine Texte</button>
-  
-    <button id="logoutButton" onclick="ausloggen()">Ausloggen</button>
   </div>
+
+  <div id="authLoggedIn" class="auth-bottom" style="display: none;">
+    <button onclick="ausloggen()">Ausloggen</button>
+  </div>
+</div>
       
 
     <!-- Anmeldung -->
@@ -513,6 +532,7 @@
       }
 
       aktuellerUser = data.user;
+      aktualisiereAuthMenu();
       document.getElementById("login_status").textContent = "Eingeloggt.";
 
       await ladeGedichtsliste();
@@ -525,6 +545,7 @@
       await supabase.auth.signOut();
 
       aktuellerUser = null;
+      aktualisiereAuthMenu();
       aktuellesGedicht = null;
 
       poemTitle.value = "";
@@ -543,6 +564,7 @@
 
       if (data.session?.user) {
         aktuellerUser = data.session.user;
+        aktualisiereAuthMenu();
         await ladeGedichtsliste();
         zeigeTab("hexameter");
         setStatus("Bereits eingeloggt.");
@@ -553,7 +575,17 @@
       document.getElementById("status").textContent = text;
     }
 
+    //seitenleiste an logging-status anpassen
+    function aktualisiereAuthMenu() {
+      document.getElementById("authLoggedOut").style.display =
+        aktuellerUser ? "none" : "block";
+    
+      document.getElementById("authLoggedIn").style.display =
+        aktuellerUser ? "block" : "none";
+    }
+
     pruefeSitzung();
+    aktualisiereAuthMenu();
   </script>
 </body>
 </html>
