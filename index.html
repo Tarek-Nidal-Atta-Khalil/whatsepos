@@ -12,7 +12,7 @@
     .tabs button, button { font-size: 20px; padding: 10px 20px; margin: 5px; cursor: pointer; }
     input { font-size: 20px; padding: 10px; margin: 5px; width: min(100%, 320px); box-sizing: border-box; }
     textarea { width: 100%; min-height: 300px; font-size: 24px; padding: 20px; box-sizing: border-box; resize: vertical; }
-    #nuntii { margin-top: 30px; text-align: left; }
+    #nuntii, #meineTexteListe { margin-top: 30px; text-align: left; }
     .nuntius { padding: 10px; margin-bottom: 10px; border-bottom: 1px solid #ccc; font-size: 24px; white-space: pre-wrap; }
     .status { min-height: 1.5em; margin-top: 10px; }
   </style>
@@ -22,12 +22,12 @@
   <div class="container">
     <h1>Scriptorium</h1>
 
-   <div class="tabs">
-  <button onclick="zeigeTab('login')">Anmeldung</button>
-  <button onclick="zeigeTab('register')">Registrierung</button>
-  <button onclick="zeigeTab('hexameter')">Hexameter</button>
-  <button onclick="zeigeTab('meineTexte')">Meine Texte</button>
-</div>
+    <div class="tabs">
+      <button onclick="zeigeTab('login')">Anmeldung</button>
+      <button onclick="zeigeTab('register')">Registrierung</button>
+      <button onclick="zeigeTab('hexameter')">Hexameter</button>
+      <button onclick="zeigeTab('meineTexte')">Meine Texte</button>
+    </div>
 
     <div id="login" class="tab-content">
       <input id="login_identifier" type="text" placeholder="Benutzername oder E-Mail">
@@ -49,14 +49,18 @@
     <div id="hexameter" class="tab-content" style="display: none;">
       <button onclick="ausloggen()">Ausloggen</button>
       <p id="status" class="status"></p>
-
       <textarea id="campus" placeholder="Hic scribe et preme Enter..."></textarea>
-
       <div id="nuntii"></div>
+    </div>
+
+    <div id="meineTexte" class="tab-content" style="display: none;">
+      <h2>Meine Texte</h2>
+      <button onclick="ladeVerse()">Aktualisieren</button>
+      <div id="meineTexteListe"></div>
     </div>
   </div>
 
-  < type="module">
+  <script type="module">
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
     const supabase = createClient(
@@ -66,6 +70,7 @@
 
     const campus = document.getElementById("campus");
     const nuntii = document.getElementById("nuntii");
+    const meineTexteListe = document.getElementById("meineTexteListe");
 
     let aktuellerUser = null;
 
@@ -73,6 +78,7 @@
       document.getElementById("login").style.display = "none";
       document.getElementById("register").style.display = "none";
       document.getElementById("hexameter").style.display = "none";
+      document.getElementById("meineTexte").style.display = "none";
       document.getElementById(tabName).style.display = "block";
     };
 
@@ -90,10 +96,22 @@
       nuntii.appendChild(div);
     }
 
-    async function ladeVerse() {
-      nuntii.innerHTML = "";
+    function zeigeEigenenText(textus) {
+      const div = document.createElement("div");
+      div.className = "nuntius";
+      div.textContent = textus;
+      meineTexteListe.appendChild(div);
+    }
 
-      if (!aktuellerUser) return;
+    window.ladeVerse = async function () {
+      nuntii.innerHTML = "";
+      meineTexteListe.innerHTML = "";
+
+      if (!aktuellerUser) {
+        document.getElementById("status").textContent =
+          "Bitte zuerst einloggen.";
+        return;
+      }
 
       const { data, error } = await supabase
         .from("versus")
@@ -106,12 +124,14 @@
         return;
       }
 
-      data.forEach(vers => zeigeVers(vers.textus));
-    }
+      data.forEach(vers => {
+        zeigeVers(vers.textus);
+        zeigeEigenenText(vers.textus);
+      });
+    };
 
     async function speichereVers() {
       const textus = campus.value.trim();
-
       if (textus === "") return;
 
       if (!aktuellerUser) {
@@ -133,6 +153,7 @@
       }
 
       zeigeVers(textus);
+      zeigeEigenenText(textus);
       campus.value = "";
       document.getElementById("status").textContent = "Vers gespeichert.";
     }
@@ -201,7 +222,6 @@
       }
 
       aktuellerUser = data.user;
-
       document.getElementById("login_status").textContent = "Eingeloggt.";
       document.getElementById("status").textContent = "Eingeloggt.";
 
@@ -214,29 +234,28 @@
 
       aktuellerUser = null;
       nuntii.innerHTML = "";
+      meineTexteListe.innerHTML = "";
       campus.value = "";
 
       document.getElementById("status").textContent = "Ausgeloggt.";
       zeigeTab("login");
     };
-    
-    // Beim Laden der Seite prüfen, ob schon eine Sitzung existiert
-async function pruefeSitzung() {
-  const { data } = await supabase.auth.getSession();
 
-  if (data.session && data.session.user) {
-    aktuellerUser = data.session.user;
+    async function pruefeSitzung() {
+      const { data } = await supabase.auth.getSession();
 
-    document.getElementById("status").textContent = "Eingeloggt.";
-    document.getElementById("login_status").textContent = "Bereits eingeloggt.";
+      if (data.session && data.session.user) {
+        aktuellerUser = data.session.user;
 
-    await ladeVerse();
-    zeigeTab("hexameter");
-  }
-}
+        document.getElementById("status").textContent = "Eingeloggt.";
+        document.getElementById("login_status").textContent = "Bereits eingeloggt.";
 
-pruefeSitzung();
+        await ladeVerse();
+        zeigeTab("hexameter");
+      }
+    }
 
+    pruefeSitzung();
   </script>
 </body>
 </html>
