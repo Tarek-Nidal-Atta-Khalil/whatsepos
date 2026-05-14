@@ -677,6 +677,7 @@
 
       aktuellerUser = data.user;
       aktualisiereAuthMenu();
+      await aktualisiereMenuButton();
       document.getElementById("login_status").textContent = "Eingeloggt.";
 
       await ladeGedichtsliste();
@@ -690,6 +691,7 @@
 
       aktuellerUser = null;
       aktualisiereAuthMenu();
+      await aktualisiereMenuButton();
       aktuellesGedicht = null;
 
       poemTitle.value = "";
@@ -701,6 +703,28 @@
       setStatus("Ausgeloggt.");
     };
 
+async function aktualisiereMenuButton() {
+      const button = document.getElementById("menuButton");
+    
+      if (!aktuellerUser) {
+        button.textContent = "☰ Menü";
+        return;
+      }
+    
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("username")
+        .eq("id", aktuellerUser.id)
+        .single();
+    
+      if (error || !data) {
+        button.textContent = "☰ Menü";
+        return;
+      }
+    
+      button.textContent = "☰ " + data.username;
+    }
+    
     // Sitzung wiederherstellen
     async function pruefeSitzung() {
       const { data } = await supabase.auth.getSession();
@@ -710,10 +734,11 @@
         aktualisiereAuthMenu();
         await ladeGedichtsliste();
         zeigeTab("hexameter");
-        setStatus("Bereits eingeloggt.");
+        await aktualisiereMenuButton();
       } else {
         aktuellerUser = null;
         aktualisiereAuthMenu();
+        await aktualisiereMenuButton();
         zeigeTab("login");
       }
     }
