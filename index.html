@@ -61,6 +61,186 @@
 
 <body>
   <div class="container">
+    <h1>Scriptorium</h1>
+
+    <div class="tabs">
+      <button onclick="zeigeTab('login')">Anmeldung</button>
+      <button onclick="zeigeTab('register')">Registrierung</button>
+      <button onclick="zeigeTab('hexameter')">Hexameter</button>
+    </div>
+
+    <div id="login" class="tab-content">
+      <input id="login_identifier" type="text" placeholder="Benutzername oder E-Mail">
+      <input id="login_password" type="password" placeholder="Passwort">
+
+      <br>
+
+      <button onclick="einloggen()">Einloggen</button>
+
+      <p id="login_status"></p>
+    </div>
+
+    <div id="register" class="tab-content" style="display: none;">
+      <input id="register_username" type="text" placeholder="Benutzername">
+      <input id="register_email" type="email" placeholder="E-Mail">
+      <input id="register_password" type="password" placeholder="Passwort">
+
+      <br>
+
+      <button onclick="registrieren()">Konto erstellen</button>
+
+      <p id="register_status"></p>
+    </div>
+
+    <div id="hexameter" class="tab-content" style="display: none;">
+      <button onclick="ausloggen()">Ausloggen</button>
+      <p id="status"></p>
+
+      <textarea id="campus" placeholder="Hic scribe et preme Enter..."></textarea>
+
+      <div id="nuntii"></div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+    const supabase = createClient(
+      "https://sdjhpovsechtfdwwakmm.supabase.co",
+      "HIER_DEINEN_ANON_PUBLIC_KEY_EINFÜGEN"
+    );
+
+    const campus = document.getElementById("campus");
+    const nuntii = document.getElementById("nuntii");
+
+    window.zeigeTab = function(tabName) {
+      document.getElementById("login").style.display = "none";
+      document.getElementById("register").style.display = "none";
+      document.getElementById("hexameter").style.display = "none";
+
+      document.getElementById(tabName).style.display = "block";
+    };
+
+    campus.addEventListener("keydown", function(event) {
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        addeNuntium();
+      }
+    });
+
+    function addeNuntium() {
+      const textus = campus.value.trim();
+
+      if (textus === "") return;
+
+      const div = document.createElement("div");
+      div.className = "nuntius";
+      div.textContent = textus;
+
+      nuntii.appendChild(div);
+      campus.value = "";
+    }
+
+    window.registrieren = async function () {
+      const username = document.getElementById("register_username").value.trim();
+      const email = document.getElementById("register_email").value;
+      const password = document.getElementById("register_password").value;
+
+      if (username === "") {
+        document.getElementById("register_status").textContent =
+          "Bitte Benutzernamen eingeben.";
+        return;
+      }
+
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password
+      });
+
+      if (error) {
+        document.getElementById("register_status").textContent = error.message;
+        return;
+      }
+
+      const user = data.user;
+
+      if (!user) {
+        document.getElementById("register_status").textContent =
+          "Konto erstellt. Bitte bestätige ggf. deine E-Mail.";
+        return;
+      }
+
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .insert({
+          id: user.id,
+          username
+        });
+
+      document.getElementById("register_status").textContent =
+        profileError
+          ? profileError.message
+          : "Konto erfolgreich erstellt.";
+    };
+
+    window.einloggen = async function () {
+      const identifier = document.getElementById("login_identifier").value.trim();
+      const password = document.getElementById("login_password").value;
+
+      if (identifier === "") {
+        document.getElementById("login_status").textContent =
+          "Bitte Benutzername oder E-Mail eingeben.";
+        return;
+      }
+
+      if (!identifier.includes("@")) {
+        document.getElementById("login_status").textContent =
+          "Bitte vorerst mit E-Mail-Adresse anmelden.";
+        return;
+      }
+
+      const { error } = await supabase.auth.signInWithPassword({
+        email: identifier,
+        password
+      });
+
+      document.getElementById("login_status").textContent =
+        error ? error.message : "Eingeloggt.";
+    };
+
+    window.ausloggen = async function () {
+      await supabase.auth.signOut();
+      document.getElementById("status").textContent = "Ausgeloggt.";
+    };
+  </script>
+</body>
+</html>
+    textarea {
+      width: 100%;
+      min-height: 300px;
+      font-size: 24px;
+      padding: 20px;
+      box-sizing: border-box;
+      resize: vertical;
+    }
+
+    #nuntii {
+      margin-top: 30px;
+      text-align: left;
+    }
+
+    .nuntius {
+      padding: 10px;
+      margin-bottom: 10px;
+      border-bottom: 1px solid #ccc;
+      font-size: 24px;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
   <h1>Scriptorium</h1>
 
   <div class="tabs">
