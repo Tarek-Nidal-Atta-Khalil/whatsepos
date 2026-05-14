@@ -5,23 +5,36 @@
     <title>Whatsepos</title>
 </head>
 <body>
-    <h1>Salve ad Whatsepos!</h1>
+    <h1>Scriptorium</h1>
 
     <!-- Campus textus -->
-    <input
-        type="text"
-        id="campus"
-        placeholder="Hic scribe..."
-        oninput="renova()"
-    >
+    <input type="text" id="campus" placeholder="Hic scribe...">
 
-    <!-- Hic nuntius monstrabitur -->
-    <p id="nuntius">Nihil adhuc scriptum est.</p>
+    <!-- Bulla -->
+    <button onclick="addeNuntium()">Mitte</button>
+
+    <!-- Hic nuntii congregabuntur -->
+    <div id="nuntii"></div>
 
     <script>
-        function renova() {
-            const textus = document.getElementById("campus").value;
-            document.getElementById("nuntius").textContent = textus;
+        function addeNuntium() {
+            const campus = document.getElementById("campus");
+            const textus = campus.value;
+
+            // Si nihil scriptum est, nihil fac
+            if (textus.trim() === "") {
+                return;
+            }
+
+            // Crea novum paragraphem
+            const p = document.createElement("p");
+            p.textContent = textus;
+
+            // Appone ad div "nuntii"
+            document.getElementById("nuntii").appendChild(p);
+
+            // Campo evacuato
+            campus.value = "";
         }
     </script>
 </body>
