@@ -215,6 +215,23 @@
       font-size: 24px;
       text-align: center;
     }
+
+    #scriptoriumStart {
+      margin-top: 35vh;
+    }
+    
+    #titelEingabe {
+      margin-top: 35vh;
+      width: min(100%, 600px);
+      text-align: center;
+      font-size: 28px;
+    }
+    
+    #aktuellerTitel {
+      text-align: left;
+      margin-left: 270px;
+      font-size: 30px;
+    }
     
   </style>
 </head>
@@ -261,16 +278,38 @@
     <!-- Hexameter -->
     <div id="hexameter" class="tab-content" style="display: none;">
       <p id="status" class="status"></p>
-
-      <input id="poemTitle" type="text" placeholder="Titel des Gedichts">
-
-      <div id="poemArea">
-        <div id="nuntii"></div>
-        <textarea
-          id="campus"
-          rows="1"
-          placeholder="Vers schreiben und Enter drücken..."
-        ></textarea>
+    
+      <!-- Startzustand -->
+      <div id="scriptoriumStart">
+        <button onclick="starteNeuesGedicht()">Neues Gedicht</button>
+      </div>
+    
+      <!-- Titel eingeben -->
+      <div id="titelEingabeBereich" style="display: none;">
+        <input
+          id="titelEingabe"
+          type="text"
+          placeholder="Titel eingeben"
+        >
+      </div>
+    
+      <!-- Eigentliche Arbeitsansicht -->
+      <div id="arbeitsbereich" style="display: none;">
+    
+        <!-- HIER steht der Titel des geöffneten Gedichts -->
+        <h2 id="aktuellerTitel"></h2>
+    
+        <!-- Hier erscheinen die Verse -->
+        <div id="poemArea">
+          <div id="nuntii"></div>
+    
+          <!-- Eingabefeld für neue Verse -->
+          <textarea
+            id="campus"
+            rows="1"
+            placeholder="Vers schreiben und Enter drücken..."
+          ></textarea>
+        </div>
       </div>
     </div>
 
@@ -312,7 +351,10 @@
 
     const campus = document.getElementById("campus");
     const nuntii = document.getElementById("nuntii");
-    const poemTitle = document.getElementById("poemTitle");
+    aktuellerTitel.textContent = "";
+    scriptoriumStart.style.display = "block";
+    titelEingabeBereich.style.display = "none";
+    arbeitsbereich.style.display = "none";
     const meineTexteListe = document.getElementById("meineTexteListe");
 
     let aktuellerUser = null;
