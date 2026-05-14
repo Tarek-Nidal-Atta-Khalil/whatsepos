@@ -126,15 +126,40 @@
     }
 
     window.registrieren = async function () {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  const username = document.getElementById("username").value.trim();
 
-      const { error } = await supabase.auth.signUp({ email, password });
+  if (username === "") {
+    document.getElementById("status").textContent = "Bitte Benutzernamen eingeben.";
+    return;
+  }
 
-      document.getElementById("status").textContent =
-        error ? error.message : "Konto erstellt.";
-    };
+  const { data, error } = await supabase.auth.signUp({ email, password });
 
+  if (error) {
+    document.getElementById("status").textContent = error.message;
+    return;
+  }
+
+  const user = data.user;
+
+      if (!user) {
+  document.getElementById("status").textContent =
+    "Konto erstellt. Bitte bestätige ggf. deine E-Mail.";
+  return;
+}
+
+  if (user) {
+    const { error: profileError } = await supabase
+      .from("profiles")
+      .insert({ id: user.id, username });
+
+    document.getElementById("status").textContent =
+      profileError ? profileError.message : "Konto mit Benutzername erstellt.";
+  }
+};
+    
     window.einloggen = async function () {
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
