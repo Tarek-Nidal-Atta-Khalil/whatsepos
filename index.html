@@ -5,9 +5,24 @@
     <title>Whatsepos</title>
 </head>
 <body>
-    <h1>Salue ad Whatsepos!</h1>
-    <p>Disce modos fingere.</p>
+    <h1>Salve ad Whatsepos!</h1>
 
-    <input type="text" placeholder="Hic scribe..." />
+    <!-- Campus textus -->
+    <input
+        type="text"
+        id="campus"
+        placeholder="Hic scribe..."
+        oninput="renova()"
+    >
+
+    <!-- Hic nuntius monstrabitur -->
+    <p id="nuntius">Nihil adhuc scriptum est.</p>
+
+    <script>
+        function renova() {
+            const textus = document.getElementById("campus").value;
+            document.getElementById("nuntius").textContent = textus;
+        }
+    </script>
 </body>
 </html>
