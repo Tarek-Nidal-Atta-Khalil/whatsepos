@@ -214,16 +214,6 @@ async function speichereGedichtText(neuerText) {
   zeigeGedicht(neuerText);
 }
 
-async function loescheVers(index) {
-  if (!aktuellesGedicht) return;
-
-  const verse = aktuellesGedicht.textus.split("\n");
-  verse.splice(index, 1);
-
-  await speichereGedichtText(verse.join("\n"));
-  setStatus("Vers gelöscht.");
-}
-
 function bearbeiteVers(index, alterVers) {
   const zeilen = document.querySelectorAll(".vers-zeile");
   const zeile = zeilen[index];
