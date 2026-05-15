@@ -28,9 +28,7 @@
     <button onclick="ausloggen()">Ausloggen</button>
   </div>
 </div>
-      
 
-    <!-- Anmeldung -->
     <div id="login" class="tab-content">
       <input id="login_identifier" type="text" placeholder="Benutzername oder E-Mail">
       <input id="login_password" type="password" placeholder="Passwort">
@@ -39,7 +37,6 @@
       <p id="login_status" class="status"></p>
     </div>
 
-    <!-- Registrierung -->
     <div id="register" class="tab-content" style="display: none;">
       <input id="register_username" type="text" placeholder="Benutzername">
       <input id="register_email" type="email" placeholder="E-Mail">
@@ -49,48 +46,30 @@
       <p id="register_status" class="status"></p>
     </div>
 
-    <!-- Hexameter -->
     <div id="hexameter" class="tab-content" style="display: none;">
       <p id="status" class="status"></p>
-    
-      <!-- Startzustand -->
+
       <div id="scriptoriumStart">
         <button onclick="starteNeuesGedicht()">Neues Gedicht</button>
       </div>
-    
-      <!-- Titel eingeben -->
+
       <div id="titelEingabeBereich" style="display: none;">
-        <input
-          id="titelEingabe"
-          type="text"
-          placeholder="Titel eingeben"
-        >
+        <input id="titelEingabe" type="text" placeholder="Titel eingeben">
       </div>
-    
-      <!-- Eigentliche Arbeitsansicht -->
+
       <div id="arbeitsbereich" style="display: none;">
-    
-        <!-- HIER steht der Titel des geöffneten Gedichts -->
         <h2 id="aktuellerTitel"></h2>
-    
-        <!-- Hier erscheinen die Verse -->
+
         <div id="poemArea">
           <div id="nuntii"></div>
-    
-          <!-- Eingabefeld für neue Verse -->
-          <textarea
-            id="campus"
-            rows="1"
-            placeholder="Vers schreiben und Enter drücken..."
-          ></textarea>
+          <textarea id="campus" rows="1" placeholder="Vers schreiben und Enter drücken..."></textarea>
         </div>
       </div>
     </div>
 
-    <!-- Meine Texte -->
     <div id="meineTexte" class="tab-content" style="display: none;">
       <h2>Meine Texte</h2>
-    
+
       <div id="meineTexteKopf" class="titel-kopfzeile">
         <span></span>
         <span class="titel-spalte">Titulus</span>
@@ -98,40 +77,30 @@
         <span class="datum-spalte">mutavi</span>
         <span></span>
       </div>
-      
+
       <div id="meineTexteListe"></div>
     </div>
 
-    <!-- Veröffentlichungen -->
     <div id="veroeffentlichungen" class="tab-content" style="display: none;">
       <h2>Veröffentlichungen</h2>
-    
       <p>Hier erscheinen später veröffentlichte Gedichte.</p>
-    
       <div id="veroeffentlichungenListe"></div>
     </div>
 
-    <!-- Profil -->
     <div id="profil" class="tab-content" style="display: none;">
       <h2>Profil</h2>
-    
-      <input
-        id="profilUsername"
-        type="text"
-        placeholder="Benutzername"
-      >
-    
+
+      <input id="profilUsername" type="text" placeholder="Benutzername">
+
       <br>
-    
-      <button onclick="speichereProfil()">
-        Benutzernamen speichern
-      </button>
-    
+
+      <button onclick="speichereProfil()">Benutzernamen speichern</button>
+
       <p id="profil_status" class="status"></p>
     </div>
-    
   </div>
 
   <script type="module" src="app.js"></script>
+  <script src="publications.js"></script>
 </body>
 </html>
