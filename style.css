@@ -34,17 +34,20 @@ input {
   width: min(100%, 320px);
 }
 
-/* Neue Startseite */
+/* Startseite */
 .auth-startseite {
   min-height: 70vh;
-  display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
-  gap: 60px;
-  align-items: center;
+  display: flex;
+  flex-direction: row;
   justify-content: center;
+  align-items: stretch;
+  gap: 60px;
+  margin-top: 60px;
 }
 
 .auth-karte {
+  flex: 1;
+  max-width: 520px;
   background: white;
   border: 1px solid #e5e7eb;
   border-radius: 28px;
@@ -79,10 +82,13 @@ input {
   line-height: 1.6;
 }
 
+.auth-register-karte .auth-hinweis {
+  color: rgba(255, 255, 255, 0.92);
+}
+
 .auth-primary,
 .auth-cta {
   width: 100%; 
-  max-width: 360px;
   margin-top: 18px;
   padding: 18px 28px;
   border: none;
@@ -90,7 +96,7 @@ input {
   font-size: 24px;
   font-weight: bold;
   cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition: transform 0.15s ease;
 }
 
 .auth-primary {
@@ -111,7 +117,6 @@ input {
 
 .auth-secondary {
   width: 100%; 
-  max-width: 360px;
   margin-top: 12px;
   padding: 14px 24px;
   border: 2px solid #d1d5db;
@@ -126,14 +131,25 @@ input {
   color: white;
 }
 
-.auth-register-karte .auth-hinweis {
-  color: rgba(255, 255, 255, 0.9);
+.register-startseite {
+  display: flex;
+  justify-content: center;
 }
 
-.register-startseite {
-  grid-template-columns: 1fr;
+.register-startseite .auth-karte {
   max-width: 720px;
-  margin: 0 auto;
+}
+
+@media (max-width: 1000px) {
+  .auth-startseite {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .auth-karte {
+    width: 100%; 
+    max-width: 720px;
+  }
 }
 
 #poemArea {
@@ -184,15 +200,6 @@ input {
   text-align: left;
 }
 
-.poem-item {
-  border-bottom: 1px solid #ccc;
-  padding: 12px 0;
-}
-
-.poem-item strong {
-  font-size: 24px;
-}
-
 #menuButton {
   position: fixed;
   top: 20px;
@@ -224,14 +231,6 @@ input {
   text-align: left;
 }
 
-#logoutButton {
-  position: absolute;
-  left: 20px;
-  bottom: 80px;
-  width: 200px;
-  text-align: left;
-}
-
 h1 {
   position: fixed;
   top: 20px;
@@ -258,5 +257,3 @@ h1 {
   margin: 0;
   text-align: left;
 }
-
-/* ... restliche bestehende Styles bleiben unverändert ... */
