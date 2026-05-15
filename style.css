@@ -360,3 +360,55 @@ h1 {
 .loesch-knopf:hover {
   background: #ef4444;
 }
+
+.vers-zeile {
+  display: inline-block;
+  position: relative;
+  padding: 8px 14px;
+  margin: 3px auto;
+  border-radius: 14px;
+  font-size: 24px;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+}
+
+.vers-zeile:hover {
+  background: #eef6ff;
+}
+
+.vers-zeile.ausgewaehlt {
+  background: #dbeafe;
+  box-shadow: 0 0 0 2px #60a5fa inset;
+}
+
+#versWerkzeuge {
+  position: fixed;
+  right: 28px;
+  bottom: 38px;
+  z-index: 1200;
+  align-items: center;
+  justify-content: center;
+}
+
+#versLoeschenKnopf {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: #dc2626;
+  color: white;
+  font-size: 22px;
+  line-height: 44px;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+}
+
+#versLoeschenKnopf:hover {
+  background: #ef4444;
+  transform: scale(1.05);
+}
