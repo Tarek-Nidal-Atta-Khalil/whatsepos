@@ -347,13 +347,14 @@
         Aktualisieren
       </button>
     
-      <div id="meineTexteListe">
-        <div id="meineTexteKopf" class="titel-kopfzeile">
-          <span class="titel-spalte">Titulus</span>
-          <span class="datum-spalte">coepi</span>
-          <span class="datum-spalte">mutavi</span>
-        </div>
+      <div id="meineTexteKopf" class="titel-kopfzeile">
+        <span class="titel-spalte">Titulus</span>
+        <span class="datum-spalte">coepi</span>
+        <span class="datum-spalte">mutavi</span>
+        <span></span>
       </div>
+      
+      <div id="meineTexteListe"></div>
     </div>
 
     <!-- Veröffentlichungen -->
@@ -627,7 +628,14 @@
 
     // Gedichtsliste
     window.ladeGedichtsliste = async function() {
-      meineTexteListe.innerHTML = "";
+      meineTexteListe.innerHTML = `
+        <div id="meineTexteKopf" class="titel-kopfzeile">
+          <span class="titel-spalte">Titulus</span>
+          <span class="datum-spalte">coepi</span>
+          <span class="datum-spalte">mutavi</span>
+          <span></span>
+        </div>
+      `;
       if (!aktuellerUser) return;
 
       const { data, error } = await supabase
