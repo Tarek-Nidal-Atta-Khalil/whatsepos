@@ -52,6 +52,8 @@ const supabase = createClient(
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNkamhwb3ZzZWNodGZkd3dha21tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NjIyNTIsImV4cCI6MjA5NDMzODI1Mn0.cyWJGEdA84bGAKyBcNYAXtJBLcf9Lo12oYn5CEAPhf4"
 );
 
+window.whatseposSupabase = supabase;
+
 const campus = document.getElementById("campus");
 const nuntii = document.getElementById("nuntii");
 const meineTexteListe = document.getElementById("meineTexteListe");
