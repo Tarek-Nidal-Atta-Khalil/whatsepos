@@ -125,10 +125,6 @@ function zeigeVeroeffentlichtesGedicht(gedicht) {
   const interaktion = document.createElement("section");
   interaktion.className = "interaktion";
 
-  const interaktionTitel = document.createElement("h3");
-  interaktionTitel.textContent = "Responde";
-
-  interaktion.appendChild(interaktionTitel);
   interaktion.appendChild(erstelleBewertungskarte());
   interaktion.appendChild(erstelleTextkarte("Commentarium", "Commentarium scribere...", "commentari", "Kommentare werden im nächsten Schritt gespeichert."));
   interaktion.appendChild(erstelleTextkarte("Correctio", "Correctionem uel emendationem proponere...", "correctionem proponere", "Korrekturvorschläge werden später gespeichert."));
@@ -146,9 +142,6 @@ function erstelleBewertungskarte() {
   const karte = document.createElement("div");
   karte.className = "interaktionskarte";
 
-  const titel = document.createElement("h4");
-  titel.textContent = "Aestimatio";
-
   const sterne = document.createElement("div");
   sterne.className = "bewertung-sterne";
 
@@ -163,7 +156,6 @@ function erstelleBewertungskarte() {
   hinweis.className = "platzhalter";
   hinweis.textContent = "Bewertungen werden im nächsten Schritt gespeichert.";
 
-  karte.appendChild(titel);
   karte.appendChild(sterne);
   karte.appendChild(hinweis);
 
