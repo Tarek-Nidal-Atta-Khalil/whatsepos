@@ -237,6 +237,9 @@ input {
   padding-top: 80px;
   transition: left 0.3s ease;
   z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .side-menu.open {
@@ -261,18 +264,7 @@ h1 {
   padding: 5px 10px;
 }
 
-.side-menu {
-  display: flex;
-  flex-direction: column;
-}
-
-.auth-bottom {
-  position: absolute;
-  left: 20px;
-  bottom: 24px;
-  width: 200px;
-}
-
+.auth-bottom,
 #authLoggedOut,
 #authLoggedIn {
   position: absolute;
