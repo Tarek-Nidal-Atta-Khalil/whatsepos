@@ -470,8 +470,8 @@ async function pruefeSitzung() {
     aktuellerUser = data.session.user;
     aktualisiereAuthMenu();
     await ladeGedichtsliste();
-    zeigeTab("login");
     await aktualisiereMenuButton();
+    zeigeTab("hexameter");
   } else {
     aktuellerUser = null;
     aktualisiereAuthMenu();
@@ -488,11 +488,16 @@ function setStatus(text) {
 }
 
 function aktualisiereAuthMenu() {
-  document.getElementById("authLoggedOut").style.display =
-    aktuellerUser ? "none" : "block";
+  const loggedOut = document.getElementById("authLoggedOut");
+  const loggedIn = document.getElementById("authLoggedIn");
 
-  document.getElementById("authLoggedIn").style.display =
-    aktuellerUser ? "block" : "none";
+  if (aktuellerUser) {
+    loggedOut.style.display = "none";
+    loggedIn.style.display = "block";
+  } else {
+    loggedOut.style.display = "flex";
+    loggedIn.style.display = "none";
+  }
 }
 
 async function ladeProfil() {
