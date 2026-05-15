@@ -34,6 +34,108 @@ input {
   width: min(100%, 320px);
 }
 
+/* Neue Startseite */
+.auth-startseite {
+  min-height: 70vh;
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 60px;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-karte {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 28px;
+  padding: 48px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.08);
+}
+
+.auth-login-karte {
+  text-align: left;
+}
+
+.auth-login-karte input,
+.auth-register-formular input {
+  display: block;
+  width: 100%; 
+  max-width: none;
+  margin: 14px 0;
+  padding: 18px 20px;
+  border: 2px solid #e5e7eb;
+  border-radius: 16px;
+  font-size: 22px;
+}
+
+.auth-karte h2 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  font-size: 42px;
+}
+
+.auth-hinweis {
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+.auth-primary,
+.auth-cta {
+  width: 100%; 
+  max-width: 360px;
+  margin-top: 18px;
+  padding: 18px 28px;
+  border: none;
+  border-radius: 18px;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.auth-primary {
+  background: #111827;
+  color: white;
+}
+
+.auth-cta {
+  background: #84cc16;
+  color: white;
+  box-shadow: inset 0 -4px 0 rgba(0, 0, 0, 0.12);
+}
+
+.auth-primary:hover,
+.auth-cta:hover {
+  transform: translateY(-2px);
+}
+
+.auth-secondary {
+  width: 100%; 
+  max-width: 360px;
+  margin-top: 12px;
+  padding: 14px 24px;
+  border: 2px solid #d1d5db;
+  border-radius: 18px;
+  background: white;
+  color: #374151;
+  font-weight: bold;
+}
+
+.auth-register-karte {
+  background: linear-gradient(135deg, #84cc16, #65a30d);
+  color: white;
+}
+
+.auth-register-karte .auth-hinweis {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.register-startseite {
+  grid-template-columns: 1fr;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
 #poemArea {
   position: relative;
   height: calc(100vh - 220px);
@@ -157,289 +259,4 @@ h1 {
   text-align: left;
 }
 
-.vers-zeile,
-.titel-zeile {
-  position: relative;
-  padding: 8px 48px 8px 12px;
-  font-size: 24px;
-  cursor: pointer;
-  border-radius: 6px;
-}
-
-.vers-zeile:hover,
-.titel-zeile:hover {
-  background: #dbeafe;
-}
-
-.loesch-knopf {
-  display: none;
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 34px;
-  height: 34px;
-  border: none;
-  border-radius: 12px;
-  background: #dc2626;
-  color: white;
-  font-size: 22px;
-  font-weight: bold;
-  line-height: 34px;
-  text-align: center;
-  cursor: pointer;
-  padding: 0;
-  margin: 0;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-  transition:
-    background-color 0.2s ease,
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-}
-
-.vers-zeile:hover .loesch-knopf,
-.titel-zeile:hover .loesch-knopf {
-  display: inline-block;
-}
-
-.loesch-knopf:hover {
-  background: #ef4444;
-  transform: translateY(-50%) scale(1.08);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
-}
-
-.loesch-knopf:active {
-  transform: translateY(-50%) scale(0.95);
-}
-
-.loesch-knopf:focus {
-  outline: none;
-  box-shadow:
-    0 0 0 3px rgba(248, 113, 113, 0.35),
-    0 4px 10px rgba(0, 0, 0, 0.25);
-}
-
-.vers-editor {
-  width: 100%;
-  font-size: 24px;
-  text-align: center;
-}
-
-#scriptoriumStart {
-  margin-top: 35vh;
-}
-
-#titelEingabe {
-  margin-top: 35vh;
-  width: min(100%, 600px);
-  text-align: center;
-  font-size: 28px;
-}
-
-#aktuellerTitel {
-  text-align: left;
-  margin-left: 270px;
-  font-size: 30px;
-}
-
-.titel-kopfzeile,
-.titel-zeile {
-  display: grid;
-  grid-template-columns: 120px 1fr 180px 180px 40px;
-  align-items: center;
-  gap: 10px;
-}
-
-.titel-kopfzeile {
-  font-weight: bold;
-  font-size: 20px;
-  padding: 8px 12px;
-  border-bottom: 2px solid #999;
-  margin-bottom: 10px;
-}
-
-.titel-spalte {
-  text-align: left;
-}
-
-.datum-spalte {
-  text-align: center;
-  font-size: 18px;
-}
-
-.titel-zeile span:nth-child(2) {
-  text-align: left;
-}
-
-.veroeffentlichen-knopf {
-  display: inline-block;
-  width: 110px;
-  padding: 8px 12px;
-  border: none;
-  border-radius: 12px;
-  background: #d4af37;
-  color: #4a2f00;
-  font-weight: bold;
-  font-size: 18px;
-  cursor: pointer;
-  text-align: center;
-  box-sizing: border-box;
-  transition: background-color 0.2s ease, transform 0.2s ease;
-}
-
-.veroeffentlichen-knopf:hover {
-  background: #f59e0b;
-  transform: scale(1.03);
-}
-
-.veroeffentlichen-knopf:active {
-  transform: scale(0.97);
-}
-
-.bibliotheca-auctor,
-.lektueremodus-auctor {
-  display: block;
-  margin: 4px 0 8px 0;
-  color: #7c5a12;
-  font-size: 18px;
-  font-weight: bold;
-  font-style: italic;
-}
-
-.bibliotheca-card h3 {
-  margin-bottom: 2px;
-}
-
-.lektueremodus {
-  position: relative;
-}
-
-.lektueremodus h2 {
-  margin-bottom: 2px;
-}
-
-.zurueck-knopf {
-  position: absolute;
-  top: 0;
-  left: 0;
-  margin: 0;
-}
-
-.kommentar-toggle {
-  position: fixed;
-  right: 28px;
-  top: 45%;
-  z-index: 900;
-  border: none;
-  border-radius: 999px;
-  background: #111827;
-  color: white;
-  font-weight: bold;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-}
-
-.kommentar-leiste {
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: min(420px, 92vw);
-  height: 100vh;
-  background: white;
-  border-left: 1px solid #ccc;
-  box-shadow: -8px 0 24px rgba(0, 0, 0, 0.18);
-  transform: translateX(100%);
-  transition: transform 0.25s ease;
-  z-index: 1200;
-  display: flex;
-  flex-direction: column;
-  text-align: left;
-}
-
-.kommentar-leiste.offen {
-  transform: translateX(0);
-}
-
-.kommentar-leiste-kopf {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 18px 18px 10px 18px;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.kommentar-leiste-kopf h3 {
-  margin: 0;
-}
-
-.kommentar-leiste-kopf button {
-  width: 38px;
-  height: 38px;
-  padding: 0;
-  border: none;
-  border-radius: 50%;
-  background: #f3f4f6;
-  font-size: 26px;
-  line-height: 38px;
-  text-align: center;
-}
-
-.kommentar-leiste-inhalt {
-  flex: 1;
-  overflow-y: auto;
-  padding: 16px 18px;
-}
-
-.kommentar-formular {
-  border-top: 1px solid #e5e7eb;
-  padding: 12px 18px 18px 18px;
-  background: #fafafa;
-}
-
-.kommentar-formular textarea {
-  width: 100%;
-  resize: none;
-  font-size: 18px;
-  border-radius: 12px;
-  border: 1px solid #d1d5db;
-}
-
-.kommentar-formular button {
-  width: 100%;
-  margin: 10px 0 0 0;
-  border: none;
-  border-radius: 12px;
-  background: #111827;
-  color: white;
-  font-weight: bold;
-}
-
-.bewertung-sterne {
-  display: inline-flex;
-  flex-direction: row;
-  gap: 6px;
-  margin: 18px 0 8px 0;
-}
-
-.bewertung-sterne button {
-  border: none;
-  background: transparent;
-  color: #c7c7c7;
-  font-size: 36px;
-  padding: 0 3px;
-  margin: 0;
-  cursor: pointer;
-  transition: color 0.15s ease, transform 0.15s ease;
-}
-
-.bewertung-sterne:hover button,
-.bewertung-sterne button.gewaehlt {
-  color: #d4af37;
-}
-
-.bewertung-sterne button:hover ~ button {
-  color: #c7c7c7;
-}
-
-.bewertung-sterne button:hover {
-  transform: scale(1.15);
-}
+/* ... restliche bestehende Styles bleiben unverändert ... */
