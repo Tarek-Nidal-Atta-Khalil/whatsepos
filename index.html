@@ -15,17 +15,17 @@
 
   <div id="sideMenu" class="side-menu">
   <button onclick="zeigeTab('hexameter')">Hexameter</button>
-  <button onclick="zeigeTab('meineTexte')">Meine Texte</button>
+  <button onclick="zeigeTab('meineTexte')">Mei textus</button>
   <button onclick="zeigeTab('veroeffentlichungen')">Bibliotheca</button>
-  <button onclick="zeigeTab('profil')">Profil</button>
+  <button onclick="zeigeTab('profil')">Persona</button>
 
   <div id="authLoggedOut" class="auth-bottom">
-    <button onclick="zeigeTab('login')">Anmeldung</button>
-    <button onclick="zeigeTab('register')">Registrierung</button>
+    <button onclick="zeigeTab('login')">Ingressus</button>
+    <button onclick="zeigeTab('register')">Registratio</button>
   </div>
 
   <div id="authLoggedIn" class="auth-bottom" style="display: none;">
-    <button onclick="ausloggen()">Ausloggen</button>
+    <button onclick="ausloggen()">Exire</button>
   </div>
 </div>
 
@@ -33,18 +33,18 @@
       <div class="auth-startseite">
         <section class="auth-karte auth-login-karte">
           <h2>Ingredere</h2>
-          <p class="auth-hinweis">Melde dich direkt an und schreibe weiter.</p>
-          <input id="login_identifier" type="text" placeholder="Benutzername oder E-Mail">
-          <input id="login_password" type="password" placeholder="Passwort">
-          <button class="auth-primary" onclick="einloggen()">Einloggen</button>
+          <p class="auth-hinweis">Ingredere et carmina tua perge scribere.</p>
+          <input id="login_identifier" type="text" placeholder="Nomen usoris aut inscriptio electronica">
+          <input id="login_password" type="password" placeholder="Tessera">
+          <button class="auth-primary" onclick="einloggen()">Ingredi</button>
           <p id="login_status" class="status"></p>
         </section>
 
         <section class="auth-karte auth-register-karte">
           <h2>Incipe</h2>
-          <p>Du hast noch kein Konto?</p>
-          <button class="auth-cta" onclick="zeigeTab('register')">Registrieren</button>
-          <p class="auth-hinweis">Erstelle ein Konto und beginne dein erstes Gedicht.</p>
+          <p>Nondum rationem habes?</p>
+          <button class="auth-cta" onclick="zeigeTab('register')">Registrari</button>
+          <p class="auth-hinweis">Rationem crea et primum carmen incipe.</p>
         </section>
       </div>
     </div>
@@ -52,12 +52,12 @@
     <div id="register" class="tab-content" style="display: none;">
       <div class="auth-startseite register-startseite">
         <section class="auth-karte auth-register-formular">
-          <h2>Registrierung</h2>
-          <input id="register_username" type="text" placeholder="Benutzername">
-          <input id="register_email" type="email" placeholder="E-Mail">
-          <input id="register_password" type="password" placeholder="Passwort">
-          <button class="auth-cta" onclick="registrieren()">Konto erstellen</button>
-          <button class="auth-secondary" onclick="zeigeTab('login')">Zur Anmeldung</button>
+          <h2>Registratio</h2>
+          <input id="register_username" type="text" placeholder="Nomen usoris">
+          <input id="register_email" type="email" placeholder="Inscriptio electronica">
+          <input id="register_password" type="password" placeholder="Tessera">
+          <button class="auth-cta" onclick="registrieren()">Rationem creare</button>
+          <button class="auth-secondary" onclick="zeigeTab('login')">Ad ingressum</button>
           <p id="register_status" class="status"></p>
         </section>
       </div>
@@ -67,11 +67,11 @@
       <p id="status" class="status"></p>
 
       <div id="scriptoriumStart">
-        <button onclick="starteNeuesGedicht()">Neues Gedicht</button>
+        <button onclick="starteNeuesGedicht()">Novum carmen</button>
       </div>
 
       <div id="titelEingabeBereich" style="display: none;">
-        <input id="titelEingabe" type="text" placeholder="Titel eingeben">
+        <input id="titelEingabe" type="text" placeholder="Titulum insere">
       </div>
 
       <div id="arbeitsbereich" style="display: none;">
@@ -79,13 +79,13 @@
 
         <div id="poemArea">
           <div id="nuntii"></div>
-          <textarea id="campus" rows="1" placeholder="Vers schreiben und Enter drücken..."></textarea>
+          <textarea id="campus" rows="1" placeholder="Versum scribe et Enter preme..."></textarea>
         </div>
       </div>
     </div>
 
     <div id="meineTexte" class="tab-content" style="display: none;">
-      <h2>Meine Texte</h2>
+      <h2>Mei textus</h2>
 
       <div id="meineTexteKopf" class="titel-kopfzeile">
         <span></span>
@@ -104,13 +104,13 @@
     </div>
 
     <div id="profil" class="tab-content" style="display: none;">
-      <h2>Profil</h2>
+      <h2>Persona</h2>
 
-      <input id="profilUsername" type="text" placeholder="Benutzername">
+      <input id="profilUsername" type="text" placeholder="Nomen usoris">
 
       <br>
 
-      <button onclick="speichereProfil()">Benutzernamen speichern</button>
+      <button onclick="speichereProfil()">Nomen usoris servare</button>
 
       <p id="profil_status" class="status"></p>
     </div>
