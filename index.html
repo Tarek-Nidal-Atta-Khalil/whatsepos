@@ -254,6 +254,22 @@
     .titel-zeile span:first-child {
       text-align: left;
     }
+
+    .publish-button {
+      background: #d4af37;      /* dunkles Goldgelb */
+      color: #5a3b00;
+      border: none;
+      border-radius: 12px;
+      padding: 6px 14px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    
+    .publish-button:hover {
+      background: orange;
+    }
     
   </style>
 </head>
@@ -656,7 +672,8 @@
         geaendertSpan.textContent = formatiereDatum(gedicht.updated_at);
 
         const publishButton = document.createElement("button");
-        publishButton.textContent = "↗";
+        publishButton.textContent = "diuulgo";
+        publishButton.className = "publish-button";
         publishButton.title = "Veröffentlichen";
         
         publishButton.onclick = async function (event) {
