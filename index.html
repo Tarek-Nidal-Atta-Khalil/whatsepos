@@ -798,8 +798,7 @@
           const { error } = await supabase
             .from("poemata")
             .update({
-              published: true,
-              published_at: new Date().toISOString()
+              publicatum: true
             })
             .eq("id", gedicht.id)
             .eq("user_id", aktuellerUser.id);
