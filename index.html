@@ -227,12 +227,12 @@
     }
 
     .titel-kopfzeile,
-    .titel-zeile {
-      display: grid;
-      grid-template-columns: 1fr 180px 180px 40px;
-      align-items: center;
-      gap: 10px;
-    }
+      .titel-zeile {
+        display: grid;
+        grid-template-columns: 40px 1fr 180px 180px 40px;
+        align-items: center;
+        gap: 10px;
+      }
     
     .titel-kopfzeile {
       font-weight: bold;
@@ -348,6 +348,7 @@
       </button>
     
       <div id="meineTexteKopf" class="titel-kopfzeile">
+        <span></span>
         <span class="titel-spalte">Titulus</span>
         <span class="datum-spalte">coepi</span>
         <span class="datum-spalte">mutavi</span>
@@ -659,7 +660,37 @@
         const geaendertSpan = document.createElement("span");
         geaendertSpan.className = "datum-spalte";
         geaendertSpan.textContent = formatiereDatum(gedicht.updated_at);
-      
+
+        const publishButton = document.createElement("button");
+        publishButton.textContent = "↗";
+        publishButton.title = "Veröffentlichen";
+        
+        publishButton.onclick = async function (event) {
+          event.stopPropagation();
+        
+          const bestaetigt = confirm(
+            `Das Gedicht "${gedicht.titulus}" veröffentlichen?`
+          );
+        
+          if (!bestaetigt) return;
+        
+          const { error } = await supabase
+            .from("poemata")
+            .update({
+              published: true,
+              published_at: new Date().toISOString()
+            })
+            .eq("id", gedicht.id)
+            .eq("user_id", aktuellerUser.id);
+        
+          if (error) {
+            setStatus(error.message);
+            return;
+          }
+        
+          setStatus("Gedicht veröffentlicht.");
+        };
+        
         const deleteButton = document.createElement("button");
         deleteButton.className = "loesch-knopf";
         deleteButton.textContent = "×";
@@ -693,6 +724,7 @@
           setStatus("Gedicht gelöscht.");
         };
       
+        div.appendChild(publishButton);
         div.appendChild(titelSpan);
         div.appendChild(erstelltSpan);
         div.appendChild(geaendertSpan);
