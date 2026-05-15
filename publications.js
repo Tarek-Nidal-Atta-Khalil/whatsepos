@@ -4,7 +4,7 @@ window.ladeVeroeffentlichungen = async function () {
 
   const { data, error } = await window.whatseposSupabase
     .from("poemata")
-    .select("id, titulus, textus, updated_at, publicatum_at")
+    .select("id, user_id, titulus, textus, updated_at, publicatum_at")
     .eq("publicatum", true)
     .order("publicatum_at", { ascending: false });
 
@@ -18,15 +18,38 @@ window.ladeVeroeffentlichungen = async function () {
     return;
   }
 
+  const userIds = [...new Set(data.map(function (gedicht) { return gedicht.user_id; }))];
+
+  const { data: profiles, error: profilesError } = await window.whatseposSupabase
+    .from("profiles")
+    .select("id, username")
+    .in("id", userIds);
+
+  if (profilesError) {
+    liste.textContent = profilesError.message;
+    return;
+  }
+
+  const usernameById = {};
+  profiles.forEach(function (profile) {
+    usernameById[profile.id] = profile.username;
+  });
+
   const bibliotheca = document.createElement("div");
   bibliotheca.className = "bibliotheca";
 
   data.forEach(function (gedicht) {
+    gedicht.auctor = usernameById[gedicht.user_id] || "ignotus";
+
     const card = document.createElement("article");
     card.className = "bibliotheca-card";
 
     const titel = document.createElement("h3");
     titel.textContent = gedicht.titulus;
+
+    const auctor = document.createElement("p");
+    auctor.className = "bibliotheca-auctor";
+    auctor.textContent = "a " + gedicht.auctor;
 
     const meta = document.createElement("p");
     meta.className = "bibliotheca-meta";
@@ -49,6 +72,7 @@ window.ladeVeroeffentlichungen = async function () {
     };
 
     card.appendChild(titel);
+    card.appendChild(auctor);
     card.appendChild(meta);
     card.appendChild(preview);
     card.appendChild(button);
@@ -75,6 +99,10 @@ function zeigeVeroeffentlichtesGedicht(gedicht) {
   const titel = document.createElement("h2");
   titel.textContent = gedicht.titulus;
 
+  const auctor = document.createElement("p");
+  auctor.className = "lektueremodus-auctor";
+  auctor.textContent = "a " + (gedicht.auctor || "ignotus");
+
   const meta = document.createElement("p");
   meta.className = "lektueremodus-meta";
   meta.textContent = "divulgatum: " + formatiereBibliotheksDatum(gedicht.publicatum_at || gedicht.updated_at);
@@ -96,6 +124,7 @@ function zeigeVeroeffentlichtesGedicht(gedicht) {
 
   ansicht.appendChild(zurueck);
   ansicht.appendChild(titel);
+  ansicht.appendChild(auctor);
   ansicht.appendChild(meta);
   ansicht.appendChild(text);
   ansicht.appendChild(interaktion);
