@@ -237,6 +237,7 @@
   <div id="sideMenu" class="side-menu">
   <button onclick="zeigeTab('hexameter')">Hexameter</button>
   <button onclick="zeigeTab('meineTexte')">Meine Texte</button>
+  <button onclick="zeigeTab('veroeffentlichungen')">Veröffentlichungen</button>
   <button onclick="zeigeTab('profil')">Profil</button>
 
   <div id="authLoggedOut" class="auth-bottom">
@@ -320,7 +321,16 @@
       <div id="meineTexteListe"></div>
     </div>
 
-   <!-- Profil -->
+    <!-- Veröffentlichungen -->
+    <div id="veroeffentlichungen" class="tab-content" style="display: none;">
+      <h2>Veröffentlichungen</h2>
+    
+      <p>Hier erscheinen später veröffentlichte Gedichte.</p>
+    
+      <div id="veroeffentlichungenListe"></div>
+    </div>
+
+    <!-- Profil -->
     <div id="profil" class="tab-content" style="display: none;">
       <h2>Profil</h2>
     
@@ -426,7 +436,7 @@
     
     // Tabs
     window.zeigeTab = function(tabName) {
-      ["login", "register", "hexameter", "meineTexte", "profil"].forEach(id => {
+      ["login", "register", "hexameter", "meineTexte", "veroeffentlichungen", "profil"].forEach(id => {
         document.getElementById(id).style.display = "none";
       });
       document.getElementById(tabName).style.display = "block";
@@ -434,6 +444,10 @@
 
       if (tabName === "meineTexte") {
         ladeGedichtsliste();
+      }
+      
+      if (tabName === "veroeffentlichungen") {
+        ladeVeroeffentlichungen();
       }
       
       if (tabName === "profil") {
@@ -871,6 +885,15 @@ async function aktualisiereMenuButton() {
         "Benutzername gespeichert.";
     
       await aktualisiereMenuButton();
+    };
+
+    window.ladeVeroeffentlichungen = async function () {
+      const liste = document.getElementById("veroeffentlichungenListe");
+      liste.innerHTML = "";
+    
+      const p = document.createElement("p");
+      p.textContent = "Noch keine Veröffentlichungen vorhanden.";
+      liste.appendChild(p);
     };
 
     pruefeSitzung();
