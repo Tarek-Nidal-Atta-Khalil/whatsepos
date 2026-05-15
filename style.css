@@ -1,0 +1,297 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  text-align: center;
+}
+
+.container {
+  width: calc(100% - 10cm);
+  max-width: 1200px;
+  margin: 40px auto;
+}
+
+.tabs {
+  margin-bottom: 30px;
+}
+
+.tabs button,
+button {
+  font-size: 20px;
+  padding: 10px 20px;
+  margin: 5px;
+  cursor: pointer;
+}
+
+input,
+textarea {
+  font-size: 20px;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+input {
+  margin: 5px;
+  width: min(100%, 320px);
+}
+
+#poemArea {
+  position: relative;
+  height: calc(100vh - 220px);
+}
+
+#nuntii {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: calc(3cm + 56px + 20px);
+  overflow-y: auto;
+  text-align: center;
+  padding-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+#campus {
+  position: fixed;
+  bottom: 3cm;
+  left: 50%;
+  transform: translateX(-50%);
+  right: 0;
+  width: 100%;
+  height: 56px;
+  resize: none;
+  text-align: center;
+  font-size: 24px;
+}
+
+.nuntius {
+  padding: 6px 0;
+  font-size: 24px;
+  white-space: pre-wrap;
+}
+
+.status {
+  min-height: 1.5em;
+  margin-top: 10px;
+}
+
+#meineTexteListe {
+  margin-top: 30px;
+  text-align: left;
+}
+
+.poem-item {
+  border-bottom: 1px solid #ccc;
+  padding: 12px 0;
+}
+
+.poem-item strong {
+  font-size: 24px;
+}
+
+#menuButton {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1001;
+}
+
+.side-menu {
+  position: fixed;
+  top: 0;
+  left: -260px;
+  width: 240px;
+  height: 100vh;
+  background: white;
+  border-right: 1px solid #ccc;
+  padding-top: 80px;
+  transition: left 0.3s ease;
+  z-index: 1000;
+}
+
+.side-menu.open {
+  left: 0;
+}
+
+.side-menu button {
+  display: block;
+  width: 200px;
+  margin: 10px auto;
+  text-align: left;
+}
+
+#logoutButton {
+  position: absolute;
+  left: 20px;
+  bottom: 80px;
+  width: 200px;
+  text-align: left;
+}
+
+h1 {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  margin: 0;
+  font-size: 32px;
+  z-index: 1001;
+  background: white;
+  padding: 5px 10px;
+}
+
+.auth-bottom {
+  position: absolute;
+  left: 20px;
+  bottom: 20px;
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.auth-bottom button {
+  width: 200px;
+  margin: 0;
+  text-align: left;
+}
+
+.vers-zeile,
+.titel-zeile {
+  position: relative;
+  padding: 8px 48px 8px 12px;
+  font-size: 24px;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.vers-zeile:hover,
+.titel-zeile:hover {
+  background: #dbeafe;
+}
+
+.loesch-knopf {
+  display: none;
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 12px;
+  background: #dc2626;
+  color: white;
+  font-size: 22px;
+  font-weight: bold;
+  line-height: 34px;
+  text-align: center;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.vers-zeile:hover .loesch-knopf,
+.titel-zeile:hover .loesch-knopf {
+  display: inline-block;
+}
+
+.loesch-knopf:hover {
+  background: #ef4444;
+  transform: translateY(-50%) scale(1.08);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+}
+
+.loesch-knopf:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.loesch-knopf:focus {
+  outline: none;
+  box-shadow:
+    0 0 0 3px rgba(248, 113, 113, 0.35),
+    0 4px 10px rgba(0, 0, 0, 0.25);
+}
+
+.vers-editor {
+  width: 100%;
+  font-size: 24px;
+  text-align: center;
+}
+
+#scriptoriumStart {
+  margin-top: 35vh;
+}
+
+#titelEingabe {
+  margin-top: 35vh;
+  width: min(100%, 600px);
+  text-align: center;
+  font-size: 28px;
+}
+
+#aktuellerTitel {
+  text-align: left;
+  margin-left: 270px;
+  font-size: 30px;
+}
+
+.titel-kopfzeile,
+.titel-zeile {
+  display: grid;
+  grid-template-columns: 120px 1fr 180px 180px 40px;
+  align-items: center;
+  gap: 10px;
+}
+
+.titel-kopfzeile {
+  font-weight: bold;
+  font-size: 20px;
+  padding: 8px 12px;
+  border-bottom: 2px solid #999;
+  margin-bottom: 10px;
+}
+
+.titel-spalte {
+  text-align: left;
+}
+
+.datum-spalte {
+  text-align: center;
+  font-size: 18px;
+}
+
+.titel-zeile span:nth-child(2) {
+  text-align: left;
+}
+
+.veroeffentlichen-knopf {
+  display: inline-block;
+  width: 110px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 12px;
+  background: #d4af37;
+  color: #4a2f00;
+  font-weight: bold;
+  font-size: 18px;
+  cursor: pointer;
+  text-align: center;
+  box-sizing: border-box;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.veroeffentlichen-knopf:hover {
+  background: #f59e0b;
+  transform: scale(1.03);
+}
+
+.veroeffentlichen-knopf:active {
+  transform: scale(0.97);
+}
