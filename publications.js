@@ -122,71 +122,73 @@ function zeigeVeroeffentlichtesGedicht(gedicht) {
   text.className = "lektueremodus-text";
   text.textContent = gedicht.textus || "";
 
-  const interaktion = document.createElement("section");
-  interaktion.className = "interaktion";
+  const seitenleisteKnopf = document.createElement("button");
+  seitenleisteKnopf.className = "kommentar-toggle";
+  seitenleisteKnopf.textContent = "commentarii";
 
-  interaktion.appendChild(erstelleBewertungskarte());
-  interaktion.appendChild(erstelleTextkarte("Commentarium", "Commentarium scribere...", "commentari", "Kommentare werden im nächsten Schritt gespeichert."));
-  interaktion.appendChild(erstelleTextkarte("Correctio", "Correctionem uel emendationem proponere...", "correctionem proponere", "Korrekturvorschläge werden später gespeichert."));
+  const kommentarLeiste = erstelleKommentarLeiste();
+
+  seitenleisteKnopf.onclick = function () {
+    kommentarLeiste.classList.add("offen");
+  };
 
   ansicht.appendChild(zurueck);
   ansicht.appendChild(titel);
   ansicht.appendChild(auctor);
   ansicht.appendChild(meta);
   ansicht.appendChild(text);
-  ansicht.appendChild(interaktion);
+  ansicht.appendChild(seitenleisteKnopf);
+  ansicht.appendChild(kommentarLeiste);
   liste.appendChild(ansicht);
 }
 
-function erstelleBewertungskarte() {
-  const karte = document.createElement("div");
-  karte.className = "interaktionskarte";
+function erstelleKommentarLeiste() {
+  const leiste = document.createElement("aside");
+  leiste.className = "kommentar-leiste";
 
-  const sterne = document.createElement("div");
-  sterne.className = "bewertung-sterne";
+  const kopf = document.createElement("div");
+  kopf.className = "kommentar-leiste-kopf";
 
-  for (let i = 0; i < 5; i++) {
-    const stern = document.createElement("button");
-    stern.type = "button";
-    stern.textContent = "☆";
-    sterne.appendChild(stern);
-  }
+  const titel = document.createElement("h3");
+  titel.textContent = "Commentarii";
 
-  const hinweis = document.createElement("p");
-  hinweis.className = "platzhalter";
-  hinweis.textContent = "Bewertungen werden im nächsten Schritt gespeichert.";
+  const schliessen = document.createElement("button");
+  schliessen.type = "button";
+  schliessen.textContent = "×";
+  schliessen.onclick = function () {
+    leiste.classList.remove("offen");
+  };
 
-  karte.appendChild(sterne);
-  karte.appendChild(hinweis);
+  kopf.appendChild(titel);
+  kopf.appendChild(schliessen);
 
-  return karte;
-}
+  const inhalt = document.createElement("div");
+  inhalt.className = "kommentar-leiste-inhalt";
 
-function erstelleTextkarte(titelText, platzhalterText, buttonText, hinweisText) {
-  const karte = document.createElement("div");
-  karte.className = "interaktionskarte";
+  const platzhalter = document.createElement("p");
+  platzhalter.className = "platzhalter";
+  platzhalter.textContent = "Commentarii hic apparebunt.";
+  inhalt.appendChild(platzhalter);
 
-  const titel = document.createElement("h4");
-  titel.textContent = titelText;
+  const formular = document.createElement("div");
+  formular.className = "kommentar-formular";
 
   const textarea = document.createElement("textarea");
-  textarea.rows = 4;
-  textarea.placeholder = platzhalterText;
+  textarea.rows = 3;
+  textarea.placeholder = "Commentarium scribere...";
 
   const button = document.createElement("button");
   button.type = "button";
-  button.textContent = buttonText;
+  button.textContent = "commentari";
 
-  const hinweis = document.createElement("p");
-  hinweis.className = "platzhalter";
-  hinweis.textContent = hinweisText;
+  formular.appendChild(textarea);
+  formular.appendChild(button);
 
-  karte.appendChild(titel);
-  karte.appendChild(textarea);
-  karte.appendChild(button);
-  karte.appendChild(hinweis);
+  leiste.appendChild(kopf);
+  leiste.appendChild(inhalt);
+  leiste.appendChild(formular);
 
-  return karte;
+  return leiste;
 }
 
 function erstelleVorschau(textus) {
