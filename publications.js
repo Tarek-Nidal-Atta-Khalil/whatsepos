@@ -128,10 +128,11 @@ function zeigeVeroeffentlichtesGedicht(gedicht) {
   seitenleisteKnopf.className = "kommentar-toggle";
   seitenleisteKnopf.textContent = "commentarii";
 
-  const kommentarLeiste = erstelleKommentarLeiste();
+  const kommentarLeiste = erstelleKommentarLeiste(gedicht.id);
 
   seitenleisteKnopf.onclick = function () {
     kommentarLeiste.classList.add("offen");
+    ladeKommentare(gedicht.id, kommentarLeiste);
   };
 
   ansicht.appendChild(zurueck);
@@ -183,7 +184,7 @@ function markiereSterne(container, wert) {
   });
 }
 
-function erstelleKommentarLeiste() {
+function erstelleKommentarLeiste(poemId) {
   const leiste = document.createElement("aside");
   leiste.className = "kommentar-leiste";
 
@@ -205,11 +206,7 @@ function erstelleKommentarLeiste() {
 
   const inhalt = document.createElement("div");
   inhalt.className = "kommentar-leiste-inhalt";
-
-  const platzhalter = document.createElement("p");
-  platzhalter.className = "platzhalter";
-  platzhalter.textContent = "Commentarii hic apparebunt.";
-  inhalt.appendChild(platzhalter);
+  inhalt.textContent = "Commentarii onerantur...";
 
   const formular = document.createElement("div");
   formular.className = "kommentar-formular";
@@ -221,6 +218,9 @@ function erstelleKommentarLeiste() {
   const button = document.createElement("button");
   button.type = "button";
   button.textContent = "commentari";
+  button.onclick = async function () {
+    await speichereKommentar(poemId, null, textarea, leiste);
+  };
 
   formular.appendChild(textarea);
   formular.appendChild(button);
@@ -230,6 +230,143 @@ function erstelleKommentarLeiste() {
   leiste.appendChild(formular);
 
   return leiste;
+}
+
+async function ladeKommentare(poemId, leiste) {
+  const inhalt = leiste.querySelector(".kommentar-leiste-inhalt");
+  inhalt.innerHTML = "";
+
+  const { data, error } = await window.whatseposSupabase
+    .from("commentarii")
+    .select("id, user_id, parent_id, textus, created_at")
+    .eq("poem_id", poemId)
+    .order("created_at", { ascending: true });
+
+  if (error) {
+    inhalt.textContent = error.message;
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    const leer = document.createElement("p");
+    leer.className = "platzhalter";
+    leer.textContent = "Nulli adhuc commentarii.";
+    inhalt.appendChild(leer);
+    return;
+  }
+
+  const userIds = [...new Set(data.map(function (kommentar) { return kommentar.user_id; }))];
+  const { data: profiles } = await window.whatseposSupabase
+    .from("profiles")
+    .select("id, username")
+    .in("id", userIds);
+
+  const usernameById = {};
+  (profiles || []).forEach(function (profile) {
+    usernameById[profile.id] = profile.username;
+  });
+
+  const kommentareByParent = {};
+  data.forEach(function (kommentar) {
+    const parent = kommentar.parent_id || "radix";
+    if (!kommentareByParent[parent]) kommentareByParent[parent] = [];
+    kommentareByParent[parent].push(kommentar);
+  });
+
+  (kommentareByParent.radix || []).forEach(function (kommentar) {
+    inhalt.appendChild(erstelleKommentarElement(kommentar, kommentareByParent, usernameById, poemId, leiste, 0));
+  });
+}
+
+function erstelleKommentarElement(kommentar, kommentareByParent, usernameById, poemId, leiste, ebene) {
+  const artikel = document.createElement("article");
+  artikel.className = "kommentar";
+  if (ebene > 0) artikel.classList.add("antwort");
+
+  const kopf = document.createElement("div");
+  kopf.className = "kommentar-kopf";
+
+  const auctor = document.createElement("strong");
+  auctor.textContent = usernameById[kommentar.user_id] || "ignotus";
+
+  const zeit = document.createElement("span");
+  zeit.textContent = formatiereKommentarZeit(kommentar.created_at);
+
+  kopf.appendChild(auctor);
+  kopf.appendChild(zeit);
+
+  const text = document.createElement("p");
+  text.className = "kommentar-text";
+  text.textContent = kommentar.textus;
+
+  const antwortKnopf = document.createElement("button");
+  antwortKnopf.type = "button";
+  antwortKnopf.className = "antwort-knopf";
+  antwortKnopf.textContent = "respondere";
+
+  const antwortBereich = document.createElement("div");
+  antwortBereich.className = "antwort-bereich";
+
+  antwortKnopf.onclick = function () {
+    antwortBereich.innerHTML = "";
+
+    const textarea = document.createElement("textarea");
+    textarea.rows = 2;
+    textarea.placeholder = "Responsum scribere...";
+
+    const senden = document.createElement("button");
+    senden.type = "button";
+    senden.textContent = "respondere";
+    senden.onclick = async function () {
+      await speichereKommentar(poemId, kommentar.id, textarea, leiste);
+    };
+
+    antwortBereich.appendChild(textarea);
+    antwortBereich.appendChild(senden);
+    textarea.focus();
+  };
+
+  artikel.appendChild(kopf);
+  artikel.appendChild(text);
+  artikel.appendChild(antwortKnopf);
+  artikel.appendChild(antwortBereich);
+
+  const antworten = kommentareByParent[kommentar.id] || [];
+  antworten.forEach(function (antwort) {
+    artikel.appendChild(erstelleKommentarElement(antwort, kommentareByParent, usernameById, poemId, leiste, ebene + 1));
+  });
+
+  return artikel;
+}
+
+async function speichereKommentar(poemId, parentId, textarea, leiste) {
+  const textus = textarea.value.trim();
+  if (textus === "") return;
+
+  const { data: sessionData } = await window.whatseposSupabase.auth.getSession();
+  const user = sessionData.session?.user;
+
+  if (!user) {
+    alert("Bitte zuerst einloggen.");
+    return;
+  }
+
+  const { error } = await window.whatseposSupabase
+    .from("commentarii")
+    .insert({
+      poem_id: poemId,
+      user_id: user.id,
+      parent_id: parentId,
+      textus: textus
+    });
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
+
+  textarea.value = "";
+  await ladeKommentare(poemId, leiste);
 }
 
 function erstelleVorschau(textus) {
@@ -252,5 +389,19 @@ function formatiereBibliotheksDatum(isoString) {
     day: "2-digit",
     month: "2-digit",
     year: "numeric"
+  });
+}
+
+function formatiereKommentarZeit(isoString) {
+  if (!isoString) return "";
+
+  const datum = new Date(isoString);
+
+  return datum.toLocaleString("de-DE", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit"
   });
 }
