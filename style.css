@@ -62,7 +62,7 @@ input {
 .auth-login-karte input,
 .auth-register-formular input {
   display: block;
-  width: 100%; 
+  width: 100%;
   max-width: none;
   margin: 14px 0;
   padding: 18px 20px;
@@ -88,7 +88,7 @@ input {
 
 .auth-primary,
 .auth-cta {
-  width: 100%; 
+  width: 100%;
   margin-top: 18px;
   padding: 18px 28px;
   border: none;
@@ -116,7 +116,7 @@ input {
 }
 
 .auth-secondary {
-  width: 100%; 
+  width: 100%;
   margin-top: 12px;
   padding: 14px 24px;
   border: 2px solid #d1d5db;
@@ -147,7 +147,7 @@ input {
   }
 
   .auth-karte {
-    width: 100%; 
+    width: 100%;
     max-width: 720px;
   }
 }
@@ -253,6 +253,19 @@ h1 {
 }
 
 .auth-bottom button {
+  width: 200px;
+  margin: 0;
+  text-align: left;
+}
+
+#authLoggedIn {
+  position: absolute;
+  left: 20px;
+  bottom: 20px;
+  width: 200px;
+}
+
+#authLoggedIn button {
   width: 200px;
   margin: 0;
   text-align: left;
