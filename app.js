@@ -550,44 +550,6 @@ window.speichereProfil = async function () {
   await aktualisiereMenuButton();
 };
 
-window.ladeVeroeffentlichungen = async function () {
-  const liste = document.getElementById("veroeffentlichungenListe");
-  liste.innerHTML = "";
-
-  const { data, error } = await supabase
-    .from("poemata")
-    .select("titulus, textus, updated_at")
-    .eq("publicatum", true)
-    .order("updated_at", { ascending: false });
-
-  if (error) {
-    liste.textContent = error.message;
-    return;
-  }
-
-  if (!data || data.length === 0) {
-    liste.textContent = "Nulla adhuc carmina divulgata sunt.";
-    return;
-  }
-
-  data.forEach(gedicht => {
-    const div = document.createElement("div");
-    div.className = "poem-item";
-
-    const titel = document.createElement("h3");
-    titel.textContent = gedicht.titulus;
-
-    const text = document.createElement("pre");
-    text.textContent = gedicht.textus;
-    text.style.whiteSpace = "pre-wrap";
-
-    div.appendChild(titel);
-    div.appendChild(text);
-
-    liste.appendChild(div);
-  });
-};
-
 window.veroeffentlicheGedicht = async function (gedichtId) {
   const bestaetigt = confirm(
     "Visne hoc carmen omnibus patefacere?"
