@@ -368,6 +368,7 @@ window.ladeGedichtsliste = async function() {
 
 function oeffneGedicht(gedicht) {
   aktuellesGedicht = gedicht;
+  ausgewaehlteVerse.clear();
   aktuellerTitel.textContent = gedicht.titulus;
 
   scriptoriumStart.style.display = "none";
@@ -376,7 +377,7 @@ function oeffneGedicht(gedicht) {
 
   zeigeGedicht(gedicht.textus);
   zeigeTab("hexameter");
-  setStatus("Gedicht geöffnet.");
+  setStatus("");
   campus.focus();
 }
 
