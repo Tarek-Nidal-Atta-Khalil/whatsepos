@@ -306,3 +306,80 @@ h1 {
 #nuntii {
   bottom: 120px;
 }
+
+.titel-kopfzeile,
+.titel-zeile {
+  display: grid;
+  grid-template-columns: 120px minmax(260px, 1fr) 180px 180px 50px;
+  align-items: center;
+  gap: 14px;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.titel-kopfzeile {
+  font-weight: bold;
+  font-size: 20px;
+  padding: 8px 12px;
+  border-bottom: 2px solid #999;
+  margin-top: 24px;
+  margin-bottom: 12px;
+}
+
+.titel-zeile {
+  padding: 8px 12px;
+  font-size: 22px;
+  border-radius: 10px;
+}
+
+.titel-zeile:hover {
+  background: #dbeafe;
+}
+
+.titel-spalte {
+  text-align: left;
+}
+
+.datum-spalte {
+  text-align: center;
+  font-size: 18px;
+}
+
+.titel-zeile span:nth-child(2) {
+  text-align: left;
+  white-space: nowrap;
+}
+
+.veroeffentlichen-knopf {
+  width: 110px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 12px;
+  background: #d4af37;
+  color: #4a2f00;
+  font-weight: bold;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.veroeffentlichen-knopf:hover {
+  background: #f59e0b;
+}
+
+.loesch-knopf {
+  width: 38px;
+  height: 38px;
+  border: none;
+  border-radius: 12px;
+  background: #dc2626;
+  color: white;
+  font-size: 22px;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 0;
+}
+
+.loesch-knopf:hover {
+  background: #ef4444;
+}
