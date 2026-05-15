@@ -43,7 +43,7 @@ async function legeGedichtMitTitelAn() {
   titelEingabeBereich.style.display = "none";
   arbeitsbereich.style.display = "block";
 
-  setStatus("Gedicht angelegt.");
+  setStatus("");
   campus.focus();
 }
 
@@ -232,7 +232,7 @@ async function fuegeVersHinzu() {
   aktuellesGedicht.textus = neuerText;
   zeigeGedicht(neuerText);
   campus.value = "";
-  setStatus("Vers gespeichert.");
+  setStatus("");
 }
 
 window.ladeGedichtsliste = async function() {
