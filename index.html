@@ -30,20 +30,37 @@
 </div>
 
     <div id="login" class="tab-content">
-      <input id="login_identifier" type="text" placeholder="Benutzername oder E-Mail">
-      <input id="login_password" type="password" placeholder="Passwort">
-      <br>
-      <button onclick="einloggen()">Einloggen</button>
-      <p id="login_status" class="status"></p>
+      <div class="auth-startseite">
+        <section class="auth-karte auth-login-karte">
+          <h2>Ingredere</h2>
+          <p class="auth-hinweis">Melde dich direkt an und schreibe weiter.</p>
+          <input id="login_identifier" type="text" placeholder="Benutzername oder E-Mail">
+          <input id="login_password" type="password" placeholder="Passwort">
+          <button class="auth-primary" onclick="einloggen()">Einloggen</button>
+          <p id="login_status" class="status"></p>
+        </section>
+
+        <section class="auth-karte auth-register-karte">
+          <h2>Incipe</h2>
+          <p>Du hast noch kein Konto?</p>
+          <button class="auth-cta" onclick="zeigeTab('register')">Registrieren</button>
+          <p class="auth-hinweis">Erstelle ein Konto und beginne dein erstes Gedicht.</p>
+        </section>
+      </div>
     </div>
 
     <div id="register" class="tab-content" style="display: none;">
-      <input id="register_username" type="text" placeholder="Benutzername">
-      <input id="register_email" type="email" placeholder="E-Mail">
-      <input id="register_password" type="password" placeholder="Passwort">
-      <br>
-      <button onclick="registrieren()">Konto erstellen</button>
-      <p id="register_status" class="status"></p>
+      <div class="auth-startseite register-startseite">
+        <section class="auth-karte auth-register-formular">
+          <h2>Registrierung</h2>
+          <input id="register_username" type="text" placeholder="Benutzername">
+          <input id="register_email" type="email" placeholder="E-Mail">
+          <input id="register_password" type="password" placeholder="Passwort">
+          <button class="auth-cta" onclick="registrieren()">Konto erstellen</button>
+          <button class="auth-secondary" onclick="zeigeTab('login')">Zur Anmeldung</button>
+          <p id="register_status" class="status"></p>
+        </section>
+      </div>
     </div>
 
     <div id="hexameter" class="tab-content" style="display: none;">
