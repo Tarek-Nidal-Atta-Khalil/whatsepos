@@ -270,3 +270,39 @@ h1 {
   margin: 0;
   text-align: left;
 }
+
+#campus {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40vw;
+  max-width: 720px;
+  min-width: 420px;
+  height: 56px;
+  resize: none;
+  text-align: center;
+  font-size: 22px;
+  line-height: 32px;
+  padding: 12px 22px;
+  border: 2px solid #d1d5db;
+  border-radius: 999px;
+  background: white;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  outline: none;
+}
+
+#campus:focus {
+  border-color: #93c5fd;
+  box-shadow:
+    0 0 0 4px rgba(147, 197, 253, 0.35),
+    0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+#campus::placeholder {
+  color: #9ca3af;
+}
+
+#nuntii {
+  bottom: 120px;
+}
