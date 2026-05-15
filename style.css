@@ -295,3 +295,21 @@ h1 {
 .veroeffentlichen-knopf:active {
   transform: scale(0.97);
 }
+
+.bibliotheca-auctor,
+.lektueremodus-auctor {
+  display: block;
+  margin: 4px 0 8px 0;
+  color: #7c5a12;
+  font-size: 18px;
+  font-weight: bold;
+  font-style: italic;
+}
+
+.bibliotheca-card h3 {
+  margin-bottom: 2px;
+}
+
+.lektueremodus h2 {
+  margin-bottom: 2px;
+}
