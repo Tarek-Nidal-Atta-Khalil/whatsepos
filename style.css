@@ -261,22 +261,39 @@ h1 {
   padding: 5px 10px;
 }
 
-.auth-bottom,
-#authLoggedIn {
-  position: absolute;
-  left: 20px;
-  bottom: 20px;
-  width: 200px;
+.side-menu {
+  display: flex;
+  flex-direction: column;
 }
 
 .auth-bottom {
+  position: absolute;
+  left: 20px;
+  bottom: 24px;
+  width: 200px;
+}
+
+#authLoggedOut,
+#authLoggedIn {
+  position: absolute;
+  left: 20px;
+  bottom: 24px;
+  width: 200px;
+}
+
+#authLoggedOut {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.auth-bottom button,
+#authLoggedIn {
+  display: none;
+}
+
+#authLoggedOut button,
 #authLoggedIn button {
+  display: block;
   width: 200px;
   margin: 0;
   text-align: left;
