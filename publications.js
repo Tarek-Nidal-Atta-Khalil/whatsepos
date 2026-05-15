@@ -2,6 +2,12 @@ window.ladeVeroeffentlichungen = async function () {
   const liste = document.getElementById("veroeffentlichungenListe");
   liste.innerHTML = "";
 
+  const bibliothecaTitel = document.querySelector("#veroeffentlichungen h2");
+  if (bibliothecaTitel) {
+    bibliothecaTitel.textContent = "Bibliotheca";
+    bibliothecaTitel.style.display = "block";
+  }
+
   const { data, error } = await window.whatseposSupabase
     .from("poemata")
     .select("id, user_id, titulus, textus, updated_at, publicatum_at")
@@ -85,6 +91,11 @@ window.ladeVeroeffentlichungen = async function () {
 function zeigeVeroeffentlichtesGedicht(gedicht) {
   const liste = document.getElementById("veroeffentlichungenListe");
   liste.innerHTML = "";
+
+  const bibliothecaTitel = document.querySelector("#veroeffentlichungen h2");
+  if (bibliothecaTitel) {
+    bibliothecaTitel.style.display = "none";
+  }
 
   const ansicht = document.createElement("article");
   ansicht.className = "lektueremodus";
