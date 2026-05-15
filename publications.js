@@ -122,6 +122,8 @@ function zeigeVeroeffentlichtesGedicht(gedicht) {
   text.className = "lektueremodus-text";
   text.textContent = gedicht.textus || "";
 
+  const bewertung = erstelleSternebewertung();
+
   const seitenleisteKnopf = document.createElement("button");
   seitenleisteKnopf.className = "kommentar-toggle";
   seitenleisteKnopf.textContent = "commentarii";
@@ -137,9 +139,48 @@ function zeigeVeroeffentlichtesGedicht(gedicht) {
   ansicht.appendChild(auctor);
   ansicht.appendChild(meta);
   ansicht.appendChild(text);
+  ansicht.appendChild(bewertung);
   ansicht.appendChild(seitenleisteKnopf);
   ansicht.appendChild(kommentarLeiste);
   liste.appendChild(ansicht);
+}
+
+function erstelleSternebewertung() {
+  const sterne = document.createElement("div");
+  sterne.className = "bewertung-sterne";
+
+  for (let i = 1; i <= 5; i++) {
+    const stern = document.createElement("button");
+    stern.type = "button";
+    stern.textContent = "★";
+    stern.dataset.wert = String(i);
+
+    stern.addEventListener("mouseenter", function () {
+      markiereSterne(sterne, i);
+    });
+
+    stern.addEventListener("click", function () {
+      sterne.dataset.gewaehlt = String(i);
+      markiereSterne(sterne, i);
+    });
+
+    sterne.appendChild(stern);
+  }
+
+  sterne.addEventListener("mouseleave", function () {
+    const gewaehlt = Number(sterne.dataset.gewaehlt || 0);
+    markiereSterne(sterne, gewaehlt);
+  });
+
+  return sterne;
+}
+
+function markiereSterne(container, wert) {
+  const sterne = container.querySelectorAll("button");
+  sterne.forEach(function (stern) {
+    const sternWert = Number(stern.dataset.wert);
+    stern.classList.toggle("gewaehlt", sternWert <= wert);
+  });
 }
 
 function erstelleKommentarLeiste() {
