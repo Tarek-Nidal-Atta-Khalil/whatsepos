@@ -225,6 +225,35 @@
       margin-left: 270px;
       font-size: 30px;
     }
+
+    .titel-kopfzeile,
+    .titel-zeile {
+      display: grid;
+      grid-template-columns: 1fr 180px 180px 40px;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .titel-kopfzeile {
+      font-weight: bold;
+      font-size: 20px;
+      padding: 8px 12px;
+      border-bottom: 2px solid #999;
+      margin-bottom: 10px;
+    }
+    
+    .titel-spalte {
+      text-align: left;
+    }
+    
+    .datum-spalte {
+      text-align: center;
+      font-size: 18px;
+    }
+    
+    .titel-zeile span:first-child {
+      text-align: left;
+    }
     
   </style>
 </head>
@@ -318,7 +347,13 @@
         Aktualisieren
       </button>
     
-      <div id="meineTexteListe"></div>
+      <div id="meineTexteListe">
+        <div id="meineTexteKopf" class="titel-kopfzeile">
+          <span class="titel-spalte">Titulus</span>
+          <span class="datum-spalte">coepi</span>
+          <span class="datum-spalte">mutavi</span>
+        </div>
+      </div>
     </div>
 
     <!-- Veröffentlichungen -->
@@ -597,7 +632,7 @@
 
       const { data, error } = await supabase
         .from("poemata")
-        .select("id, titulus, textus, updated_at")
+        .select("id, titulus, textus, created_at, updated_at")
         .eq("user_id", aktuellerUser.id)
         .order("updated_at", { ascending: false });
 
@@ -610,8 +645,19 @@
         const div = document.createElement("div");
         div.className = "titel-zeile";
       
-        const span = document.createElement("span");
-        span.textContent = gedicht.titulus;
+        const titelSpan = document.createElement("span");
+        titelSpan.textContent = gedicht.titulus;
+        titelSpan.onclick = function () {
+          oeffneGedicht(gedicht);
+        };
+        
+        const erstelltSpan = document.createElement("span");
+        erstelltSpan.className = "datum-spalte";
+        erstelltSpan.textContent = formatiereDatum(gedicht.created_at);
+        
+        const geaendertSpan = document.createElement("span");
+        geaendertSpan.className = "datum-spalte";
+        geaendertSpan.textContent = formatiereDatum(gedicht.updated_at);
       
         span.onclick = function () {
           oeffneGedicht(gedicht);
@@ -650,7 +696,9 @@
           setStatus("Gedicht gelöscht.");
         };
       
-        div.appendChild(span);
+        div.appendChild(titelSpan);
+        div.appendChild(erstelltSpan);
+        div.appendChild(geaendertSpan);
         div.appendChild(deleteButton);
         meineTexteListe.appendChild(div);
       });
@@ -895,6 +943,18 @@ async function aktualisiereMenuButton() {
       p.textContent = "Noch keine Veröffentlichungen vorhanden.";
       liste.appendChild(p);
     };
+
+    function formatiereDatum(isoString) {
+      if (!isoString) return "";
+    
+      const datum = new Date(isoString);
+    
+      return datum.toLocaleDateString("de-DE", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric"
+      });
+    }
 
     pruefeSitzung();
   </script>
