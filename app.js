@@ -81,6 +81,21 @@ titelEingabe.addEventListener("keydown", async function (event) {
 
 let aktuellerUser = null;
 let aktuellesGedicht = null;
+let ausgewaehlteVerse = new Set();
+
+const versWerkzeuge = document.createElement("div");
+versWerkzeuge.id = "versWerkzeuge";
+versWerkzeuge.style.display = "none";
+
+const versLoeschenKnopf = document.createElement("button");
+versLoeschenKnopf.id = "versLoeschenKnopf";
+versLoeschenKnopf.type = "button";
+versLoeschenKnopf.textContent = "🗑";
+versLoeschenKnopf.title = "Ausgewählte Verse löschen";
+versLoeschenKnopf.onclick = loescheAusgewaehlteVerse;
+
+versWerkzeuge.appendChild(versLoeschenKnopf);
+document.body.appendChild(versWerkzeuge);
 
 window.zeigeTab = function(tabName) {
   ["login", "register", "hexameter", "meineTexte", "veroeffentlichungen", "profil"].forEach(id => {
@@ -111,36 +126,71 @@ campus.addEventListener("keydown", async function(event) {
 
 function zeigeGedicht(textus) {
   nuntii.innerHTML = "";
-  if (!textus) return;
+
+  if (!textus) {
+    aktualisiereVersWerkzeuge();
+    return;
+  }
 
   const verse = textus.split("\n");
 
   verse.forEach((vers, index) => {
     const div = document.createElement("div");
     div.className = "vers-zeile";
+    div.dataset.index = String(index);
+
+    if (ausgewaehlteVerse.has(index)) {
+      div.classList.add("ausgewaehlt");
+    }
 
     const span = document.createElement("span");
     span.textContent = vers;
 
-    const deleteButton = document.createElement("button");
-    deleteButton.className = "loesch-knopf";
-    deleteButton.textContent = "×";
+    div.onclick = function () {
+      if (ausgewaehlteVerse.has(index)) {
+        ausgewaehlteVerse.delete(index);
+      } else {
+        ausgewaehlteVerse.add(index);
+      }
 
-    deleteButton.onclick = async function (event) {
-      event.stopPropagation();
-      await loescheVers(index);
+      zeigeGedicht(aktuellesGedicht.textus);
+      aktualisiereVersWerkzeuge();
     };
 
-    div.onclick = function () {
+    div.ondblclick = function (event) {
+      event.stopPropagation();
       bearbeiteVers(index, vers);
     };
 
     div.appendChild(span);
-    div.appendChild(deleteButton);
     nuntii.appendChild(div);
   });
 
   nuntii.scrollTop = nuntii.scrollHeight;
+  aktualisiereVersWerkzeuge();
+}
+
+function aktualisiereVersWerkzeuge() {
+  if (ausgewaehlteVerse.size > 0) {
+    versWerkzeuge.style.display = "flex";
+    versLoeschenKnopf.title = ausgewaehlteVerse.size + " Vers(e) löschen";
+  } else {
+    versWerkzeuge.style.display = "none";
+  }
+}
+
+async function loescheAusgewaehlteVerse() {
+  if (!aktuellesGedicht || ausgewaehlteVerse.size === 0) return;
+
+  const verse = aktuellesGedicht.textus.split("\n");
+
+  const neueVerse = verse.filter(function (_vers, index) {
+    return !ausgewaehlteVerse.has(index);
+  });
+
+  ausgewaehlteVerse.clear();
+  await speichereGedichtText(neueVerse.join("\n"));
+  setStatus("");
 }
 
 async function speichereGedichtText(neuerText) {
