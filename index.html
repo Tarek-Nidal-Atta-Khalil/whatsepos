@@ -660,10 +660,6 @@
         geaendertSpan.className = "datum-spalte";
         geaendertSpan.textContent = formatiereDatum(gedicht.updated_at);
       
-        span.onclick = function () {
-          oeffneGedicht(gedicht);
-        };
-      
         const deleteButton = document.createElement("button");
         deleteButton.className = "loesch-knopf";
         deleteButton.textContent = "×";
