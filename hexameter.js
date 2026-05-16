@@ -22,7 +22,15 @@ function endetAufElidierbarenLaut(wort) {
   return /([aeiouy]|[aeiouy]m)$/.test(wort);
 }
 
+function beginntMitKonsonantischemU(wort) {
+  return /^u[aeiouy]/.test(wort);
+}
+
 function beginntMitVokalOderH(wort) {
+  if (beginntMitKonsonantischemU(wort)) {
+    return false;
+  }
+
   return /^[aeiouyh]/.test(wort);
 }
 
