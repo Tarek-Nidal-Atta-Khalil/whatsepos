@@ -19,7 +19,7 @@ export function normalisiereLatein(textus) {
 }
 
 function endetAufElidierbarenLaut(wort) {
-  return /[aeiouy]m?$/.test(wort);
+  return /([aeiouy]|[aeiouy]m)$/.test(wort);
 }
 
 function beginntMitVokalOderH(wort) {
@@ -71,7 +71,6 @@ export function analysiereHexameterRoh(textus) {
   };
 }
 
-// Bequem zum Testen in der Browser-Konsole:
 window.analysiereHexameterRoh = analysiereHexameterRoh;
 window.normalisiereLatein = normalisiereLatein;
 window.findeElisionen = findeElisionen;
