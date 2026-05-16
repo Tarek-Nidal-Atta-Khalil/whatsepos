@@ -421,3 +421,11 @@ h1 {
   background: #ef4444;
   transform: scale(1.05);
 }
+
+#authLoggedIn {
+  z-index: 1002;
+}
+
+#authLoggedIn button {
+  background: white;
+}
