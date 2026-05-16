@@ -479,7 +479,7 @@ window.ausloggen = async function() {
   meineTexteListe.innerHTML = "";
 
   zeigeTab("login");
-  setStatus("Ausgeloggt.");
+  setStatus("");
 };
 
 async function aktualisiereMenuButton() {
