@@ -93,6 +93,7 @@ export function bereiteVersstromVor(textus) {
     }
 
     w = w.replace(/^u([aeiouy])/g, "v$1");
+    w = w.replace(/qu/g, "q");
     w = w.replace(/([aeiouy])i([aeiouy])/g, "$1jj$2");
 
     return w;
@@ -177,7 +178,7 @@ export function analysiereSilbenVorlaeufig(textus) {
   return {
     original: textus,
     versstrom: vorbereitet.versstrom,
-    elisionen: vorbereitet.elisionen,
+    elisionen: voorbereid.elisionen,
     silben
   };
 }
