@@ -264,17 +264,16 @@ h1 {
   padding: 5px 10px;
 }
 
-.auth-bottom,
 #authLoggedOut,
 #authLoggedIn {
-  position: absolute;
+  position: fixed;
   left: 20px;
-  bottom: 24px;
+  bottom: 20px;
   width: 200px;
+  z-index: 9999;
 }
 
 #authLoggedOut {
-  display: flex;
   flex-direction: column;
   gap: 10px;
 }
@@ -289,6 +288,7 @@ h1 {
   width: 200px;
   margin: 0;
   text-align: left;
+  background: white;
 }
 
 .titel-kopfzeile,
@@ -420,12 +420,4 @@ h1 {
 #versLoeschenKnopf:hover {
   background: #ef4444;
   transform: scale(1.05);
-}
-
-#authLoggedIn {
-  z-index: 1002;
-}
-
-#authLoggedIn button {
-  background: white;
 }
