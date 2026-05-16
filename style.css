@@ -279,11 +279,7 @@ h1 {
 }
 
 #authLoggedIn {
-  display: none !important;
-}
-
-.side-menu.open #authLoggedIn {
-  display: block !important;
+  display: none;
 }
 
 #authLoggedOut button,
