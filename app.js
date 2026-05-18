@@ -243,7 +243,7 @@ function aktualisiereHexameterVorschau() {
       ? "syllaba-problema"
       : "syllaba-analysis";
 
-    span.textContent = elementum.signum + elementum.textus;
+    span.textContent = elementum.textusSignatus;
 
     hexameterVorschau.appendChild(span);
 
