@@ -90,9 +90,7 @@ export function findeElisionen(textus) {
   for (let i = 0; i < woerter.length - 1; i += 1) {
     const links = woerter[i];
     const rechts = woerter[i + 1];
-    if (endetAufElidierbarenLaut(links) && beginntMitVokalOderH(rechts)) {
-      elisionen.push({ index: i, links, rechts, hinweis: `${links} + ${rechts}` });
-    }
+    if (endetAufElidierbarenLaut(links) && beginntMitVokalOderH(rechts)) elisionen.push({ index: i, links, rechts, hinweis: `${links} + ${rechts}` });
   }
 
   return elisionen;
@@ -106,18 +104,10 @@ function entferneElidierteEndung(wort) {
 
 function geminaIntervokalischesI(wort) {
   let resultatum = "";
-
   for (let i = 0; i < wort.length; i += 1) {
-    if (
-      wort[i] === "i" &&
-      i > 0 &&
-      i < wort.length - 1 &&
-      estVokalInTextu(wort, i - 1) &&
-      estVokalInTextu(wort, i + 1)
-    ) resultatum += "jj";
+    if (wort[i] === "i" && i > 0 && i < wort.length - 1 && estVokalInTextu(wort, i - 1) && estVokalInTextu(wort, i + 1)) resultatum += "jj";
     else resultatum += wort[i];
   }
-
   return resultatum;
 }
 
@@ -229,25 +219,20 @@ function quantitasAusSiglo(siglum) {
 
 function applicaQuantitatesLexicalesMitFormis(silben, vorbereitet, formaeSelectae) {
   const resultatum = silben.map(s => ({ ...s }));
-
   for (const segmentum of vorbereitet.wortSegmente || []) {
     const forma = formaeSelectae.get(segmentum.index);
     if (!forma) continue;
-
     const indices = [];
     resultatum.forEach(function(syllaba, index) {
       if (syllaba.start >= segmentum.start && syllaba.ende <= segmentum.ende) indices.push(index);
     });
-
     const quantitates = String(forma.quantitates || "").toUpperCase();
     if (quantitates.length !== indices.length) continue;
-
     indices.forEach(function(indexSyllabae, offset) {
       const quantitas = quantitasAusSiglo(quantitates[offset]);
       if (quantitas) resultatum[indexSyllabae].quantitas = quantitas;
     });
   }
-
   return resultatum;
 }
 
@@ -255,13 +240,11 @@ function formaeCompatibilesSegmenti(segmentum, silben) {
   const clavis = clavisFormae(segmentum.wort);
   const formae = formaePerFormam.get(clavis) || [];
   if (formae.length === 0) return [null];
-
   const numerusSyllabarum = silben.filter(syllaba => syllaba.start >= segmentum.start && syllaba.ende <= segmentum.ende).length;
   const compatibiles = formae.filter(function(forma) {
     const quantitates = String(forma.quantitates || "").toUpperCase();
     return quantitates.length === numerusSyllabarum;
   });
-
   return compatibiles.length > 0 ? compatibiles : [null];
 }
 
@@ -270,7 +253,6 @@ function combinaFormasRekursiv(segmenta, silben, index, selectae, resultata) {
     resultata.push(new Map(selectae));
     return;
   }
-
   const segmentum = segmenta[index];
   const formae = formaeCompatibilesSegmenti(segmentum, silben);
   for (const forma of formae) {
@@ -293,23 +275,14 @@ export function trenneSilbenVariantenVers(textus) {
   const varianten = [];
   if (kerne.length === 0) return [];
   erzeugeSilbenVariantenRekursiv(strom, kerne, 0, 0, [], varianten);
-
   const resultata = [];
   varianten.forEach(function(silben, indexVariante) {
     const formaeCombinationes = combinaFormas(vorbereitet.wortSegmente || [], silben);
     formaeCombinationes.forEach(function(formaeSelectae, indexFormae) {
       const silbenCumLexico = applicaQuantitatesLexicalesMitFormis(silben, vorbereitet, formaeSelectae);
-      resultata.push({
-        index: resultata.length,
-        indexSyllabarum: indexVariante,
-        indexFormae,
-        schema: silbenCumLexico.map(s => s.textus).join("-"),
-        silben: silbenCumLexico,
-        formaeSelectae
-      });
+      resultata.push({ index: resultata.length, indexSyllabarum: indexVariante, indexFormae, schema: silbenCumLexico.map(s => s.textus).join("-"), silben: silbenCumLexico, formaeSelectae });
     });
   });
-
   return resultata;
 }
 
@@ -376,7 +349,6 @@ function resolvePedesRekursiv(silbae, pesIndex, initium, pedes) {
     schemata.push({ nomen: "spondeus", schema: ["longa", "longa"] });
   } else if (pesIndex === 4) schemata.push({ nomen: "dactylus", schema: ["longa", "brevis", "brevis"] });
   else schemata.push({ nomen: "finalis", schema: ["longa", "anceps"] });
-
   for (const schemaInfo of schemata) {
     if (!pesCompatibilis(silbae, initium, schemaInfo.schema)) continue;
     const finis = initium + schemaInfo.schema.length;
@@ -410,30 +382,44 @@ function finesPedumProvisorii(silbae) {
   const fines = new Set();
   let i = 0;
   let pedes = 0;
-
   while (i < silbae.length && pedes < 6) {
     const q0 = quantitasSimplex(silbae[i]);
     const q1 = silbae[i + 1] ? quantitasSimplex(silbae[i + 1]) : null;
     const q2 = silbae[i + 2] ? quantitasSimplex(silbae[i + 2]) : null;
-
     if (q0 === "longa" && q1 === "brevis" && q2 === "brevis") {
       fines.add(i + 2);
       i += 3;
       pedes += 1;
       continue;
     }
-
     if (q0 === "longa" && q1 === "longa") {
       fines.add(i + 1);
       i += 2;
       pedes += 1;
       continue;
     }
-
     break;
   }
-
   return fines;
+}
+
+function scoreVariante(variante) {
+  const silben = variante?.silben || [];
+  let score = 0;
+  score += finesPedumProvisorii(silben).size * 10;
+  silben.forEach(function(syllaba) {
+    if (syllaba.quantitas === "longa_natura_lexico") score += 6;
+    else if (syllaba.quantitas === "brevis_natura_lexico") score += 6;
+    else if (syllaba.quantitas === "longa_natura_diphthongo") score += 3;
+    else if (syllaba.quantitas === "longa_positione_provisoria") score += 1;
+  });
+  score -= tresBrevesIndices(silben).size * 5;
+  return score;
+}
+
+function optimaVariante(varianten) {
+  if (!Array.isArray(varianten) || varianten.length === 0) return null;
+  return [...varianten].sort(function(a, b) { return scoreVariante(b) - scoreVariante(a); })[0];
 }
 
 export function pruefeVersVorlaeufig(textus) {
@@ -447,7 +433,8 @@ export function pruefeVersVorlaeufig(textus) {
 export function erstelleAnalysezeile(textus) {
   const pruefung = pruefeVersVorlaeufig(textus);
   const pedesAnalyse = pruefung.pedesAnalyse;
-  const silben = pedesAnalyse.successit ? pedesAnalyse.silben : (pruefung.analyse.varianten?.[0]?.silben ?? []);
+  const optima = optimaVariante(pruefung.analyse.varianten);
+  const silben = pedesAnalyse.successit ? pedesAnalyse.silben : (optima?.silben ?? []);
   const problemIndices = tresBrevesIndices(silben);
   const finesPedum = new Set();
   if (pedesAnalyse.successit) pedesAnalyse.pedes.forEach(pes => finesPedum.add(pes.finis - 1));
