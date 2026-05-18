@@ -4,6 +4,14 @@
 
 const VOKALE = "aeiouy";
 const DIPHTHONGE = ["ae", "au", "oe", "ei", "eu", "ui"];
+const MUTAE_CUM_LIQUIDA = [
+  "bl", "br",
+  "cl", "cr",
+  "dl", "dr",
+  "gl", "gr",
+  "pl", "pr",
+  "tl", "tr"
+];
 
 export function normalisiereLatein(textus) {
   return textus
@@ -27,6 +35,10 @@ function estVokal(littera) {
 
 function istDiphthong(textus, index) {
   return DIPHTHONGE.includes(textus.slice(index, index + 2));
+}
+
+function istMutaCumLiquida(gruppe) {
+  return MUTAE_CUM_LIQUIDA.includes(gruppe);
 }
 
 function endetAufElidierbarenLaut(wort) {
@@ -125,10 +137,35 @@ function findeSilbenkerne(strom) {
   return kerne;
 }
 
+export function findeMutaCumLiquidaStellen(textus) {
+  const vorbereitet = bereiteVersstromVor(textus);
+  const strom = vorbereitet.versstrom;
+  const kerne = findeSilbenkerne(strom);
+  const stellen = [];
+
+  for (let i = 0; i < kerne.length - 1; i += 1) {
+    const links = kerne[i];
+    const rechts = kerne[i + 1];
+    const zwischen = strom.slice(links.ende + 1, rechts.start);
+
+    if (istMutaCumLiquida(zwischen)) {
+      stellen.push({
+        index: i,
+        gruppe: zwischen,
+        position: links.ende + 1,
+        hinweis: `${zwischen}: ambigua muta cum liquida`
+      });
+    }
+  }
+
+  return stellen;
+}
+
 export function trenneSilbenVers(textus) {
   const vorbereitet = bereiteVersstromVor(textus);
   const strom = vorbereitet.versstrom;
   const kerne = findeSilbenkerne(strom);
+  const mutaCumLiquidaStellen = findeMutaCumLiquidaStellen(textus);
   const silben = [];
 
   if (kerne.length === 0) {
@@ -141,6 +178,7 @@ export function trenneSilbenVers(textus) {
     const kern = kerne[i];
     const naechsterKern = kerne[i + 1];
     let silbenEnde;
+    let ambigua = false;
 
     if (!naechsterKern) {
       silbenEnde = strom.length - 1;
@@ -149,7 +187,10 @@ export function trenneSilbenVers(textus) {
       const zwischenEnde = naechsterKern.start - 1;
       const konsonanten = strom.slice(zwischenStart, zwischenEnde + 1);
 
-      if (konsonanten.length <= 1) {
+      if (istMutaCumLiquida(konsonanten)) {
+        ambigua = true;
+        silbenEnde = zwischenStart;
+      } else if (konsonanten.length <= 1) {
         silbenEnde = kern.ende;
       } else {
         silbenEnde = zwischenStart;
@@ -162,7 +203,12 @@ export function trenneSilbenVers(textus) {
     silben.push({
       textus: textusSilbae,
       aperta: offen,
-      quantitas: offen ? "brevis_provisoria" : "longa_positione_provisoria"
+      ambigua_muta_cum_liquida: ambigua,
+      quantitas: ambigua
+        ? "ambigua_muta_cum_liquida"
+        : offen
+          ? "brevis_provisoria"
+          : "longa_positione_provisoria"
     });
 
     silbenStart = silbenEnde + 1;
@@ -179,6 +225,7 @@ export function analysiereSilbenVorlaeufig(textus) {
     original: textus,
     versstrom: vorbereitet.versstrom,
     elisionen: vorbereitet.elisionen,
+    mutaCumLiquida: findeMutaCumLiquidaStellen(textus),
     silben
   };
 }
@@ -188,6 +235,7 @@ export function analysiereHexameterRoh(textus) {
   const woerter = normalisiert ? normalisiert.split(" ") : [];
   const elisionen = findeElisionen(textus);
   const hinweise = [];
+  const mutaCumLiquida = findeMutaCumLiquidaStellen(textus);
 
   if (woerter.length === 0) {
     hinweise.push("Kein Text erkannt.");
@@ -197,11 +245,16 @@ export function analysiereHexameterRoh(textus) {
     hinweise.push(`${elisionen.length} mögliche Elision(en) erkannt.`);
   }
 
+  if (mutaCumLiquida.length > 0) {
+    hinweise.push(`${mutaCumLiquida.length} mögliche muta-cum-liquida-Ambiguität(en).`);
+  }
+
   return {
     original: textus,
     normalisiert,
     woerter,
     elisionen,
+    mutaCumLiquida,
     hinweise,
     silbenanalyse: analysiereSilbenVorlaeufig(textus)
   };
@@ -213,3 +266,4 @@ window.findeElisionen = findeElisionen;
 window.bereiteVersstromVor = bereiteVersstromVor;
 window.trenneSilbenVers = trenneSilbenVers;
 window.analysiereSilbenVorlaeufig = analysiereSilbenVorlaeufig;
+window.findeMutaCumLiquidaStellen = findeMutaCumLiquidaStellen;
