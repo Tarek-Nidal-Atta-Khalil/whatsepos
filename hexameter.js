@@ -3,7 +3,7 @@
 // Es bereitet Textnormalisierung, Elisionshinweise, Silbentrennung und eine vorläufige Quantitätenprüfung vor.
 
 const VOKALE = "aeiouy";
-const DIPHTHONGE = ["ae", "au", "oe", "ei", "eu", "ui"];
+const DIPHTHONGE = ["ae", "au", "oe", "ei", "eu"];
 const MUTAE_CUM_LIQUIDA = [
   "bl", "br",
   "cl", "cr",
