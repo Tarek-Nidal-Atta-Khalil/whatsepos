@@ -62,6 +62,14 @@ function estVokalInTextu(textus, index) {
   return estVokal(textus[index]);
 }
 
+function indexPrimiVocalisInTextu(textus) {
+  for (let i = 0; i < textus.length; i += 1) {
+    if (estVokalInTextu(textus, i)) return i;
+  }
+
+  return -1;
+}
+
 function istDiphthong(textus, index) {
   if (!estVokalInTextu(textus, index) || !estVokalInTextu(textus, index + 1)) {
     return false;
@@ -330,24 +338,23 @@ function notaSyllabamLongamPositione(textus, indexVocalis) {
 
 function notaSyllabamQuantitate(syllaba, quantitas) {
   const textus = syllaba.textus;
+  const indexVocalis = indexPrimiVocalisInTextu(textus);
 
-  for (let i = 0; i < textus.length; i += 1) {
-    if (!estVokalInTextu(textus, i)) continue;
+  if (indexVocalis < 0) return textus;
 
-    if (quantitas === "longa" && istDiphthong(textus, i)) {
-      return textus.slice(0, i) + notaDiphthongumLongum(textus, i) + textus.slice(i + 2);
-    }
-
-    if (quantitas === "longa" && !syllaba.aperta) {
-      return notaSyllabamLongamPositione(textus, i);
-    }
-
-    return textus.slice(0, i)
-      + litteraQuantitateNotata(textus[i], quantitas)
-      + textus.slice(i + 1);
+  if (quantitas === "longa" && istDiphthong(textus, indexVocalis)) {
+    return textus.slice(0, indexVocalis)
+      + notaDiphthongumLongum(textus, indexVocalis)
+      + textus.slice(indexVocalis + 2);
   }
 
-  return textus;
+  if (quantitas === "longa" && !syllaba.aperta) {
+    return notaSyllabamLongamPositione(textus, indexVocalis);
+  }
+
+  return textus.slice(0, indexVocalis)
+    + litteraQuantitateNotata(textus[indexVocalis], quantitas)
+    + textus.slice(indexVocalis + 1);
 }
 
 function longaCompatibilis(quantitas) {
