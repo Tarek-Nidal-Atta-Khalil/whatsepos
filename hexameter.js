@@ -178,7 +178,7 @@ export function analysiereSilbenVorlaeufig(textus) {
   return {
     original: textus,
     versstrom: vorbereitet.versstrom,
-    elisionen: voorbereid.elisionen,
+    elisionen: vorbereitet.elisionen,
     silben
   };
 }
