@@ -112,9 +112,7 @@ input {
   .auth-karte { width: 100%; max-width: 720px; }
 }
 
-#scriptoriumLayout {
-  display: block;
-}
+#scriptoriumLayout { display: block; }
 
 #poemArea {
   position: relative;
@@ -141,10 +139,7 @@ input {
   z-index: 900;
 }
 
-#suggestionesMetricae h3 {
-  margin-top: 0;
-  margin-bottom: 16px;
-}
+#suggestionesMetricae h3 { margin-top: 0; margin-bottom: 16px; }
 
 #suggestionesMetricaeLista {
   display: flex;
@@ -259,6 +254,25 @@ input {
 .side-menu.open { left: 0; }
 .side-menu button { display: block; width: 200px; margin: 10px auto; text-align: left; }
 
+#authLoggedOut,
+#authLoggedIn {
+  position: fixed;
+  left: -260px;
+  bottom: 20px;
+  width: 200px;
+  z-index: 9999;
+  transition: left 0.3s ease;
+}
+
+.side-menu.open ~ #authLoggedOut,
+.side-menu.open ~ #authLoggedIn {
+  left: 20px;
+}
+
+#authLoggedOut { flex-direction: column; gap: 10px; }
+#authLoggedIn { display: none; }
+#authLoggedOut button, #authLoggedIn button { display: block; width: 200px; margin: 0; text-align: left; background: white; }
+
 h1 {
   position: fixed;
   top: 20px;
@@ -269,12 +283,6 @@ h1 {
   background: white;
   padding: 5px 10px;
 }
-
-#authLoggedOut,
-#authLoggedIn { position: fixed; left: 20px; bottom: 20px; width: 200px; z-index: 9999; }
-#authLoggedOut { flex-direction: column; gap: 10px; }
-#authLoggedIn { display: none; }
-#authLoggedOut button, #authLoggedIn button { display: block; width: 200px; margin: 0; text-align: left; background: white; }
 
 .titel-kopfzeile,
 .titel-zeile {
