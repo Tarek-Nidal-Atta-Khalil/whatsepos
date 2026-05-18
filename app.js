@@ -1,5 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { erstelleAnalysezeile, pruefeVersVorlaeufig } from "./hexameter.js";
+import { erstelleAnalysezeile, pruefeVersVorlaeufig, setzeFormaeMetricas } from "./hexameter.js";
 
 window.toggleMenu = function () {
   document.getElementById("sideMenu").classList.toggle("open");
@@ -165,10 +165,10 @@ async function ladeDictionariumMetricum() {
   if (!suggestionesMetricaeLista) return;
 
   const { data, error } = await supabase
-    .from("longitudines")
-    .select("forma, lemma, quantitates, notae")
+    .from("formae")
+    .select("id, forma, lemma, pars_orationis, quantitates, genus, numerus, casus, gradus, persona, tempus, modus, vox, notae")
     .order("forma", { ascending: true })
-    .limit(200);
+    .limit(1000);
 
   if (error) {
     suggestionesMetricaeLista.innerHTML = "";
@@ -180,6 +180,8 @@ async function ladeDictionariumMetricum() {
   }
 
   dictionariumMetricum = data || [];
+  setzeFormaeMetricas(dictionariumMetricum);
+  aktualisiereHexameterVorschau();
   aktualisiereSuggestionesMetricas();
 }
 
@@ -196,7 +198,15 @@ function aktualisiereSuggestionesMetricas() {
     return;
   }
 
-  const suggestiones = dictionariumMetricum
+  const formaeVisibiles = new Map();
+  
+  dictionariumMetricum.forEach(item => {
+    if (item.forma && !formaeVisibiles.has(item.forma)) {
+      formaeVisibiles.set(item.forma, item);
+    }
+  });
+  
+  const suggestiones = Array.from(formaeVisibiles.values())
     .filter(item => item.forma && suggestioMetricePossibilis(item.forma))
     .slice(0, 30);
 
