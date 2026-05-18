@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { analysiereSilbenVorlaeufig } from "./hexameter.js";
 
 window.toggleMenu = function () {
   document.getElementById("sideMenu").classList.toggle("open");
@@ -56,6 +57,7 @@ window.whatseposSupabase = supabase;
 
 const campus = document.getElementById("campus");
 const nuntii = document.getElementById("nuntii");
+const hexameterVorschau = document.getElementById("hexameterVorschau");
 const meineTexteListe = document.getElementById("meineTexteListe");
 const scriptoriumStart = document.getElementById("scriptoriumStart");
 const titelEingabeBereich = document.getElementById("titelEingabeBereich");
@@ -123,6 +125,42 @@ campus.addEventListener("keydown", async function(event) {
     await fuegeVersHinzu();
   }
 });
+
+campus.addEventListener("input", aktualisiereHexameterVorschau);
+
+function istWortVorlaeufigMoeglich(textusBisHier) {
+  try {
+    const analyse = analysiereSilbenVorlaeufig(textusBisHier);
+    const varianten = analyse.varianten || [];
+    const silbenAnzahl = varianten[0]?.silben?.length || analyse.silben?.length || 0;
+
+    if (silbenAnzahl === 0) return false;
+    if (silbenAnzahl > 17) return false;
+
+    return true;
+  } catch (_fehler) {
+    return false;
+  }
+}
+
+function aktualisiereHexameterVorschau() {
+  if (!hexameterVorschau) return;
+
+  const verba = campus.value.trim().split(/\s+/).filter(Boolean);
+  hexameterVorschau.innerHTML = "";
+
+  verba.forEach(function(verbum, index) {
+    const textusBisHier = verba.slice(0, index + 1).join(" ");
+    const span = document.createElement("span");
+
+    span.textContent = verbum;
+    span.className = istWortVorlaeufigMoeglich(textusBisHier)
+      ? "verbum-ok"
+      : "verbum-malum";
+
+    hexameterVorschau.appendChild(span);
+  });
+}
 
 function zeigeGedicht(textus) {
   nuntii.innerHTML = "";
@@ -272,6 +310,7 @@ async function fuegeVersHinzu() {
   aktuellesGedicht.textus = neuerText;
   zeigeGedicht(neuerText);
   campus.value = "";
+  aktualisiereHexameterVorschau();
   setStatus("");
 }
 
