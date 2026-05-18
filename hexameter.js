@@ -298,12 +298,18 @@ export function analysiereSilbenVorlaeufig(textus) {
 }
 
 function quantitasSimplex(syllaba) {
-  if (syllaba.quantitas === "longa_positione_provisoria") return "longa";
-  if (syllaba.quantitas === "longa_natura_diphthongo") return "longa";
   if (syllaba.quantitas === "longa_natura_lexico") return "longa";
   if (syllaba.quantitas === "brevis_natura_lexico") return "brevis";
+  if (syllaba.quantitas === "longa_positione_provisoria") return "longa";
+  if (syllaba.quantitas === "longa_natura_diphthongo") return "longa";
   if (syllaba.quantitas === "brevis_provisoria") return "brevis";
   return "ambigua";
+}
+
+function quantitasGraphica(syllaba) {
+  if (syllaba.quantitas === "longa_natura_lexico") return "longa";
+  if (syllaba.quantitas === "brevis_natura_lexico") return "brevis";
+  return quantitasSimplex(syllaba);
 }
 
 function signumQuantitatis(quantitas) { if (quantitas === "longa") return "¯"; if (quantitas === "brevis") return "˘"; return "?"; }
@@ -323,7 +329,7 @@ function notaSyllabamQuantitate(syllaba, quantitas) {
   const indexVocalis = indexPrimiVocalisInTextu(textus);
   if (indexDiphthongi >= 0) return textus.slice(0, indexDiphthongi) + notaDiphthongumLongum(textus, indexDiphthongi) + textus.slice(indexDiphthongi + 2);
   if (indexVocalis < 0) return textus;
-  if (quantitas === "longa" && !syllaba.aperta) return notaSyllabamLongamPositione(textus, indexVocalis);
+  if (syllaba.quantitas === "longa_positione_provisoria") return notaSyllabamLongamPositione(textus, indexVocalis);
   return textus.slice(0, indexVocalis) + litteraQuantitateNotata(textus[indexVocalis], quantitas) + textus.slice(indexVocalis + 1);
 }
 
@@ -445,7 +451,7 @@ export function erstelleAnalysezeile(textus) {
     pedes: pedesAnalyse.pedes,
     schema: silben.map(s => s.textus).join("-"),
     elemente: silben.map(function(syllaba, index) {
-      const quantitas = quantitasSimplex(syllaba);
+      const quantitas = quantitasGraphica(syllaba);
       return { textus: syllaba.textus, textusSignatus: notaSyllabamQuantitate(syllaba, quantitas), quantitas, signum: signumQuantitatis(quantitas), problema: problemIndices.has(index), finisPedis: finesPedum.has(index) };
     })
   };
