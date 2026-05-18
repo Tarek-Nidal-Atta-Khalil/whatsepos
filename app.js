@@ -505,7 +505,7 @@ window.einloggen = async function() {
   document.getElementById("login_status").textContent = "Eingeloggt.";
 
   await ladeGedichtsliste();
-  zeigeTab("hexameter");
+  zeigeTab("meineTexte");
 };
 
 window.ausloggen = async function() {
@@ -554,7 +554,7 @@ async function pruefeSitzung() {
     aktualisiereAuthMenu();
     await ladeGedichtsliste();
     await aktualisiereMenuButton();
-    zeigeTab("hexameter");
+    zeigeTab("meineTexte");
   } else {
     aktuellerUser = null;
     aktualisiereAuthMenu();
