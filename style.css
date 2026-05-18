@@ -152,9 +152,47 @@ input {
   }
 }
 
+#scriptoriumLayout {
+  display: flex;
+  gap: 24px;
+  align-items: stretch;
+}
+
 #poemArea {
   position: relative;
+  flex: 1;
   height: calc(100vh - 220px);
+}
+
+#suggestionesMetricae {
+  width: 280px;
+  min-width: 280px;
+  max-height: calc(100vh - 220px);
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 24px;
+  padding: 20px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+  text-align: left;
+}
+
+#suggestionesMetricae h3 {
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
+#suggestionesMetricaeLista {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.suggestio-item {
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: #f8fafc;
+  font-size: 18px;
 }
 
 #nuntii {
