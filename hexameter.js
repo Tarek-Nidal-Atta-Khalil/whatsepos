@@ -16,6 +16,24 @@ const MUTAE_CUM_LIQUIDA = [
   "thl", "thr"
 ];
 
+const VOCALES_LONGAE = {
+  a: "ā",
+  e: "ē",
+  i: "ī",
+  o: "ō",
+  u: "ū",
+  y: "ȳ"
+};
+
+const VOCALES_BREVES = {
+  a: "ǎ",
+  e: "ĕ",
+  i: "ĭ",
+  o: "ŏ",
+  u: "ŭ",
+  y: "y̆"
+};
+
 export function normalisiereLatein(textus) {
   return textus
     .toLowerCase()
@@ -164,17 +182,17 @@ export function findeMutaCumLiquidaStellen(textus) {
   return stellen;
 }
 
-function erstelleSilbe(strom, start, ende, ambigua = false) {
-  const textusSilbae = strom.slice(start, ende + 1);
-  const offen = estVokal(textusSilbae[textusSilbae.length - 1]);
+function erstelleSyllaba(strom, start, ende, ambigua = false) {
+  const textusSyllabae = strom.slice(start, ende + 1);
+  const aperta = estVokal(textusSyllabae[textusSyllabae.length - 1]);
 
   return {
-    textus: textusSilbae,
-    aperta: offen,
+    textus: textusSyllabae,
+    aperta,
     ambigua_muta_cum_liquida: ambigua,
     quantitas: ambigua
       ? "ambigua_muta_cum_liquida"
-      : offen
+      : aperta
         ? "brevis_provisoria"
         : "longa_positione_provisoria"
   };
@@ -192,7 +210,7 @@ function erzeugeSilbenVariantenRekursiv(strom, kerne, kernIndex, silbenStart, bi
   if (!naechsterKern) {
     varianten.push([
       ...bisherigeSilben,
-      erstelleSilbe(strom, silbenStart, strom.length - 1)
+      erstelleSyllaba(strom, silbenStart, strom.length - 1)
     ]);
     return;
   }
@@ -205,8 +223,8 @@ function erzeugeSilbenVariantenRekursiv(strom, kerne, kernIndex, silbenStart, bi
     const offeneEnde = kern.ende;
     const geschlosseneEnde = zwischenStart;
 
-    erzeugeSilbenVariantenRekursiv(strom, kerne, kernIndex + 1, offeneEnde + 1, [...bisherigeSilben, erstelleSilbe(strom, silbenStart, offeneEnde, true)], varianten);
-    erzeugeSilbenVariantenRekursiv(strom, kerne, kernIndex + 1, geschlosseneEnde + 1, [...bisherigeSilben, erstelleSilbe(strom, silbenStart, geschlosseneEnde, true)], varianten);
+    erzeugeSilbenVariantenRekursiv(strom, kerne, kernIndex + 1, offeneEnde + 1, [...bisherigeSilben, erstelleSyllaba(strom, silbenStart, offeneEnde, true)], varianten);
+    erzeugeSilbenVariantenRekursiv(strom, kerne, kernIndex + 1, geschlosseneEnde + 1, [...bisherigeSilben, erstelleSyllaba(strom, silbenStart, geschlosseneEnde, true)], varianten);
 
     return;
   }
@@ -219,7 +237,7 @@ function erzeugeSilbenVariantenRekursiv(strom, kerne, kernIndex, silbenStart, bi
     silbenEnde = zwischenStart;
   }
 
-  erzeugeSilbenVariantenRekursiv(strom, kerne, kernIndex + 1, silbenEnde + 1, [...bisherigeSilben, erstelleSilbe(strom, silbenStart, silbenEnde)], varianten);
+  erzeugeSilbenVariantenRekursiv(strom, kerne, kernIndex + 1, silbenEnde + 1, [...bisherigeSilben, erstelleSyllaba(strom, silbenStart, silbenEnde)], varianten);
 }
 
 export function trenneSilbenVariantenVers(textus) {
@@ -262,9 +280,9 @@ export function analysiereSilbenVorlaeufig(textus) {
   };
 }
 
-function quantitasSimplex(silba) {
-  if (silba.quantitas === "longa_positione_provisoria") return "longa";
-  if (silba.quantitas === "brevis_provisoria") return "brevis";
+function quantitasSimplex(syllaba) {
+  if (syllaba.quantitas === "longa_positione_provisoria") return "longa";
+  if (syllaba.quantitas === "brevis_provisoria") return "brevis";
   return "ambigua";
 }
 
@@ -272,6 +290,53 @@ function signumQuantitatis(quantitas) {
   if (quantitas === "longa") return "¯";
   if (quantitas === "brevis") return "˘";
   return "?";
+}
+
+function litteraQuantitateNotata(littera, quantitas) {
+  if (quantitas === "longa") return VOCALES_LONGAE[littera] || littera;
+  if (quantitas === "brevis") return VOCALES_BREVES[littera] || littera;
+  return littera;
+}
+
+function notaDiphthongumLongum(textus, index) {
+  return textus[index] + "͞" + textus[index + 1];
+}
+
+function notaSyllabamLongamPositione(textus, indexVocalis) {
+  for (let i = indexVocalis + 1; i < textus.length; i += 1) {
+    if (!estVokal(textus[i])) {
+      return textus.slice(0, indexVocalis + 1)
+        + "͞"
+        + textus.slice(indexVocalis + 1, i + 1)
+        + textus.slice(i + 1);
+    }
+  }
+
+  return textus.slice(0, indexVocalis)
+    + litteraQuantitateNotata(textus[indexVocalis], "longa")
+    + textus.slice(indexVocalis + 1);
+}
+
+function notaSyllabamQuantitate(syllaba, quantitas) {
+  const textus = syllaba.textus;
+
+  for (let i = 0; i < textus.length; i += 1) {
+    if (!estVokal(textus[i])) continue;
+
+    if (quantitas === "longa" && istDiphthong(textus, i)) {
+      return textus.slice(0, i) + notaDiphthongumLongum(textus, i) + textus.slice(i + 2);
+    }
+
+    if (quantitas === "longa" && !syllaba.aperta) {
+      return notaSyllabamLongamPositione(textus, i);
+    }
+
+    return textus.slice(0, i)
+      + litteraQuantitateNotata(textus[i], quantitas)
+      + textus.slice(i + 1);
+  }
+
+  return textus;
 }
 
 function longaCompatibilis(quantitas) {
@@ -440,11 +505,12 @@ export function erstelleAnalysezeile(textus) {
     grund: pruefung.grund,
     pedes: pedesAnalyse.pedes,
     schema: silben.map(s => s.textus).join("-"),
-    elemente: silben.map(function(silba, index) {
-      const quantitas = quantitasSimplex(silba);
+    elemente: silben.map(function(syllaba, index) {
+      const quantitas = quantitasSimplex(syllaba);
 
       return {
-        textus: silba.textus,
+        textus: syllaba.textus,
+        textusSignatus: notaSyllabamQuantitate(syllaba, quantitas),
         quantitas,
         signum: signumQuantitatis(quantitas),
         problema: problemIndices.has(index),
