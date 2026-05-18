@@ -161,72 +161,123 @@ export function findeMutaCumLiquidaStellen(textus) {
   return stellen;
 }
 
-export function trenneSilbenVers(textus) {
+function erstelleSilbe(strom, start, ende, ambigua = false) {
+  const textusSilbae = strom.slice(start, ende + 1);
+  const offen = estVokal(textusSilbae[textusSilbae.length - 1]);
+
+  return {
+    textus: textusSilbae,
+    aperta: offen,
+    ambigua_muta_cum_liquida: ambigua,
+    quantitas: ambigua
+      ? "ambigua_muta_cum_liquida"
+      : offen
+        ? "brevis_provisoria"
+        : "longa_positione_provisoria"
+  };
+}
+
+function erzeugeSilbenVariantenRekursiv(strom, kerne, kernIndex, silbenStart, bisherigeSilben, varianten) {
+  const kern = kerne[kernIndex];
+  const naechsterKern = kerne[kernIndex + 1];
+
+  if (!kern) {
+    varianten.push(bisherigeSilben);
+    return;
+  }
+
+  if (!naechsterKern) {
+    varianten.push([
+      ...bisherigeSilben,
+      erstelleSilbe(strom, silbenStart, strom.length - 1)
+    ]);
+    return;
+  }
+
+  const zwischenStart = kern.ende + 1;
+  const zwischenEnde = naechsterKern.start - 1;
+  const konsonanten = strom.slice(zwischenStart, zwischenEnde + 1);
+
+  if (istMutaCumLiquida(konsonanten)) {
+    const offeneEnde = kern.ende;
+    const geschlosseneEnde = zwischenStart;
+
+    erzeugeSilbenVariantenRekursiv(
+      strom,
+      kerne,
+      kernIndex + 1,
+      offeneEnde + 1,
+      [...bisherigeSilben, erstelleSilbe(strom, silbenStart, offeneEnde, true)],
+      varianten
+    );
+
+    erzeugeSilbenVariantenRekursiv(
+      strom,
+      kerne,
+      kernIndex + 1,
+      geschlosseneEnde + 1,
+      [...bisherigeSilben, erstelleSilbe(strom, silbenStart, geschlosseneEnde, true)],
+      varianten
+    );
+
+    return;
+  }
+
+  let silbenEnde;
+
+  if (konsonanten.length <= 1) {
+    silbenEnde = kern.ende;
+  } else {
+    silbenEnde = zwischenStart;
+  }
+
+  erzeugeSilbenVariantenRekursiv(
+    strom,
+    kerne,
+    kernIndex + 1,
+    silbenEnde + 1,
+    [...bisherigeSilben, erstelleSilbe(strom, silbenStart, silbenEnde)],
+    varianten
+  );
+}
+
+export function trenneSilbenVariantenVers(textus) {
   const vorbereitet = bereiteVersstromVor(textus);
   const strom = vorbereitet.versstrom;
   const kerne = findeSilbenkerne(strom);
-  const mutaCumLiquidaStellen = findeMutaCumLiquidaStellen(textus);
-  const silben = [];
+  const varianten = [];
 
   if (kerne.length === 0) {
     return [];
   }
 
-  let silbenStart = 0;
+  erzeugeSilbenVariantenRekursiv(strom, kerne, 0, 0, [], varianten);
 
-  for (let i = 0; i < kerne.length; i += 1) {
-    const kern = kerne[i];
-    const naechsterKern = kerne[i + 1];
-    let silbenEnde;
-    let ambigua = false;
+  return varianten.map(function(silben, index) {
+    return {
+      index,
+      schema: silben.map(s => s.textus).join("-"),
+      silben
+    };
+  });
+}
 
-    if (!naechsterKern) {
-      silbenEnde = strom.length - 1;
-    } else {
-      const zwischenStart = kern.ende + 1;
-      const zwischenEnde = naechsterKern.start - 1;
-      const konsonanten = strom.slice(zwischenStart, zwischenEnde + 1);
-
-      if (istMutaCumLiquida(konsonanten)) {
-        ambigua = true;
-        silbenEnde = zwischenStart;
-      } else if (konsonanten.length <= 1) {
-        silbenEnde = kern.ende;
-      } else {
-        silbenEnde = zwischenStart;
-      }
-    }
-
-    const textusSilbae = strom.slice(silbenStart, silbenEnde + 1);
-    const offen = estVokal(textusSilbae[textusSilbae.length - 1]);
-
-    silben.push({
-      textus: textusSilbae,
-      aperta: offen,
-      ambigua_muta_cum_liquida: ambigua,
-      quantitas: ambigua
-        ? "ambigua_muta_cum_liquida"
-        : offen
-          ? "brevis_provisoria"
-          : "longa_positione_provisoria"
-    });
-
-    silbenStart = silbenEnde + 1;
-  }
-
-  return silben;
+export function trenneSilbenVers(textus) {
+  const varianten = trenneSilbenVariantenVers(textus);
+  return varianten[0]?.silben ?? [];
 }
 
 export function analysiereSilbenVorlaeufig(textus) {
   const vorbereitet = bereiteVersstromVor(textus);
-  const silben = trenneSilbenVers(textus);
+  const varianten = trenneSilbenVariantenVers(textus);
 
   return {
     original: textus,
     versstrom: vorbereitet.versstrom,
     elisionen: vorbereitet.elisionen,
     mutaCumLiquida: findeMutaCumLiquidaStellen(textus),
-    silben
+    silben: varianten[0]?.silben ?? [],
+    varianten
   };
 }
 
@@ -265,5 +316,6 @@ window.normalisiereLatein = normalisiereLatein;
 window.findeElisionen = findeElisionen;
 window.bereiteVersstromVor = bereiteVersstromVor;
 window.trenneSilbenVers = trenneSilbenVers;
+window.trenneSilbenVariantenVers = trenneSilbenVariantenVers;
 window.analysiereSilbenVorlaeufig = analysiereSilbenVorlaeufig;
 window.findeMutaCumLiquidaStellen = findeMutaCumLiquidaStellen;
