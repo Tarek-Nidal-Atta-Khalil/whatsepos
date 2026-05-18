@@ -456,3 +456,31 @@ h1 {
   background: #ef4444;
   transform: scale(1.05);
 }
+
+.syllaba-analysis,
+.syllaba-problema,
+.pes-separator {
+  display: inline-block;
+  font-size: 18px;
+  font-weight: 600;
+  margin: 2px;
+}
+
+.syllaba-analysis {
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #3730a3;
+}
+
+.syllaba-problema {
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.pes-separator {
+  color: #6b7280;
+  padding: 4px 2px;
+}
