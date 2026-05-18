@@ -10,7 +10,10 @@ const MUTAE_CUM_LIQUIDA = [
   "dl", "dr",
   "gl", "gr",
   "pl", "pr",
-  "tl", "tr"
+  "tl", "tr",
+  "chl", "chr",
+  "phl", "phr",
+  "thl", "thr"
 ];
 
 export function normalisiereLatein(textus) {
