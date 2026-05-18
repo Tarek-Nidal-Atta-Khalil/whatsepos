@@ -104,8 +104,29 @@ function entferneElidierteEndung(wort) {
   return wort;
 }
 
+function geminaIntervokalischesI(wort) {
+  let resultatum = "";
+
+  for (let i = 0; i < wort.length; i += 1) {
+    if (
+      wort[i] === "i" &&
+      i > 0 &&
+      i < wort.length - 1 &&
+      estVokalInTextu(wort, i - 1) &&
+      estVokalInTextu(wort, i + 1)
+    ) {
+      resultatum += "jj";
+    } else {
+      resultatum += wort[i];
+    }
+  }
+
+  return resultatum;
+}
+
 function bereiteWortVor(wort) {
-  return wort.replace(/^u([aeiouy])/g, "v$1").replace(/([aeiouy])i([aeiouy])/g, "$1jj$2");
+  const mitKonsonantischemU = wort.replace(/^u([aeiouy])/g, "v$1");
+  return geminaIntervokalischesI(mitKonsonantischemU);
 }
 
 export function bereiteVersstromVor(textus) {
