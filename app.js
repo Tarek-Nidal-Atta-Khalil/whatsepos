@@ -204,6 +204,10 @@ async function ladeDictionariumMetricum(optiones = {}) {
   }
 }
 
+window.reloadDictionariumMetricum = async function() {
+  await ladeDictionariumMetricum({ erzwingen: true });
+};
+
 function aktualisiereSuggestionesMetricas() {
   if (!suggestionesMetricaeLista) return;
 
@@ -404,6 +408,8 @@ function bearbeiteVers(index, alterVers) {
 }
 
 async function fuegeVersHinzu() {
+  await ladeDictionariumMetricum({ erzwingen: true });
+
   const vers = campus.value.trim();
   if (vers === "") return;
 
