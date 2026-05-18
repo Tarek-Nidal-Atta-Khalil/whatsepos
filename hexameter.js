@@ -114,11 +114,8 @@ function geminaIntervokalischesI(wort) {
       i < wort.length - 1 &&
       estVokalInTextu(wort, i - 1) &&
       estVokalInTextu(wort, i + 1)
-    ) {
-      resultatum += "jj";
-    } else {
-      resultatum += wort[i];
-    }
+    ) resultatum += "jj";
+    else resultatum += wort[i];
   }
 
   return resultatum;
@@ -158,9 +155,7 @@ function findeSilbenkerne(strom) {
     if (istDiphthong(strom, i)) {
       kerne.push({ start: i, ende: i + 1, kern: strom.slice(i, i + 2) });
       i += 1;
-    } else {
-      kerne.push({ start: i, ende: i, kern: strom[i] });
-    }
+    } else kerne.push({ start: i, ende: i, kern: strom[i] });
   }
   return kerne;
 }
@@ -234,31 +229,25 @@ function quantitasAusSiglo(siglum) {
 
 function applicaQuantitatesLexicales(silben, vorbereitet) {
   const resultatum = silben.map(s => ({ ...s }));
-
   for (const segmentum of vorbereitet.wortSegmente || []) {
     const clavis = clavisFormae(segmentum.wort);
     const formae = formaePerFormam.get(clavis) || [];
     if (formae.length === 0) continue;
-
     const indices = [];
     resultatum.forEach(function(syllaba, index) {
       if (syllaba.start >= segmentum.start && syllaba.ende <= segmentum.ende) indices.push(index);
     });
-
     const formaCompatibilis = formae.find(function(forma) {
       const quantitates = String(forma.quantitates || "").toUpperCase();
       return quantitates.length === indices.length;
     });
-
     if (!formaCompatibilis) continue;
-
     const quantitates = String(formaCompatibilis.quantitates || "").toUpperCase();
     indices.forEach(function(indexSyllabae, offset) {
       const quantitas = quantitasAusSiglo(quantitates[offset]);
       if (quantitas) resultatum[indexSyllabae].quantitas = quantitas;
     });
   }
-
   return resultatum;
 }
 
@@ -368,6 +357,36 @@ function tresBrevesIndices(silbae) {
   return indices;
 }
 
+function finesPedumProvisorii(silbae) {
+  const fines = new Set();
+  let i = 0;
+  let pedes = 0;
+
+  while (i < silbae.length && pedes < 6) {
+    const q0 = quantitasSimplex(silbae[i]);
+    const q1 = silbae[i + 1] ? quantitasSimplex(silbae[i + 1]) : null;
+    const q2 = silbae[i + 2] ? quantitasSimplex(silbae[i + 2]) : null;
+
+    if (q0 === "longa" && q1 === "brevis" && q2 === "brevis") {
+      fines.add(i + 2);
+      i += 3;
+      pedes += 1;
+      continue;
+    }
+
+    if (q0 === "longa" && q1 === "longa") {
+      fines.add(i + 1);
+      i += 2;
+      pedes += 1;
+      continue;
+    }
+
+    break;
+  }
+
+  return fines;
+}
+
 export function pruefeVersVorlaeufig(textus) {
   const analyse = analysiereSilbenVorlaeufig(textus);
   const pedesAnalyse = analysiereHexameterPedes(textus);
@@ -383,6 +402,7 @@ export function erstelleAnalysezeile(textus) {
   const problemIndices = tresBrevesIndices(silben);
   const finesPedum = new Set();
   if (pedesAnalyse.successit) pedesAnalyse.pedes.forEach(pes => finesPedum.add(pes.finis - 1));
+  else finesPedumProvisorii(silben).forEach(index => finesPedum.add(index));
   return {
     abschickbar: pruefung.abschickbar,
     grund: pruefung.grund,
