@@ -1,5 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { analysiereSilbenVorlaeufig } from "./hexameter.js";
+import { erstelleAnalysezeile, pruefeVersVorlaeufig } from "./hexameter.js";
 
 window.toggleMenu = function () {
   document.getElementById("sideMenu").classList.toggle("open");
@@ -304,6 +304,13 @@ async function fuegeVersHinzu() {
 
   if (error) {
     setStatus(error.message);
+    return;
+  }
+  
+  const pruefung = pruefeVersVorlaeufig(vers);
+
+  if (!pruefung.abschickbar) {
+    setStatus(pruefung.grund || "Versus nondum mitti potest.");
     return;
   }
 
