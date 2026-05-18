@@ -56,27 +56,10 @@ export function normalisiereLatein(textus) {
 }
 
 function estVokal(littera) { return VOKALE.includes(littera); }
-
-function estVokalInTextu(textus, index) {
-  if (textus[index] === "u" && index > 0 && textus[index - 1] === "q") return false;
-  return estVokal(textus[index]);
-}
-
-function indexPrimiVocalisInTextu(textus) {
-  for (let i = 0; i < textus.length; i += 1) if (estVokalInTextu(textus, i)) return i;
-  return -1;
-}
-
-function istDiphthong(textus, index) {
-  if (!estVokalInTextu(textus, index) || !estVokalInTextu(textus, index + 1)) return false;
-  return DIPHTHONGE.includes(textus.slice(index, index + 2));
-}
-
-function indexDiphthongiInTextu(textus) {
-  for (let i = 0; i < textus.length - 1; i += 1) if (istDiphthong(textus, i)) return i;
-  return -1;
-}
-
+function estVokalInTextu(textus, index) { if (textus[index] === "u" && index > 0 && textus[index - 1] === "q") return false; return estVokal(textus[index]); }
+function indexPrimiVocalisInTextu(textus) { for (let i = 0; i < textus.length; i += 1) if (estVokalInTextu(textus, i)) return i; return -1; }
+function istDiphthong(textus, index) { if (!estVokalInTextu(textus, index) || !estVokalInTextu(textus, index + 1)) return false; return DIPHTHONGE.includes(textus.slice(index, index + 2)); }
+function indexDiphthongiInTextu(textus) { for (let i = 0; i < textus.length - 1; i += 1) if (istDiphthong(textus, i)) return i; return -1; }
 function istMutaCumLiquida(gruppe) { return MUTAE_CUM_LIQUIDA.includes(gruppe); }
 function endetAufElidierbarenLaut(wort) { return /([aeiouy]|[aeiouy]m)$/.test(wort); }
 function beginntMitKonsonantischemU(wort) { return /^u[aeiouy]/.test(wort); }
@@ -86,35 +69,17 @@ export function findeElisionen(textus) {
   const normalisiert = normalisiereLatein(textus);
   const woerter = normalisiert ? normalisiert.split(" ") : [];
   const elisionen = [];
-
   for (let i = 0; i < woerter.length - 1; i += 1) {
     const links = woerter[i];
     const rechts = woerter[i + 1];
     if (endetAufElidierbarenLaut(links) && beginntMitVokalOderH(rechts)) elisionen.push({ index: i, links, rechts, hinweis: `${links} + ${rechts}` });
   }
-
   return elisionen;
 }
 
-function entferneElidierteEndung(wort) {
-  if (/[aeiouy]m$/.test(wort)) return wort.slice(0, -2);
-  if (/[aeiouy]$/.test(wort)) return wort.slice(0, -1);
-  return wort;
-}
-
-function geminaIntervokalischesI(wort) {
-  let resultatum = "";
-  for (let i = 0; i < wort.length; i += 1) {
-    if (wort[i] === "i" && i > 0 && i < wort.length - 1 && estVokalInTextu(wort, i - 1) && estVokalInTextu(wort, i + 1)) resultatum += "jj";
-    else resultatum += wort[i];
-  }
-  return resultatum;
-}
-
-function bereiteWortVor(wort) {
-  const mitKonsonantischemU = wort.replace(/^u([aeiouy])/g, "v$1");
-  return geminaIntervokalischesI(mitKonsonantischemU);
-}
+function entferneElidierteEndung(wort) { if (/[aeiouy]m$/.test(wort)) return wort.slice(0, -2); if (/[aeiouy]$/.test(wort)) return wort.slice(0, -1); return wort; }
+function geminaIntervokalischesI(wort) { let resultatum = ""; for (let i = 0; i < wort.length; i += 1) { if (wort[i] === "i" && i > 0 && i < wort.length - 1 && estVokalInTextu(wort, i - 1) && estVokalInTextu(wort, i + 1)) resultatum += "jj"; else resultatum += wort[i]; } return resultatum; }
+function bereiteWortVor(wort) { const mitKonsonantischemU = wort.replace(/^u([aeiouy])/g, "v$1"); return geminaIntervokalischesI(mitKonsonantischemU); }
 
 export function bereiteVersstromVor(textus) {
   const normalisiert = normalisiereLatein(textus);
@@ -123,7 +88,6 @@ export function bereiteVersstromVor(textus) {
   const elisionsIndizes = new Set(elisionen.map(e => e.index));
   const wortSegmente = [];
   let position = 0;
-
   const bearbeiteteWoerter = woerter.map(function(wort, index) {
     let w = wort;
     if (elisionsIndizes.has(index)) w = entferneElidierteEndung(w);
@@ -134,7 +98,6 @@ export function bereiteVersstromVor(textus) {
     position += w.length;
     return w;
   });
-
   return { original: textus, normalisiert, woerter, elisionen, wortSegmente, versstrom: bearbeiteteWoerter.join("") };
 }
 
@@ -142,10 +105,8 @@ function findeSilbenkerne(strom) {
   const kerne = [];
   for (let i = 0; i < strom.length; i += 1) {
     if (!estVokalInTextu(strom, i)) continue;
-    if (istDiphthong(strom, i)) {
-      kerne.push({ start: i, ende: i + 1, kern: strom.slice(i, i + 2) });
-      i += 1;
-    } else kerne.push({ start: i, ende: i, kern: strom[i] });
+    if (istDiphthong(strom, i)) { kerne.push({ start: i, ende: i + 1, kern: strom.slice(i, i + 2) }); i += 1; }
+    else kerne.push({ start: i, ende: i, kern: strom[i] });
   }
   return kerne;
 }
@@ -169,20 +130,7 @@ function hatDiphthongum(textus) { return indexDiphthongiInTextu(textus) >= 0; }
 function erstelleSyllaba(strom, start, ende, ambigua = false) {
   const textusSyllabae = strom.slice(start, ende + 1);
   const aperta = estVokalInTextu(textusSyllabae, textusSyllabae.length - 1);
-  return {
-    textus: textusSyllabae,
-    start,
-    ende,
-    aperta,
-    ambigua_muta_cum_liquida: ambigua,
-    quantitas: hatDiphthongum(textusSyllabae)
-      ? "longa_natura_diphthongo"
-      : ambigua
-        ? "ambigua_muta_cum_liquida"
-        : aperta
-          ? "brevis_provisoria"
-          : "longa_positione_provisoria"
-  };
+  return { textus: textusSyllabae, start, ende, aperta, ambigua_muta_cum_liquida: ambigua, quantitas: hatDiphthongum(textusSyllabae) ? "longa_natura_diphthongo" : ambigua ? "ambigua_muta_cum_liquida" : aperta ? "brevis_provisoria" : "longa_positione_provisoria" };
 }
 
 function erzeugeSilbenVariantenRekursiv(strom, kerne, kernIndex, silbenStart, bisherigeSilben, varianten) {
@@ -190,11 +138,9 @@ function erzeugeSilbenVariantenRekursiv(strom, kerne, kernIndex, silbenStart, bi
   const naechsterKern = kerne[kernIndex + 1];
   if (!kern) { varianten.push(bisherigeSilben); return; }
   if (!naechsterKern) { varianten.push([...bisherigeSilben, erstelleSyllaba(strom, silbenStart, strom.length - 1)]); return; }
-
   const zwischenStart = kern.ende + 1;
   const zwischenEnde = naechsterKern.start - 1;
   const konsonanten = strom.slice(zwischenStart, zwischenEnde + 1);
-
   if (istMutaCumLiquida(konsonanten)) {
     const offeneEnde = kern.ende;
     const geschlosseneEnde = zwischenStart;
@@ -202,20 +148,14 @@ function erzeugeSilbenVariantenRekursiv(strom, kerne, kernIndex, silbenStart, bi
     erzeugeSilbenVariantenRekursiv(strom, kerne, kernIndex + 1, geschlosseneEnde + 1, [...bisherigeSilben, erstelleSyllaba(strom, silbenStart, geschlosseneEnde, true)], varianten);
     return;
   }
-
   let silbenEnde;
   if (konsonanten.length <= 1) silbenEnde = kern.ende;
   else if (konsonanten.startsWith("qu")) silbenEnde = kern.ende;
   else silbenEnde = zwischenStart;
-
   erzeugeSilbenVariantenRekursiv(strom, kerne, kernIndex + 1, silbenEnde + 1, [...bisherigeSilben, erstelleSyllaba(strom, silbenStart, silbenEnde)], varianten);
 }
 
-function quantitasAusSiglo(siglum) {
-  if (siglum === "L") return "longa_natura_lexico";
-  if (siglum === "B") return "brevis_natura_lexico";
-  return null;
-}
+function quantitasAusSiglo(siglum) { if (siglum === "L") return "longa_natura_lexico"; if (siglum === "B") return "brevis_natura_lexico"; return null; }
 
 function applicaQuantitatesLexicalesMitFormis(silben, vorbereitet, formaeSelectae) {
   const resultatum = silben.map(s => ({ ...s }));
@@ -223,15 +163,10 @@ function applicaQuantitatesLexicalesMitFormis(silben, vorbereitet, formaeSelecta
     const forma = formaeSelectae.get(segmentum.index);
     if (!forma) continue;
     const indices = [];
-    resultatum.forEach(function(syllaba, index) {
-      if (syllaba.start >= segmentum.start && syllaba.ende <= segmentum.ende) indices.push(index);
-    });
+    resultatum.forEach(function(syllaba, index) { if (syllaba.start >= segmentum.start && syllaba.ende <= segmentum.ende) indices.push(index); });
     const quantitates = String(forma.quantitates || "").toUpperCase();
     if (quantitates.length !== indices.length) continue;
-    indices.forEach(function(indexSyllabae, offset) {
-      const quantitas = quantitasAusSiglo(quantitates[offset]);
-      if (quantitas) resultatum[indexSyllabae].quantitas = quantitas;
-    });
+    indices.forEach(function(indexSyllabae, offset) { const quantitas = quantitasAusSiglo(quantitates[offset]); if (quantitas) resultatum[indexSyllabae].quantitas = quantitas; });
   }
   return resultatum;
 }
@@ -241,18 +176,12 @@ function formaeCompatibilesSegmenti(segmentum, silben) {
   const formae = formaePerFormam.get(clavis) || [];
   if (formae.length === 0) return [null];
   const numerusSyllabarum = silben.filter(syllaba => syllaba.start >= segmentum.start && syllaba.ende <= segmentum.ende).length;
-  const compatibiles = formae.filter(function(forma) {
-    const quantitates = String(forma.quantitates || "").toUpperCase();
-    return quantitates.length === numerusSyllabarum;
-  });
+  const compatibiles = formae.filter(function(forma) { const quantitates = String(forma.quantitates || "").toUpperCase(); return quantitates.length === numerusSyllabarum; });
   return compatibiles.length > 0 ? compatibiles : [null];
 }
 
 function combinaFormasRekursiv(segmenta, silben, index, selectae, resultata) {
-  if (index >= segmenta.length) {
-    resultata.push(new Map(selectae));
-    return;
-  }
+  if (index >= segmenta.length) { resultata.push(new Map(selectae)); return; }
   const segmentum = segmenta[index];
   const formae = formaeCompatibilesSegmenti(segmentum, silben);
   for (const forma of formae) {
@@ -261,12 +190,7 @@ function combinaFormasRekursiv(segmenta, silben, index, selectae, resultata) {
     combinaFormasRekursiv(segmenta, silben, index + 1, selectae, resultata);
   }
 }
-
-function combinaFormas(segmenta, silben) {
-  const resultata = [];
-  combinaFormasRekursiv(segmenta, silben, 0, new Map(), resultata);
-  return resultata;
-}
+function combinaFormas(segmenta, silben) { const resultata = []; combinaFormasRekursiv(segmenta, silben, 0, new Map(), resultata); return resultata; }
 
 export function trenneSilbenVariantenVers(textus) {
   const vorbereitet = bereiteVersstromVor(textus);
@@ -286,16 +210,8 @@ export function trenneSilbenVariantenVers(textus) {
   return resultata;
 }
 
-export function trenneSilbenVers(textus) {
-  const varianten = trenneSilbenVariantenVers(textus);
-  return varianten[0]?.silben ?? [];
-}
-
-export function analysiereSilbenVorlaeufig(textus) {
-  const vorbereitet = bereiteVersstromVor(textus);
-  const varianten = trenneSilbenVariantenVers(textus);
-  return { original: textus, versstrom: vorbereitet.versstrom, elisionen: vorbereitet.elisionen, mutaCumLiquida: findeMutaCumLiquidaStellen(textus), silben: varianten[0]?.silben ?? [], varianten };
-}
+export function trenneSilbenVers(textus) { const varianten = trenneSilbenVariantenVers(textus); return varianten[0]?.silben ?? []; }
+export function analysiereSilbenVorlaeufig(textus) { const vorbereitet = bereiteVersstromVor(textus); const varianten = trenneSilbenVariantenVers(textus); return { original: textus, versstrom: vorbereitet.versstrom, elisionen: vorbereitet.elisionen, mutaCumLiquida: findeMutaCumLiquidaStellen(textus), silben: varianten[0]?.silben ?? [], varianten }; }
 
 function quantitasSimplex(syllaba) {
   if (syllaba.quantitas === "longa_natura_lexico") return "longa";
@@ -305,23 +221,11 @@ function quantitasSimplex(syllaba) {
   if (syllaba.quantitas === "brevis_provisoria") return "brevis";
   return "ambigua";
 }
-
-function quantitasGraphica(syllaba) {
-  if (syllaba.quantitas === "longa_natura_lexico") return "longa";
-  if (syllaba.quantitas === "brevis_natura_lexico") return "brevis";
-  return quantitasSimplex(syllaba);
-}
-
+function quantitasGraphica(syllaba) { if (syllaba.quantitas === "longa_natura_lexico") return "longa"; if (syllaba.quantitas === "brevis_natura_lexico") return "brevis"; return quantitasSimplex(syllaba); }
 function signumQuantitatis(quantitas) { if (quantitas === "longa") return "¯"; if (quantitas === "brevis") return "˘"; return "?"; }
 function litteraQuantitateNotata(littera, quantitas) { if (quantitas === "longa") return VOCALES_LONGAE[littera] || littera; if (quantitas === "brevis") return VOCALES_BREVES[littera] || littera; return littera; }
 function notaDiphthongumLongum(textus, index) { return textus[index] + "͞" + textus[index + 1]; }
-
-function notaSyllabamLongamPositione(textus, indexVocalis) {
-  for (let i = indexVocalis + 1; i < textus.length; i += 1) {
-    if (!estVokalInTextu(textus, i)) return textus.slice(0, indexVocalis + 1) + "͞" + textus.slice(indexVocalis + 1, i + 1) + textus.slice(i + 1);
-  }
-  return textus.slice(0, indexVocalis) + litteraQuantitateNotata(textus[indexVocalis], "longa") + textus.slice(indexVocalis + 1);
-}
+function notaSyllabamLongamPositione(textus, indexVocalis) { for (let i = indexVocalis + 1; i < textus.length; i += 1) { if (!estVokalInTextu(textus, i)) return textus.slice(0, indexVocalis + 1) + "͞" + textus.slice(indexVocalis + 1, i + 1) + textus.slice(i + 1); } return textus.slice(0, indexVocalis) + litteraQuantitateNotata(textus[indexVocalis], "longa") + textus.slice(indexVocalis + 1); }
 
 function notaSyllabamQuantitate(syllaba, quantitas) {
   const textus = syllaba.textus;
@@ -335,25 +239,12 @@ function notaSyllabamQuantitate(syllaba, quantitas) {
 
 function longaCompatibilis(quantitas) { return quantitas === "longa" || quantitas === "ambigua"; }
 function brevisCompatibilis(quantitas) { return quantitas === "brevis" || quantitas === "ambigua"; }
-
-function pesCompatibilis(silbae, initium, schema) {
-  if (initium + schema.length > silbae.length) return false;
-  return schema.every(function(quantitasExspectata, offset) {
-    const quantitas = quantitasSimplex(silbae[initium + offset]);
-    if (quantitasExspectata === "longa") return longaCompatibilis(quantitas);
-    if (quantitasExspectata === "brevis") return brevisCompatibilis(quantitas);
-    if (quantitasExspectata === "anceps") return true;
-    return false;
-  });
-}
-
+function pesCompatibilis(silbae, initium, schema) { if (initium + schema.length > silbae.length) return false; return schema.every(function(quantitasExspectata, offset) { const quantitas = quantitasSimplex(silbae[initium + offset]); if (quantitasExspectata === "longa") return longaCompatibilis(quantitas); if (quantitasExspectata === "brevis") return brevisCompatibilis(quantitas); if (quantitasExspectata === "anceps") return true; return false; }); }
 function resolvePedesRekursiv(silbae, pesIndex, initium, pedes) {
   if (pesIndex === 6) return initium === silbae.length ? pedes : null;
   const schemata = [];
-  if (pesIndex <= 3) {
-    schemata.push({ nomen: "dactylus", schema: ["longa", "brevis", "brevis"] });
-    schemata.push({ nomen: "spondeus", schema: ["longa", "longa"] });
-  } else if (pesIndex === 4) schemata.push({ nomen: "dactylus", schema: ["longa", "brevis", "brevis"] });
+  if (pesIndex <= 3) { schemata.push({ nomen: "dactylus", schema: ["longa", "brevis", "brevis"] }); schemata.push({ nomen: "spondeus", schema: ["longa", "longa"] }); }
+  else if (pesIndex === 4) schemata.push({ nomen: "dactylus", schema: ["longa", "brevis", "brevis"] });
   else schemata.push({ nomen: "finalis", schema: ["longa", "anceps"] });
   for (const schemaInfo of schemata) {
     if (!pesCompatibilis(silbae, initium, schemaInfo.schema)) continue;
@@ -375,58 +266,10 @@ export function analysiereHexameterPedes(textus) {
   return { successit: false, varians: null, schema: "", silben: [], pedes: [], conatus };
 }
 
-function tresBrevesIndices(silbae) {
-  const indices = new Set();
-  for (let i = 0; i <= silbae.length - 3; i += 1) {
-    const tres = silbae.slice(i, i + 3);
-    if (tres.every(s => quantitasSimplex(s) === "brevis")) { indices.add(i); indices.add(i + 1); indices.add(i + 2); }
-  }
-  return indices;
-}
-
-function finesPedumProvisorii(silbae) {
-  const fines = new Set();
-  let i = 0;
-  let pedes = 0;
-  while (i < silbae.length && pedes < 6) {
-    const q0 = quantitasSimplex(silbae[i]);
-    const q1 = silbae[i + 1] ? quantitasSimplex(silbae[i + 1]) : null;
-    const q2 = silbae[i + 2] ? quantitasSimplex(silbae[i + 2]) : null;
-    if (q0 === "longa" && q1 === "brevis" && q2 === "brevis") {
-      fines.add(i + 2);
-      i += 3;
-      pedes += 1;
-      continue;
-    }
-    if (q0 === "longa" && q1 === "longa") {
-      fines.add(i + 1);
-      i += 2;
-      pedes += 1;
-      continue;
-    }
-    break;
-  }
-  return fines;
-}
-
-function scoreVariante(variante) {
-  const silben = variante?.silben || [];
-  let score = 0;
-  score += finesPedumProvisorii(silben).size * 10;
-  silben.forEach(function(syllaba) {
-    if (syllaba.quantitas === "longa_natura_lexico") score += 6;
-    else if (syllaba.quantitas === "brevis_natura_lexico") score += 6;
-    else if (syllaba.quantitas === "longa_natura_diphthongo") score += 3;
-    else if (syllaba.quantitas === "longa_positione_provisoria") score += 1;
-  });
-  score -= tresBrevesIndices(silben).size * 5;
-  return score;
-}
-
-function optimaVariante(varianten) {
-  if (!Array.isArray(varianten) || varianten.length === 0) return null;
-  return [...varianten].sort(function(a, b) { return scoreVariante(b) - scoreVariante(a); })[0];
-}
+function tresBrevesIndices(silbae) { const indices = new Set(); for (let i = 0; i <= silbae.length - 3; i += 1) { const tres = silbae.slice(i, i + 3); if (tres.every(s => quantitasSimplex(s) === "brevis")) { indices.add(i); indices.add(i + 1); indices.add(i + 2); } } return indices; }
+function finesPedumProvisorii(silbae) { const fines = new Set(); let i = 0; let pedes = 0; while (i < silbae.length && pedes < 6) { const q0 = quantitasSimplex(silbae[i]); const q1 = silbae[i + 1] ? quantitasSimplex(silbae[i + 1]) : null; const q2 = silbae[i + 2] ? quantitasSimplex(silbae[i + 2]) : null; if (q0 === "longa" && q1 === "brevis" && q2 === "brevis") { fines.add(i + 2); i += 3; pedes += 1; continue; } if (q0 === "longa" && q1 === "longa") { fines.add(i + 1); i += 2; pedes += 1; continue; } break; } return fines; }
+function scoreVariante(variante) { const silben = variante?.silben || []; let score = 0; score += finesPedumProvisorii(silben).size * 10; silben.forEach(function(syllaba) { if (syllaba.quantitas === "longa_natura_lexico") score += 6; else if (syllaba.quantitas === "brevis_natura_lexico") score += 6; else if (syllaba.quantitas === "longa_natura_diphthongo") score += 3; else if (syllaba.quantitas === "longa_positione_provisoria") score += 1; }); score -= tresBrevesIndices(silben).size * 5; return score; }
+function optimaVariante(varianten) { if (!Array.isArray(varianten) || varianten.length === 0) return null; return [...varianten].sort(function(a, b) { return scoreVariante(b) - scoreVariante(a); })[0]; }
 
 export function pruefeVersVorlaeufig(textus) {
   const analyse = analysiereSilbenVorlaeufig(textus);
@@ -445,16 +288,7 @@ export function erstelleAnalysezeile(textus) {
   const finesPedum = new Set();
   if (pedesAnalyse.successit) pedesAnalyse.pedes.forEach(pes => finesPedum.add(pes.finis - 1));
   else finesPedumProvisorii(silben).forEach(index => finesPedum.add(index));
-  return {
-    abschickbar: pruefung.abschickbar,
-    grund: pruefung.grund,
-    pedes: pedesAnalyse.pedes,
-    schema: silben.map(s => s.textus).join("-"),
-    elemente: silben.map(function(syllaba, index) {
-      const quantitas = quantitasGraphica(syllaba);
-      return { textus: syllaba.textus, textusSignatus: notaSyllabamQuantitate(syllaba, quantitas), quantitas, signum: signumQuantitatis(quantitas), problema: problemIndices.has(index), finisPedis: finesPedum.has(index) };
-    })
-  };
+  return { abschickbar: pruefung.abschickbar, grund: pruefung.grund, pedes: pedesAnalyse.pedes, schema: silben.map(s => s.textus).join("-"), elemente: silben.map(function(syllaba, index) { const quantitas = quantitasGraphica(syllaba); return { textus: syllaba.textus, textusSignatus: notaSyllabamQuantitate(syllaba, quantitas), quantitas, signum: signumQuantitatis(quantitas), problema: problemIndices.has(index), finisPedis: finesPedum.has(index) }; }) };
 }
 
 export function analysiereHexameterRoh(textus) {
