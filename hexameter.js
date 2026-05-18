@@ -227,28 +227,63 @@ function quantitasAusSiglo(siglum) {
   return null;
 }
 
-function applicaQuantitatesLexicales(silben, vorbereitet) {
+function applicaQuantitatesLexicalesMitFormis(silben, vorbereitet, formaeSelectae) {
   const resultatum = silben.map(s => ({ ...s }));
+
   for (const segmentum of vorbereitet.wortSegmente || []) {
-    const clavis = clavisFormae(segmentum.wort);
-    const formae = formaePerFormam.get(clavis) || [];
-    if (formae.length === 0) continue;
+    const forma = formaeSelectae.get(segmentum.index);
+    if (!forma) continue;
+
     const indices = [];
     resultatum.forEach(function(syllaba, index) {
       if (syllaba.start >= segmentum.start && syllaba.ende <= segmentum.ende) indices.push(index);
     });
-    const formaCompatibilis = formae.find(function(forma) {
-      const quantitates = String(forma.quantitates || "").toUpperCase();
-      return quantitates.length === indices.length;
-    });
-    if (!formaCompatibilis) continue;
-    const quantitates = String(formaCompatibilis.quantitates || "").toUpperCase();
+
+    const quantitates = String(forma.quantitates || "").toUpperCase();
+    if (quantitates.length !== indices.length) continue;
+
     indices.forEach(function(indexSyllabae, offset) {
       const quantitas = quantitasAusSiglo(quantitates[offset]);
       if (quantitas) resultatum[indexSyllabae].quantitas = quantitas;
     });
   }
+
   return resultatum;
+}
+
+function formaeCompatibilesSegmenti(segmentum, silben) {
+  const clavis = clavisFormae(segmentum.wort);
+  const formae = formaePerFormam.get(clavis) || [];
+  if (formae.length === 0) return [null];
+
+  const numerusSyllabarum = silben.filter(syllaba => syllaba.start >= segmentum.start && syllaba.ende <= segmentum.ende).length;
+  const compatibiles = formae.filter(function(forma) {
+    const quantitates = String(forma.quantitates || "").toUpperCase();
+    return quantitates.length === numerusSyllabarum;
+  });
+
+  return compatibiles.length > 0 ? compatibiles : [null];
+}
+
+function combinaFormasRekursiv(segmenta, silben, index, selectae, resultata) {
+  if (index >= segmenta.length) {
+    resultata.push(new Map(selectae));
+    return;
+  }
+
+  const segmentum = segmenta[index];
+  const formae = formaeCompatibilesSegmenti(segmentum, silben);
+  for (const forma of formae) {
+    if (forma) selectae.set(segmentum.index, forma);
+    else selectae.delete(segmentum.index);
+    combinaFormasRekursiv(segmenta, silben, index + 1, selectae, resultata);
+  }
+}
+
+function combinaFormas(segmenta, silben) {
+  const resultata = [];
+  combinaFormasRekursiv(segmenta, silben, 0, new Map(), resultata);
+  return resultata;
 }
 
 export function trenneSilbenVariantenVers(textus) {
@@ -258,10 +293,24 @@ export function trenneSilbenVariantenVers(textus) {
   const varianten = [];
   if (kerne.length === 0) return [];
   erzeugeSilbenVariantenRekursiv(strom, kerne, 0, 0, [], varianten);
-  return varianten.map(function(silben, index) {
-    const silbenCumLexico = applicaQuantitatesLexicales(silben, vorbereitet);
-    return { index, schema: silbenCumLexico.map(s => s.textus).join("-"), silben: silbenCumLexico };
+
+  const resultata = [];
+  varianten.forEach(function(silben, indexVariante) {
+    const formaeCombinationes = combinaFormas(vorbereitet.wortSegmente || [], silben);
+    formaeCombinationes.forEach(function(formaeSelectae, indexFormae) {
+      const silbenCumLexico = applicaQuantitatesLexicalesMitFormis(silben, vorbereitet, formaeSelectae);
+      resultata.push({
+        index: resultata.length,
+        indexSyllabarum: indexVariante,
+        indexFormae,
+        schema: silbenCumLexico.map(s => s.textus).join("-"),
+        silben: silbenCumLexico,
+        formaeSelectae
+      });
+    });
   });
+
+  return resultata;
 }
 
 export function trenneSilbenVers(textus) {
@@ -342,8 +391,8 @@ export function analysiereHexameterPedes(textus) {
   const conatus = [];
   for (const variante of analyse.varianten || []) {
     const pedes = resolvePedesRekursiv(variante.silben, 0, 0, []);
-    conatus.push({ varians: variante.index, schema: variante.schema, successit: Boolean(pedes), pedes: pedes || [] });
-    if (pedes) return { successit: true, varians: variante.index, schema: variante.schema, silben: variante.silben, pedes, conatus };
+    conatus.push({ varians: variante.index, schema: variante.schema, successit: Boolean(pedes), pedes: pedes || [], formaeSelectae: variante.formaeSelectae });
+    if (pedes) return { successit: true, varians: variante.index, schema: variante.schema, silben: variante.silben, pedes, conatus, formaeSelectae: variante.formaeSelectae };
   }
   return { successit: false, varians: null, schema: "", silben: [], pedes: [], conatus };
 }
