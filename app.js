@@ -149,7 +149,7 @@ function aktualisiereHexameterVorschau() {
 
     hexameterVorschau.appendChild(span);
 
-    if ((index + 1) % 3 === 0 && index < analyse.elemente.length - 1) {
+    if (elementum.finisPedis && index < analyse.elemente.length - 1) {
       const separator = document.createElement("span");
       separator.className = "pes-separator";
       separator.textContent = "|";
