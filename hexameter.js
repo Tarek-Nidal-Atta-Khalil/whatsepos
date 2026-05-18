@@ -78,6 +78,14 @@ function istDiphthong(textus, index) {
   return DIPHTHONGE.includes(textus.slice(index, index + 2));
 }
 
+function indexDiphthongiInTextu(textus) {
+  for (let i = 0; i < textus.length - 1; i += 1) {
+    if (istDiphthong(textus, i)) return i;
+  }
+
+  return -1;
+}
+
 function istMutaCumLiquida(gruppe) {
   return MUTAE_CUM_LIQUIDA.includes(gruppe);
 }
@@ -201,6 +209,10 @@ export function findeMutaCumLiquidaStellen(textus) {
   return stellen;
 }
 
+function hatDiphthongum(textus) {
+  return indexDiphthongiInTextu(textus) >= 0;
+}
+
 function erstelleSyllaba(strom, start, ende, ambigua = false) {
   const textusSyllabae = strom.slice(start, ende + 1);
   const aperta = estVokalInTextu(textusSyllabae, textusSyllabae.length - 1);
@@ -209,11 +221,13 @@ function erstelleSyllaba(strom, start, ende, ambigua = false) {
     textus: textusSyllabae,
     aperta,
     ambigua_muta_cum_liquida: ambigua,
-    quantitas: ambigua
-      ? "ambigua_muta_cum_liquida"
-      : aperta
-        ? "brevis_provisoria"
-        : "longa_positione_provisoria"
+    quantitas: hatDiphthongum(textusSyllabae)
+      ? "longa_natura_diphthongo"
+      : ambigua
+        ? "ambigua_muta_cum_liquida"
+        : aperta
+          ? "brevis_provisoria"
+          : "longa_positione_provisoria"
   };
 }
 
@@ -303,6 +317,7 @@ export function analysiereSilbenVorlaeufig(textus) {
 
 function quantitasSimplex(syllaba) {
   if (syllaba.quantitas === "longa_positione_provisoria") return "longa";
+  if (syllaba.quantitas === "longa_natura_diphthongo") return "longa";
   if (syllaba.quantitas === "brevis_provisoria") return "brevis";
   return "ambigua";
 }
@@ -340,15 +355,16 @@ function notaSyllabamLongamPositione(textus, indexVocalis) {
 
 function notaSyllabamQuantitate(syllaba, quantitas) {
   const textus = syllaba.textus;
+  const indexDiphthongi = indexDiphthongiInTextu(textus);
   const indexVocalis = indexPrimiVocalisInTextu(textus);
 
-  if (indexVocalis < 0) return textus;
-
-  if (quantitas === "longa" && istDiphthong(textus, indexVocalis)) {
-    return textus.slice(0, indexVocalis)
-      + notaDiphthongumLongum(textus, indexVocalis)
-      + textus.slice(indexVocalis + 2);
+  if (indexDiphthongi >= 0) {
+    return textus.slice(0, indexDiphthongi)
+      + notaDiphthongumLongum(textus, indexDiphthongi)
+      + textus.slice(indexDiphthongi + 2);
   }
+
+  if (indexVocalis < 0) return textus;
 
   if (quantitas === "longa" && !syllaba.aperta) {
     return notaSyllabamLongamPositione(textus, indexVocalis);
