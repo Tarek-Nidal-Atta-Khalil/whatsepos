@@ -68,6 +68,7 @@ const aktuellerTitel = document.getElementById("aktuellerTitel");
 
 let dictionariumMetricum = [];
 let dictionariumIamTentatum = false;
+let dictionariumPromissum = null;
 
 window.starteNeuesGedicht = function () {
   scriptoriumStart.style.display = "none";
@@ -103,7 +104,7 @@ versLoeschenKnopf.onclick = loescheAusgewaehlteVerse;
 versWerkzeuge.appendChild(versLoeschenKnopf);
 document.body.appendChild(versWerkzeuge);
 
-window.zeigeTab = function(tabName) {
+window.zeigeTab = async function(tabName) {
   ["login", "register", "hexameter", "meineTexte", "veroeffentlichungen", "profil"].forEach(id => {
     document.getElementById(id).style.display = "none";
   });
@@ -123,7 +124,7 @@ window.zeigeTab = function(tabName) {
   }
 
   if (tabName === "hexameter") {
-    ladeDictionariumMetricum();
+    await ladeDictionariumMetricum({ erzwingen: true });
     aktualisiereSuggestionesMetricas();
   }
 };
@@ -135,7 +136,8 @@ campus.addEventListener("keydown", async function(event) {
   }
 });
 
-campus.addEventListener("input", function () {
+campus.addEventListener("input", async function () {
+  await ladeDictionariumMetricum();
   aktualisiereHexameterVorschau();
   aktualisiereSuggestionesMetricas();
 });
@@ -158,31 +160,48 @@ function suggestioMetricePossibilis(forma) {
   }
 }
 
-async function ladeDictionariumMetricum() {
-  if (dictionariumIamTentatum) return;
-  dictionariumIamTentatum = true;
+async function ladeDictionariumMetricum(optiones = {}) {
+  const erzwingen = Boolean(optiones.erzwingen);
 
-  if (!suggestionesMetricaeLista) return;
+  if (dictionariumIamTentatum && !erzwingen) return;
+  if (dictionariumPromissum && !erzwingen) return dictionariumPromissum;
 
-  const { data, error } = await supabase
-    .from("formae")
-    .select("id, forma, lemma, pars_orationis, quantitates, genus, numerus, casus, gradus, persona, tempus, modus, vox, notae")
-    .order("forma", { ascending: true })
-    .limit(1000);
-
-  if (error) {
-    suggestionesMetricaeLista.innerHTML = "";
-    const div = document.createElement("div");
-    div.className = "suggestio-item suggestio-vacua";
-    div.textContent = "Dictionarium nondum legi potest.";
-    suggestionesMetricaeLista.appendChild(div);
-    return;
+  if (erzwingen) {
+    dictionariumIamTentatum = false;
   }
 
-  dictionariumMetricum = data || [];
-  setzeFormaeMetricas(dictionariumMetricum);
-  aktualisiereHexameterVorschau();
-  aktualisiereSuggestionesMetricas();
+  dictionariumPromissum = (async function () {
+    if (!suggestionesMetricaeLista) return;
+
+    const { data, error } = await supabase
+      .from("formae")
+      .select("id, forma, lemma, pars_orationis, quantitates, genus, numerus, casus, gradus, persona, tempus, modus, vox, notae")
+      .order("forma", { ascending: true })
+      .limit(5000);
+
+    if (error) {
+      suggestionesMetricaeLista.innerHTML = "";
+      const div = document.createElement("div");
+      div.className = "suggestio-item suggestio-vacua";
+      div.textContent = "Dictionarium nondum legi potest.";
+      suggestionesMetricaeLista.appendChild(div);
+      dictionariumIamTentatum = false;
+      return;
+    }
+
+    dictionariumMetricum = data || [];
+    setzeFormaeMetricas(dictionariumMetricum);
+    dictionariumIamTentatum = true;
+
+    aktualisiereHexameterVorschau();
+    aktualisiereSuggestionesMetricas();
+  })();
+
+  try {
+    await dictionariumPromissum;
+  } finally {
+    dictionariumPromissum = null;
+  }
 }
 
 function aktualisiereSuggestionesMetricas() {
