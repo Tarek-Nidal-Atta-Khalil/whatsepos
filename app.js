@@ -58,12 +58,16 @@ window.whatseposSupabase = supabase;
 const campus = document.getElementById("campus");
 const nuntii = document.getElementById("nuntii");
 const hexameterVorschau = document.getElementById("hexameterVorschau");
+const suggestionesMetricaeLista = document.getElementById("suggestionesMetricaeLista");
 const meineTexteListe = document.getElementById("meineTexteListe");
 const scriptoriumStart = document.getElementById("scriptoriumStart");
 const titelEingabeBereich = document.getElementById("titelEingabeBereich");
 const titelEingabe = document.getElementById("titelEingabe");
 const arbeitsbereich = document.getElementById("arbeitsbereich");
 const aktuellerTitel = document.getElementById("aktuellerTitel");
+
+let dictionariumMetricum = [];
+let dictionariumIamTentatum = false;
 
 window.starteNeuesGedicht = function () {
   scriptoriumStart.style.display = "none";
@@ -117,6 +121,11 @@ window.zeigeTab = function(tabName) {
   if (tabName === "profil") {
     ladeProfil();
   }
+
+  if (tabName === "hexameter") {
+    ladeDictionariumMetricum();
+    aktualisiereSuggestionesMetricas();
+  }
 };
 
 campus.addEventListener("keydown", async function(event) {
@@ -126,7 +135,96 @@ campus.addEventListener("keydown", async function(event) {
   }
 });
 
-campus.addEventListener("input", aktualisiereHexameterVorschau);
+campus.addEventListener("input", function () {
+  aktualisiereHexameterVorschau();
+  aktualisiereSuggestionesMetricas();
+});
+
+function textusCumSuggestione(forma) {
+  const basis = campus.value.trim();
+  return basis === "" ? forma : basis + " " + forma;
+}
+
+function suggestioMetricePossibilis(forma) {
+  try {
+    const analyse = erstelleAnalysezeile(textusCumSuggestione(forma));
+
+    if (analyse.abschickbar) return true;
+    if ((analyse.elemente || []).length <= 17 && !analyse.elemente.some(e => e.problema)) return true;
+
+    return false;
+  } catch (_fehler) {
+    return false;
+  }
+}
+
+async function ladeDictionariumMetricum() {
+  if (dictionariumIamTentatum) return;
+  dictionariumIamTentatum = true;
+
+  if (!suggestionesMetricaeLista) return;
+
+  const { data, error } = await supabase
+    .from("longitudines")
+    .select("forma, lemma, quantitates, notae")
+    .order("forma", { ascending: true })
+    .limit(200);
+
+  if (error) {
+    suggestionesMetricaeLista.innerHTML = "";
+    const div = document.createElement("div");
+    div.className = "suggestio-item suggestio-vacua";
+    div.textContent = "Dictionarium nondum legi potest.";
+    suggestionesMetricaeLista.appendChild(div);
+    return;
+  }
+
+  dictionariumMetricum = data || [];
+  aktualisiereSuggestionesMetricas();
+}
+
+function aktualisiereSuggestionesMetricas() {
+  if (!suggestionesMetricaeLista) return;
+
+  suggestionesMetricaeLista.innerHTML = "";
+
+  if (dictionariumMetricum.length === 0) {
+    const div = document.createElement("div");
+    div.className = "suggestio-item suggestio-vacua";
+    div.textContent = "Nullae suggestiones.";
+    suggestionesMetricaeLista.appendChild(div);
+    return;
+  }
+
+  const suggestiones = dictionariumMetricum
+    .filter(item => item.forma && suggestioMetricePossibilis(item.forma))
+    .slice(0, 30);
+
+  if (suggestiones.length === 0) {
+    const div = document.createElement("div");
+    div.className = "suggestio-item suggestio-vacua";
+    div.textContent = "Nihil metricum invenio.";
+    suggestionesMetricaeLista.appendChild(div);
+    return;
+  }
+
+  suggestiones.forEach(function(item) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "suggestio-item suggestio-button";
+    button.textContent = item.forma;
+    button.title = item.notae || item.lemma || "";
+
+    button.onclick = function () {
+      campus.value = textusCumSuggestione(item.forma) + " ";
+      campus.focus();
+      aktualisiereHexameterVorschau();
+      aktualisiereSuggestionesMetricas();
+    };
+
+    suggestionesMetricaeLista.appendChild(button);
+  });
+}
 
 function aktualisiereHexameterVorschau() {
   if (!hexameterVorschau) return;
@@ -314,6 +412,7 @@ async function fuegeVersHinzu() {
   zeigeGedicht(neuerText);
   campus.value = "";
   aktualisiereHexameterVorschau();
+  aktualisiereSuggestionesMetricas();
   setStatus("");
 }
 
