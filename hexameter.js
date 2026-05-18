@@ -54,7 +54,19 @@ function estVokal(littera) {
   return VOKALE.includes(littera);
 }
 
+function estVokalInTextu(textus, index) {
+  if (textus[index] === "u" && index > 0 && textus[index - 1] === "q") {
+    return false;
+  }
+
+  return estVokal(textus[index]);
+}
+
 function istDiphthong(textus, index) {
+  if (!estVokalInTextu(textus, index) || !estVokalInTextu(textus, index + 1)) {
+    return false;
+  }
+
   return DIPHTHONGE.includes(textus.slice(index, index + 2));
 }
 
@@ -126,7 +138,6 @@ export function bereiteVersstromVor(textus) {
     }
 
     w = w.replace(/^u([aeiouy])/g, "v$1");
-    w = w.replace(/qu/g, "q");
     w = w.replace(/([aeiouy])i([aeiouy])/g, "$1jj$2");
 
     return w;
@@ -145,7 +156,7 @@ function findeSilbenkerne(strom) {
   const kerne = [];
 
   for (let i = 0; i < strom.length; i += 1) {
-    if (!estVokal(strom[i])) continue;
+    if (!estVokalInTextu(strom, i)) continue;
 
     if (istDiphthong(strom, i)) {
       kerne.push({ start: i, ende: i + 1, kern: strom.slice(i, i + 2) });
@@ -184,7 +195,7 @@ export function findeMutaCumLiquidaStellen(textus) {
 
 function erstelleSyllaba(strom, start, ende, ambigua = false) {
   const textusSyllabae = strom.slice(start, ende + 1);
-  const aperta = estVokal(textusSyllabae[textusSyllabae.length - 1]);
+  const aperta = estVokalInTextu(textusSyllabae, textusSyllabae.length - 1);
 
   return {
     textus: textusSyllabae,
@@ -304,7 +315,7 @@ function notaDiphthongumLongum(textus, index) {
 
 function notaSyllabamLongamPositione(textus, indexVocalis) {
   for (let i = indexVocalis + 1; i < textus.length; i += 1) {
-    if (!estVokal(textus[i])) {
+    if (!estVokalInTextu(textus, i)) {
       return textus.slice(0, indexVocalis + 1)
         + "͞"
         + textus.slice(indexVocalis + 1, i + 1)
@@ -321,7 +332,7 @@ function notaSyllabamQuantitate(syllaba, quantitas) {
   const textus = syllaba.textus;
 
   for (let i = 0; i < textus.length; i += 1) {
-    if (!estVokal(textus[i])) continue;
+    if (!estVokalInTextu(textus, i)) continue;
 
     if (quantitas === "longa" && istDiphthong(textus, i)) {
       return textus.slice(0, i) + notaDiphthongumLongum(textus, i) + textus.slice(i + 2);
