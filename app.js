@@ -128,37 +128,33 @@ campus.addEventListener("keydown", async function(event) {
 
 campus.addEventListener("input", aktualisiereHexameterVorschau);
 
-function istWortVorlaeufigMoeglich(textusBisHier) {
-  try {
-    const analyse = analysiereSilbenVorlaeufig(textusBisHier);
-    const varianten = analyse.varianten || [];
-    const silbenAnzahl = varianten[0]?.silben?.length || analyse.silben?.length || 0;
-
-    if (silbenAnzahl === 0) return false;
-    if (silbenAnzahl > 17) return false;
-
-    return true;
-  } catch (_fehler) {
-    return false;
-  }
-}
-
 function aktualisiereHexameterVorschau() {
   if (!hexameterVorschau) return;
 
-  const verba = campus.value.trim().split(/\s+/).filter(Boolean);
+  const textus = campus.value.trim();
   hexameterVorschau.innerHTML = "";
 
-  verba.forEach(function(verbum, index) {
-    const textusBisHier = verba.slice(0, index + 1).join(" ");
+  if (textus === "") return;
+
+  const analyse = erstelleAnalysezeile(textus);
+
+  analyse.elemente.forEach(function(elementum, index) {
     const span = document.createElement("span");
 
-    span.textContent = verbum;
-    span.className = istWortVorlaeufigMoeglich(textusBisHier)
-      ? "verbum-ok"
-      : "verbum-malum";
+    span.className = elementum.problema
+      ? "syllaba-problema"
+      : "syllaba-analysis";
+
+    span.textContent = elementum.signum + elementum.textus;
 
     hexameterVorschau.appendChild(span);
+
+    if ((index + 1) % 3 === 0 && index < analyse.elemente.length - 1) {
+      const separator = document.createElement("span");
+      separator.className = "pes-separator";
+      separator.textContent = "|";
+      hexameterVorschau.appendChild(separator);
+    }
   });
 }
 
@@ -289,6 +285,13 @@ async function fuegeVersHinzu() {
     return;
   }
 
+  const pruefung = pruefeVersVorlaeufig(vers);
+
+  if (!pruefung.abschickbar) {
+    setStatus(pruefung.grund || "Versus nondum mitti potest.");
+    return;
+  }
+
   const neuerText = aktuellesGedicht.textus
     ? aktuellesGedicht.textus + "\n" + vers
     : vers;
@@ -304,13 +307,6 @@ async function fuegeVersHinzu() {
 
   if (error) {
     setStatus(error.message);
-    return;
-  }
-  
-  const pruefung = pruefeVersVorlaeufig(vers);
-
-  if (!pruefung.abschickbar) {
-    setStatus(pruefung.grund || "Versus nondum mitti potest.");
     return;
   }
 
