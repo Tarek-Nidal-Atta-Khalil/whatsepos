@@ -17,7 +17,7 @@ const MUTAE_CUM_LIQUIDA = [
 ];
 
 const VOCALES_LONGAE = { a: "ā", e: "ē", i: "ī", o: "ō", u: "ū", y: "ȳ" };
-const VOCALES_BREVES = { a: "ǎ", e: "ĕ", i: "ĭ", o: "ŏ", u: "ŭ", y: "y̆" };
+const VOCALES_BREVES = { a: "ă", e: "ĕ", i: "ĭ", o: "ŏ", u: "ŭ", y: "y̆" };
 
 let formaeMetricae = [];
 let formaePerFormam = new Map();
