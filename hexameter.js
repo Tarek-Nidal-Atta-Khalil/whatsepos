@@ -406,7 +406,7 @@ export function pruefeVersVorlaeufig(textus) {
   if (!pedesAnalyse.successit) {
     return {
       abschickbar: false,
-      grund: "Non sex pedes hexametri agniti sunt.",
+      grund: "Sex pedes hexametri non invenio.",
       analyse,
       pedesAnalyse
     };
