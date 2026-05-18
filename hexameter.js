@@ -205,23 +205,8 @@ function erzeugeSilbenVariantenRekursiv(strom, kerne, kernIndex, silbenStart, bi
     const offeneEnde = kern.ende;
     const geschlosseneEnde = zwischenStart;
 
-    erzeugeSilbenVariantenRekursiv(
-      strom,
-      kerne,
-      kernIndex + 1,
-      offeneEnde + 1,
-      [...bisherigeSilben, erstelleSilbe(strom, silbenStart, offeneEnde, true)],
-      varianten
-    );
-
-    erzeugeSilbenVariantenRekursiv(
-      strom,
-      kerne,
-      kernIndex + 1,
-      geschlosseneEnde + 1,
-      [...bisherigeSilben, erstelleSilbe(strom, silbenStart, geschlosseneEnde, true)],
-      varianten
-    );
+    erzeugeSilbenVariantenRekursiv(strom, kerne, kernIndex + 1, offeneEnde + 1, [...bisherigeSilben, erstelleSilbe(strom, silbenStart, offeneEnde, true)], varianten);
+    erzeugeSilbenVariantenRekursiv(strom, kerne, kernIndex + 1, geschlosseneEnde + 1, [...bisherigeSilben, erstelleSilbe(strom, silbenStart, geschlosseneEnde, true)], varianten);
 
     return;
   }
@@ -234,14 +219,7 @@ function erzeugeSilbenVariantenRekursiv(strom, kerne, kernIndex, silbenStart, bi
     silbenEnde = zwischenStart;
   }
 
-  erzeugeSilbenVariantenRekursiv(
-    strom,
-    kerne,
-    kernIndex + 1,
-    silbenEnde + 1,
-    [...bisherigeSilben, erstelleSilbe(strom, silbenStart, silbenEnde)],
-    varianten
-  );
+  erzeugeSilbenVariantenRekursiv(strom, kerne, kernIndex + 1, silbenEnde + 1, [...bisherigeSilben, erstelleSilbe(strom, silbenStart, silbenEnde)], varianten);
 }
 
 export function trenneSilbenVariantenVers(textus) {
@@ -296,6 +274,106 @@ function signumQuantitatis(quantitas) {
   return "?";
 }
 
+function longaCompatibilis(quantitas) {
+  return quantitas === "longa" || quantitas === "ambigua";
+}
+
+function brevisCompatibilis(quantitas) {
+  return quantitas === "brevis" || quantitas === "ambigua";
+}
+
+function pesCompatibilis(silbae, initium, schema) {
+  if (initium + schema.length > silbae.length) return false;
+
+  return schema.every(function(quantitasExspectata, offset) {
+    const quantitas = quantitasSimplex(silbae[initium + offset]);
+
+    if (quantitasExspectata === "longa") return longaCompatibilis(quantitas);
+    if (quantitasExspectata === "brevis") return brevisCompatibilis(quantitas);
+    if (quantitasExspectata === "anceps") return true;
+
+    return false;
+  });
+}
+
+function resolvePedesRekursiv(silbae, pesIndex, initium, pedes) {
+  if (pesIndex === 6) {
+    return initium === silbae.length ? pedes : null;
+  }
+
+  const schemata = [];
+
+  if (pesIndex <= 3) {
+    schemata.push({ nomen: "dactylus", schema: ["longa", "brevis", "brevis"] });
+    schemata.push({ nomen: "spondeus", schema: ["longa", "longa"] });
+  } else if (pesIndex === 4) {
+    schemata.push({ nomen: "dactylus", schema: ["longa", "brevis", "brevis"] });
+  } else {
+    schemata.push({ nomen: "finalis", schema: ["longa", "anceps"] });
+  }
+
+  for (const schemaInfo of schemata) {
+    if (!pesCompatibilis(silbae, initium, schemaInfo.schema)) continue;
+
+    const finis = initium + schemaInfo.schema.length;
+    const resultatum = resolvePedesRekursiv(
+      silbae,
+      pesIndex + 1,
+      finis,
+      [
+        ...pedes,
+        {
+          index: pesIndex + 1,
+          nomen: schemaInfo.nomen,
+          initium,
+          finis,
+          silbae: silbae.slice(initium, finis)
+        }
+      ]
+    );
+
+    if (resultatum) return resultatum;
+  }
+
+  return null;
+}
+
+export function analysiereHexameterPedes(textus) {
+  const analyse = analysiereSilbenVorlaeufig(textus);
+  const conatus = [];
+
+  for (const variante of analyse.varianten || []) {
+    const pedes = resolvePedesRekursiv(variante.silben, 0, 0, []);
+
+    conatus.push({
+      varians: variante.index,
+      schema: variante.schema,
+      successit: Boolean(pedes),
+      pedes: pedes || []
+    });
+
+    if (pedes) {
+      return {
+        successit: true,
+        varians: variante.index,
+        schema: variante.schema,
+        silben: variante.silben,
+        pedes,
+        conatus
+      };
+    }
+  }
+
+  return {
+    successit: false,
+    varians: null,
+    schema: "",
+    silben: [],
+    pedes: [],
+    conatus
+  };
+}
+
 function tresBrevesIndices(silbae) {
   const indices = new Set();
 
@@ -314,37 +392,54 @@ function tresBrevesIndices(silbae) {
 
 export function pruefeVersVorlaeufig(textus) {
   const analyse = analysiereSilbenVorlaeufig(textus);
-  const varianten = analyse.varianten || [];
+  const pedesAnalyse = analysiereHexameterPedes(textus);
 
-  if (varianten.length === 0) {
+  if ((analyse.varianten || []).length === 0) {
     return {
       abschickbar: false,
       grund: "Nullae syllabae agnitae.",
-      analyse
+      analyse,
+      pedesAnalyse
     };
   }
 
-  const eineGueltigeVariante = varianten.some(function(variante) {
-    return tresBrevesIndices(variante.silben).size === 0;
-  });
+  if (!pedesAnalyse.successit) {
+    return {
+      abschickbar: false,
+      grund: "Non sex pedes hexametri agniti sunt.",
+      analyse,
+      pedesAnalyse
+    };
+  }
 
   return {
-    abschickbar: eineGueltigeVariante,
-    grund: eineGueltigeVariante ? "" : "Tres breves continuae.",
-    analyse
+    abschickbar: true,
+    grund: "",
+    analyse,
+    pedesAnalyse
   };
 }
 
 export function erstelleAnalysezeile(textus) {
   const pruefung = pruefeVersVorlaeufig(textus);
-  const variante = pruefung.analyse.varianten?.[0];
-  const silben = variante?.silben ?? [];
+  const pedesAnalyse = pruefung.pedesAnalyse;
+  const silben = pedesAnalyse.successit
+    ? pedesAnalyse.silben
+    : (pruefung.analyse.varianten?.[0]?.silben ?? []);
   const problemIndices = tresBrevesIndices(silben);
+  const finesPedum = new Set();
+
+  if (pedesAnalyse.successit) {
+    pedesAnalyse.pedes.forEach(function(pes) {
+      finesPedum.add(pes.finis - 1);
+    });
+  }
 
   return {
     abschickbar: pruefung.abschickbar,
     grund: pruefung.grund,
-    schema: variante?.schema ?? "",
+    pedes: pedesAnalyse.pedes,
+    schema: silben.map(s => s.textus).join("-"),
     elemente: silben.map(function(silba, index) {
       const quantitas = quantitasSimplex(silba);
 
@@ -352,7 +447,8 @@ export function erstelleAnalysezeile(textus) {
         textus: silba.textus,
         quantitas,
         signum: signumQuantitatis(quantitas),
-        problema: problemIndices.has(index)
+        problema: problemIndices.has(index),
+        finisPedis: finesPedum.has(index)
       };
     })
   };
@@ -385,6 +481,7 @@ export function analysiereHexameterRoh(textus) {
     mutaCumLiquida,
     hinweise,
     silbenanalyse: analysiereSilbenVorlaeufig(textus),
+    pedesAnalyse: analysiereHexameterPedes(textus),
     pruefung: pruefeVersVorlaeufig(textus),
     analysezeile: erstelleAnalysezeile(textus)
   };
@@ -398,5 +495,6 @@ window.trenneSilbenVers = trenneSilbenVers;
 window.trenneSilbenVariantenVers = trenneSilbenVariantenVers;
 window.analysiereSilbenVorlaeufig = analysiereSilbenVorlaeufig;
 window.findeMutaCumLiquidaStellen = findeMutaCumLiquidaStellen;
+window.analysiereHexameterPedes = analysiereHexameterPedes;
 window.pruefeVersVorlaeufig = pruefeVersVorlaeufig;
 window.erstelleAnalysezeile = erstelleAnalysezeile;
