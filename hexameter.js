@@ -252,6 +252,8 @@ function erzeugeSilbenVariantenRekursiv(strom, kerne, kernIndex, silbenStart, bi
 
   if (konsonanten.length <= 1) {
     silbenEnde = kern.ende;
+  } else if (konsonanten.startsWith("qu")) {
+    silbenEnde = kern.ende;
   } else {
     silbenEnde = zwischenStart;
   }
