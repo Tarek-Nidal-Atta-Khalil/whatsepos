@@ -1,6 +1,6 @@
 // Erste, vorsichtige Hexameter-Hilfsfunktionen.
-// Dieses Modul bewertet noch nicht, ob ein Vers korrekt ist.
-// Es bereitet Textnormalisierung, Elisionshinweise und erste Silbentrennung vor.
+// Dieses Modul bewertet noch nicht endgültig, ob ein Vers korrekt ist.
+// Es bereitet Textnormalisierung, Elisionshinweise, Silbentrennung und eine vorläufige Quantitätenprüfung vor.
 
 const VOKALE = "aeiouy";
 const DIPHTHONGE = ["ae", "au", "oe", "ei", "eu", "ui"];
@@ -284,6 +284,80 @@ export function analysiereSilbenVorlaeufig(textus) {
   };
 }
 
+function quantitasSimplex(silba) {
+  if (silba.quantitas === "longa_positione_provisoria") return "longa";
+  if (silba.quantitas === "brevis_provisoria") return "brevis";
+  return "ambigua";
+}
+
+function signumQuantitatis(quantitas) {
+  if (quantitas === "longa") return "¯";
+  if (quantitas === "brevis") return "˘";
+  return "?";
+}
+
+function tresBrevesIndices(silbae) {
+  const indices = new Set();
+
+  for (let i = 0; i <= silbae.length - 3; i += 1) {
+    const tres = silbae.slice(i, i + 3);
+
+    if (tres.every(s => quantitasSimplex(s) === "brevis")) {
+      indices.add(i);
+      indices.add(i + 1);
+      indices.add(i + 2);
+    }
+  }
+
+  return indices;
+}
+
+export function pruefeVersVorlaeufig(textus) {
+  const analyse = analysiereSilbenVorlaeufig(textus);
+  const varianten = analyse.varianten || [];
+
+  if (varianten.length === 0) {
+    return {
+      abschickbar: false,
+      grund: "Nullae syllabae agnitae.",
+      analyse
+    };
+  }
+
+  const eineGueltigeVariante = varianten.some(function(variante) {
+    return tresBrevesIndices(variante.silben).size === 0;
+  });
+
+  return {
+    abschickbar: eineGueltigeVariante,
+    grund: eineGueltigeVariante ? "" : "Tres breves continuae.",
+    analyse
+  };
+}
+
+export function erstelleAnalysezeile(textus) {
+  const pruefung = pruefeVersVorlaeufig(textus);
+  const variante = pruefung.analyse.varianten?.[0];
+  const silben = variante?.silben ?? [];
+  const problemIndices = tresBrevesIndices(silben);
+
+  return {
+    abschickbar: pruefung.abschickbar,
+    grund: pruefung.grund,
+    schema: variante?.schema ?? "",
+    elemente: silben.map(function(silba, index) {
+      const quantitas = quantitasSimplex(silba);
+
+      return {
+        textus: silba.textus,
+        quantitas,
+        signum: signumQuantitatis(quantitas),
+        problema: problemIndices.has(index)
+      };
+    })
+  };
+}
+
 export function analysiereHexameterRoh(textus) {
   const normalisiert = normalisiereLatein(textus);
   const woerter = normalisiert ? normalisiert.split(" ") : [];
@@ -310,7 +384,9 @@ export function analysiereHexameterRoh(textus) {
     elisionen,
     mutaCumLiquida,
     hinweise,
-    silbenanalyse: analysiereSilbenVorlaeufig(textus)
+    silbenanalyse: analysiereSilbenVorlaeufig(textus),
+    pruefung: pruefeVersVorlaeufig(textus),
+    analysezeile: erstelleAnalysezeile(textus)
   };
 }
 
@@ -322,3 +398,5 @@ window.trenneSilbenVers = trenneSilbenVers;
 window.trenneSilbenVariantenVers = trenneSilbenVariantenVers;
 window.analysiereSilbenVorlaeufig = analysiereSilbenVorlaeufig;
 window.findeMutaCumLiquidaStellen = findeMutaCumLiquidaStellen;
+window.pruefeVersVorlaeufig = pruefeVersVorlaeufig;
+window.erstelleAnalysezeile = erstelleAnalysezeile;
