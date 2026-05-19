@@ -11,24 +11,14 @@ function clavisFormae(textus) { return normalisiereLatein(textus).replace(/\s+/g
 export function normalisiereLatein(textus) { return textus.toLowerCase().replace(/[āáàâäǎă]/g,"a").replace(/[ēéèêëĕ]/g,"e").replace(/[īíìîïĭ]/g,"i").replace(/[ōóòôöŏ]/g,"o").replace(/[ūúùûüŭ]/g,"u").replace(/[ȳýỳŷÿ]/g,"y").replace(/j/g,"i").replace(/v/g,"u").replace(/[^a-zA-Zāēīōūȳáéíóúàèìòùâêîôûäëïöüŷÿ\s]/g," ").replace(/\s+/g," ").trim(); }
 function estVokal(littera) { return VOKALE.includes(littera); }
 function estVokalInTextu(textus, index) { if (textus[index] === "u" && index > 0 && textus[index - 1] === "q") return false; return estVokal(textus[index]); }
-function indexPrimiVocalisInTextu(textus) {
-  for (let i = 0; i < textus.length; i += 1) {
-    if (textus[i] === "i" && i > 0 && i < textus.length - 1 && estVokal(textus[i - 1]) === false && estVokal(textus[i + 1])) {
-      continue;
-    }
-
-    if (estVokalInTextu(textus, i)) return i;
-  }
-
-  return -1;
-}function istDiphthong(textus, index) { if (!estVokalInTextu(textus, index) || !estVokalInTextu(textus, index + 1)) return false; return DIPHTHONGE.includes(textus.slice(index, index + 2)); }
+function indexPrimiVocalisInTextu(textus) { for (let i = 0; i < textus.length; i += 1) { if (textus[i] === "i" && i > 0 && i < textus.length - 1 && !estVokal(textus[i - 1]) && estVokal(textus[i + 1])) continue; if (estVokalInTextu(textus, i)) return i; } return -1; }
+function istDiphthong(textus, index) { if (!estVokalInTextu(textus, index) || !estVokalInTextu(textus, index + 1)) return false; return DIPHTHONGE.includes(textus.slice(index, index + 2)); }
 function indexDiphthongiInTextu(textus) { for (let i = 0; i < textus.length - 1; i += 1) if (istDiphthong(textus, i)) return i; return -1; }
 function istMutaCumLiquida(gruppe) { return MUTAE_CUM_LIQUIDA.includes(gruppe); }
 function endetAufElidierbarenLaut(wort) { return /(?:[aeiouy]m|[aeiouy])$/.test(wort); }
 function beginntMitKonsonantischemU(wort) { return /^u[aeiouy]/.test(wort); }
 function beginntMitVokalOderH(wort) { return beginntMitKonsonantischemU(wort) ? false : /^[aeiouyh]/.test(wort); }
-export function findeElisionen(textus) { const normalisiert = normalisiereLatein(textus); const woerter = normalisiert ? normalisiert.split(" ") : []; const elisionen = []; for (let i = 0; i < woerter.length - 1; i += 1) { const links = woerter[i]; const rechts = woerter[i + 1]; if (endetAufElidierbarenLaut(links) && beginsWithVowelOrH(rechts)) elisionen.push({ index: i, links, rechts, hinweis: `${links} + ${rechts}` }); } return elisionen; }
-function beginsWithVowelOrH(wort) { return beginntMitVokalOderH(wort); }
+export function findeElisionen(textus) { const normalisiert = normalisiereLatein(textus); const woerter = normalisiert ? normalisiert.split(" ") : []; const elisionen = []; for (let i = 0; i < woerter.length - 1; i += 1) { const links = woerter[i]; const rechts = woerter[i + 1]; if (endetAufElidierbarenLaut(links) && beginntMitVokalOderH(rechts)) elisionen.push({ index: i, links, rechts, hinweis: `${links} + ${rechts}` }); } return elisionen; }
 function entferneElidierteEndung(wort) { if (/[aeiouy]m$/.test(wort)) return wort.slice(0, -2); if (/[aeiouy]$/.test(wort)) return wort.slice(0, -1); return wort; }
 function geminaIntervokalischesI(wort) { let resultatum = ""; for (let i = 0; i < wort.length; i += 1) { if (wort[i] === "i" && i > 0 && i < wort.length - 1 && estVokalInTextu(wort, i - 1) && estVokalInTextu(wort, i + 1)) resultatum += "jj"; else resultatum += wort[i]; } return resultatum; }
 function consonantificaIntervocalicumU(wort) { return wort.replace(/([aeioy])u([aeiouy])/g, "$1v$2"); }
@@ -39,47 +29,8 @@ export function findeMutaCumLiquidaStellen(textus) { const vorbereitet = bereite
 function hatDiphthongum(textus) { return indexDiphthongiInTextu(textus) >= 0; }
 function hatLangeMCoda(textus) { return /[aeiouy]m$/.test(textus); }
 function erstelleSyllaba(strom, start, ende, ambigua = false) { const textusSyllabae = strom.slice(start, ende + 1); const aperta = estVokalInTextu(textusSyllabae, textusSyllabae.length - 1); let quantitas; if (hatDiphthongum(textusSyllabae)) quantitas = "longa_natura_diphthongo"; else if (hatLangeMCoda(textusSyllabae)) quantitas = "longa_natura_m_coda"; else if (ambigua) quantitas = "ambigua_muta_cum_liquida"; else quantitas = aperta ? "brevis_provisoria" : "longa_positione_provisoria"; return { textus: textusSyllabae, start, ende, aperta, ambigua_muta_cum_liquida: ambigua, quantitas }; }
-function normalisiereSyllabaeLexico(textus) {
-  return String(textus)
-    .toLowerCase()
-    .replace(/[āáàâäǎă]/g, "a")
-    .replace(/[ēéèêëĕ]/g, "e")
-    .replace(/[īíìîïĭ]/g, "i")
-    .replace(/[ōóòôöŏ]/g, "o")
-    .replace(/[ūúùûüŭ]/g, "u")
-    .replace(/[ȳýỳŷÿ]/g, "y")
-    .replace(/[^a-z.]/g, "");
-}
-function erzeugeSilbenAusLexico(strom, segmentum, forma) {
-  if (!forma?.syllabae) return null;
-
-  const partesOriginales = normalisiereSyllabaeLexico(forma.syllabae)
-    .split(".")
-    .filter(Boolean);
-
-  if (partesOriginales.length === 0) return null;
-
-  const partesInternae = partesOriginales.map(bereiteWortVor);
-  const textus = partesInternae.join("");
-
-  if (textus !== segmentum.textus) return null;
-
-  const quantitates = String(forma.quantitates || "").toUpperCase();
-  if (quantitates && quantitates.length !== partesInternae.length) return null;
-
-  let cursor = segmentum.start;
-
-  return partesInternae.map(function(pars, offset) {
-    const start = cursor;
-    const ende = cursor + pars.length - 1;
-    cursor = ende + 1;
-
-    const syllaba = erstelleSyllaba(strom, start, ende);
-    const quantitas = quantitasAusSiglo(quantitates[offset]);
-
-    return quantitas ? { ...syllaba, quantitas } : syllaba;
-  });
-}
+function normalisiereSyllabaeLexico(textus) { return String(textus).toLowerCase().replace(/[āáàâäǎă]/g, "a").replace(/[ēéèêëĕ]/g, "e").replace(/[īíìîïĭ]/g, "i").replace(/[ōóòôöŏ]/g, "o").replace(/[ūúùûüŭ]/g, "u").replace(/[ȳýỳŷÿ]/g, "y").replace(/[^a-z.]/g, ""); }
+function erzeugeSilbenAusLexico(strom, segmentum, forma) { if (!forma?.syllabae) return null; const partesOriginales = normalisiereSyllabaeLexico(forma.syllabae).split(".").filter(Boolean); if (partesOriginales.length === 0) return null; const partesInternae = partesOriginales.map(bereiteWortVor); const textus = partesInternae.join(""); if (textus !== segmentum.textus) return null; const quantitates = String(forma.quantitates || "").toUpperCase(); if (quantitates && quantitates.length !== partesInternae.length) return null; let cursor = segmentum.start; return partesInternae.map(function(pars, offset) { const start = cursor; const ende = cursor + pars.length - 1; cursor = ende + 1; const syllaba = erstelleSyllaba(strom, start, ende); const quantitas = quantitasAusSiglo(quantitates[offset]); return quantitas ? { ...syllaba, quantitas } : syllaba; }); }
 function erzeugeSilbenVariantenRekursiv(strom, kerne, kernIndex, silbenStart, bisherigeSilben, varianten) { const kern = kerne[kernIndex]; const naechsterKern = kerne[kernIndex + 1]; if (!kern) { varianten.push(bisherigeSilben); return; } if (!naechsterKern) { varianten.push([...bisherigeSilben, erstelleSyllaba(strom, silbenStart, strom.length - 1)]); return; } const zwischenStart = kern.ende + 1; const zwischenEnde = naechsterKern.start - 1; const konsonanten = strom.slice(zwischenStart, zwischenEnde + 1); if (istMutaCumLiquida(konsonanten)) { const offeneEnde = kern.ende; const geschlosseneEnde = zwischenStart; erzeugeSilbenVariantenRekursiv(strom, kerne, kernIndex + 1, offeneEnde + 1, [...bisherigeSilben, erstelleSyllaba(strom, silbenStart, offeneEnde, true)], varianten); erzeugeSilbenVariantenRekursiv(strom, kerne, kernIndex + 1, geschlosseneEnde + 1, [...bisherigeSilben, erstelleSyllaba(strom, silbenStart, geschlosseneEnde, true)], varianten); return; } let silbenEnde; if (konsonanten.length <= 1) silbenEnde = kern.ende; else if (konsonanten.startsWith("qu")) silbenEnde = kern.ende; else silbenEnde = zwischenStart; erzeugeSilbenVariantenRekursiv(strom, kerne, kernIndex + 1, silbenEnde + 1, [...bisherigeSilben, erstelleSyllaba(strom, silbenStart, silbenEnde)], varianten); }
 function quantitasAusSiglo(siglum) { if (siglum === "L") return "longa_natura_lexico"; if (siglum === "B") return "brevis_natura_lexico"; return null; }
 function indexKernInSyllaba(syllaba) { const d = indexDiphthongiInTextu(syllaba.textus); if (d >= 0) return syllaba.start + d; const v = indexPrimiVocalisInTextu(syllaba.textus); if (v >= 0) return syllaba.start + v; return -1; }
