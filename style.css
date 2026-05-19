@@ -330,25 +330,25 @@ h1 {
 .vers-zeile {
   display: inline-block;
   position: relative;
+  width: fit-content;
+  max-width: min(100%, calc(100vw - 420px));
   padding: 8px 14px;
   margin: 3px auto;
   border-radius: 14px;
   font-size: 24px;
   cursor: pointer;
   transition: background-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
-  max-width: min(100%, calc(100vw - 420px));
-  overflow-x: auto;
-  overflow-y: hidden;
   white-space: nowrap;
+  overflow: visible;
 }
 .vers-zeile:hover { background: #eef6ff; }
 .vers-zeile.ausgewaehlt { background: #dbeafe; box-shadow: 0 0 0 2px #60a5fa inset; }
 
 .vers-editor {
   display: block;
-  width: min(820px, calc(100vw - 460px));
-  max-width: 100%;
-  min-width: min(420px, 100%);
+  width: auto;
+  min-width: min(420px, calc(100vw - 460px));
+  max-width: calc(100vw - 460px);
   margin: 8px auto;
   padding: 14px 20px;
   border: 2px solid #93c5fd;
@@ -359,8 +359,7 @@ h1 {
   line-height: 1.35;
   text-align: center;
   white-space: nowrap;
-  overflow-x: auto;
-  overflow-y: hidden;
+  overflow: visible;
   box-shadow: 0 0 0 4px rgba(147, 197, 253, 0.25), 0 12px 30px rgba(0, 0, 0, 0.12);
   outline: none;
 }
@@ -368,6 +367,18 @@ h1 {
 .vers-editor:focus {
   border-color: #60a5fa;
   box-shadow: 0 0 0 5px rgba(96, 165, 250, 0.28), 0 14px 34px rgba(0, 0, 0, 0.14);
+}
+
+.vers-editor-sizer {
+  position: absolute;
+  visibility: hidden;
+  white-space: pre;
+  font-size: 24px;
+  line-height: 1.35;
+  padding: 14px 20px;
+  border: 2px solid transparent;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
 }
 
 #versWerkzeuge {
@@ -430,7 +441,6 @@ h1 {
   }
   .vers-zeile,
   .vers-editor {
-    width: calc(100vw - 40px);
     max-width: calc(100vw - 40px);
   }
 }
