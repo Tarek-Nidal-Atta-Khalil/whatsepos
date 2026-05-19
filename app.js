@@ -1,5 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { erstelleAnalysezeile, pruefeVersVorlaeufig, setzeFormaeMetricas } from "./hexameter.js?v=20260519-syllabae-4"
+import { erstelleAnalysezeile, pruefeVersVorlaeufig, setzeFormaeMetricas } from "./hexameter.js?v=20260519-nia-kern-a-2"
 
 window.toggleMenu = function () {
   document.getElementById("sideMenu").classList.toggle("open");
