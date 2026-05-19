@@ -128,7 +128,13 @@ function silbeAusProfilTeil(strom, start, teil, quantitasSiglum) {
   const ende = start + teil.length - 1;
   const syllaba = erstelleSyllaba(strom, start, ende);
   const quantitas = quantitasAusSiglo(quantitasSiglum);
-  return quantitas ? { ...syllaba, quantitas } : syllaba;
+
+  const ersetzt = {
+    ...syllaba,
+    textus: teil
+  };
+
+  return quantitas ? { ...ersetzt, quantitas } : ersetzt;
 }
 
 function ersetzeSegmentDurchProfil(strom, silben, segmentum, profil) {
