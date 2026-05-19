@@ -6,7 +6,21 @@ const VOCALES_LONGAE = { a: "ā", e: "ē", i: "ī", o: "ō", u: "ū", y: "ȳ" };
 const VOCALES_BREVES = { a: "ă", e: "ĕ", i: "ĭ", o: "ŏ", u: "ŭ", y: "y̆" };
 let formaeMetricae = [];
 let formaePerFormam = new Map();
-export function setzeFormaeMetricas(formae) { formaeMetricae = Array.isArray(formae) ? formae : []; formaePerFormam = new Map(); formaeMetricae.forEach(function(forma) { if (!forma?.forma) return; const clavis = clavisFormae(forma.forma); if (!clavis) return; if (!formaePerFormam.has(clavis)) formaePerFormam.set(clavis, []); formaePerFormam.get(clavis).push(forma); }); }
+export function setzeFormaeMetricas(formae) {
+  formaeMetricae = Array.isArray(formae) ? formae : [];
+  formaePerFormam = new Map();
+
+  formaeMetricae.forEach(function(forma) {
+    if (!forma?.forma) return;
+    const clavis = clavisFormae(forma.forma);
+    if (!clavis) return;
+    if (!formaePerFormam.has(clavis)) formaePerFormam.set(clavis, []);
+    formaePerFormam.get(clavis).push(forma);
+  });
+
+  window.formaeMetricae = formaeMetricae;
+  window.formaePerFormam = formaePerFormam;
+}
 function clavisFormae(textus) { return normalisiereLatein(textus).replace(/\s+/g, ""); }
 export function normalisiereLatein(textus) { return textus.toLowerCase().replace(/[āáàâäǎă]/g,"a").replace(/[ēéèêëĕ]/g,"e").replace(/[īíìîïĭ]/g,"i").replace(/[ōóòôöŏ]/g,"o").replace(/[ūúùûüŭ]/g,"u").replace(/[ȳýỳŷÿ]/g,"y").replace(/j/g,"i").replace(/v/g,"u").replace(/[^a-zA-Zāēīōūȳáéíóúàèìòùâêîôûäëïöüŷÿ\s]/g," ").replace(/\s+/g," ").trim(); }
 function estVokal(littera) { return VOKALE.includes(littera); }
