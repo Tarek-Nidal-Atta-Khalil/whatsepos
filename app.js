@@ -384,10 +384,20 @@ function bearbeiteVers(index, alterVers) {
   const zeile = zeilen[index];
 
   zeile.innerHTML = "";
+  zeile.onclick = null;
+  zeile.ondblclick = null;
 
   const input = document.createElement("input");
   input.className = "vers-editor";
   input.value = alterVers;
+
+  input.addEventListener("click", function (event) {
+    event.stopPropagation();
+  });
+  
+  input.addEventListener("dblclick", function (event) {
+    event.stopPropagation();
+  });
 
     zeile.appendChild(input);
   passeVersEditorBreiteAn(input);
