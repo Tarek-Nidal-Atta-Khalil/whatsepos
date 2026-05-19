@@ -265,9 +265,7 @@ input {
 }
 
 .side-menu.open ~ #authLoggedOut,
-.side-menu.open ~ #authLoggedIn {
-  left: 20px;
-}
+.side-menu.open ~ #authLoggedIn { left: 20px; }
 
 #authLoggedOut { flex-direction: column; gap: 10px; }
 #authLoggedIn { display: none; }
@@ -338,9 +336,39 @@ h1 {
   font-size: 24px;
   cursor: pointer;
   transition: background-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+  max-width: min(100%, calc(100vw - 420px));
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
 }
 .vers-zeile:hover { background: #eef6ff; }
 .vers-zeile.ausgewaehlt { background: #dbeafe; box-shadow: 0 0 0 2px #60a5fa inset; }
+
+.vers-editor {
+  display: block;
+  width: min(820px, calc(100vw - 460px));
+  max-width: 100%;
+  min-width: min(420px, 100%);
+  margin: 8px auto;
+  padding: 14px 20px;
+  border: 2px solid #93c5fd;
+  border-radius: 18px;
+  background: #ffffff;
+  color: #111827;
+  font-size: 24px;
+  line-height: 1.35;
+  text-align: center;
+  white-space: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  box-shadow: 0 0 0 4px rgba(147, 197, 253, 0.25), 0 12px 30px rgba(0, 0, 0, 0.12);
+  outline: none;
+}
+
+.vers-editor:focus {
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 5px rgba(96, 165, 250, 0.28), 0 14px 34px rgba(0, 0, 0, 0.14);
+}
 
 #versWerkzeuge {
   position: fixed;
@@ -397,6 +425,11 @@ h1 {
   #hexameterVorschau,
   #campus {
     left: 50%;
+    width: calc(100vw - 40px);
+    max-width: calc(100vw - 40px);
+  }
+  .vers-zeile,
+  .vers-editor {
     width: calc(100vw - 40px);
     max-width: calc(100vw - 40px);
   }
