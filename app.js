@@ -1,5 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { erstelleAnalysezeile, pruefeVersVorlaeufig, setzeFormaeMetricas } from "./hexameter.js?v=20260519-oris-ll-2";
+import { erstelleAnalysezeile, pruefeVersVorlaeufig, setzeFormaeMetricas } from "./hexameter.js?v=20260519-syllabae-1";
 
 window.toggleMenu = function () {
   document.getElementById("sideMenu").classList.toggle("open");
@@ -175,7 +175,7 @@ async function ladeDictionariumMetricum(optiones = {}) {
 
     const { data, error } = await supabase
       .from("formae")
-      .select("id, forma, lemma, pars_orationis, quantitates, genus, numerus, casus, gradus, persona, tempus, modus, vox, notae")
+      .select("id, forma, lemma, pars_orationis, quantitates, syllabae, genus, numerus, casus, gradus, persona, tempus, modus, vox, notae")
       .order("forma", { ascending: true })
       .limit(5000);
 
