@@ -390,6 +390,10 @@ function bearbeiteVers(index, alterVers) {
   input.value = alterVers;
 
   zeile.appendChild(input);
+  passeVersEditorBreiteAn(input);
+  input.addEventListener("input", function () {
+    passeVersEditorBreiteAn(input);
+});
   input.focus();
 
   input.addEventListener("keydown", async function (event) {
@@ -405,6 +409,23 @@ function bearbeiteVers(index, alterVers) {
       zeigeGedicht(aktuellesGedicht.textus);
     }
   });
+}
+
+function passeVersEditorBreiteAn(input) {
+  let sizer = input._versEditorSizer;
+
+  if (!sizer) {
+    sizer = document.createElement("span");
+    sizer.className = "vers-editor-sizer";
+    document.body.appendChild(sizer);
+    input._versEditorSizer = sizer;
+  }
+
+  sizer.textContent = input.value || " ";
+  const verfuegbar = Math.max(360, window.innerWidth - 460);
+  const ziel = Math.min(Math.ceil(sizer.getBoundingClientRect().width) + 8, verfuegbar);
+
+  input.style.width = ziel + "px";
 }
 
 async function fuegeVersHinzu() {
