@@ -173,23 +173,21 @@ window.debugSupabaseProfile = function(textus) {
       index,
       wort,
       formae: formae.map(function(forma) {
+        const partes = normalisiereSyllabaeLexico(forma.syllabae)
+          .split(".")
+          .filter(Boolean);
+
         return {
           forma: forma.forma,
           lemma: forma.lemma,
           syllabae: forma.syllabae,
           quantitates: forma.quantitates,
-          partes: normalisiereSyllabaeLexico(forma.syllabae)
-            .split(".")
-            .filter(Boolean),
-          iaAlsEinKern: normalisiereSyllabaeLexico(forma.syllabae)
-            .split(".")
-            .filter(Boolean)
-            .map(s => s.includes("ia"))
+          partes,
+          iaAlsEinKern: partes.map(s => s.includes("ia"))
         };
       })
     };
   });
 };
-
 
 
