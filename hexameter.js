@@ -123,7 +123,46 @@ function erzeugeProfileAusSupabase(textus) {
     };
   });
 }
-function erzeugeSilbenAusLexico(strom, segmentum, forma) { if (!forma?.syllabae) return null; const partesOriginales = normalisiereSyllabaeLexico(forma.syllabae).split(".").filter(Boolean); if (partesOriginales.length === 0) return null; const partesInternae = partesOriginales.map(bereiteWortVor); const textus = partesInternae.join(""); if (textus !== segmentum.textus) return null; const quantitates = String(forma.quantitates || "").toUpperCase(); if (quantitates && quantitates.length !== partesInternae.length) return null; let cursor = segmentum.start; return partesInternae.map(function(pars, offset) { const start = cursor; const ende = cursor + pars.length - 1; cursor = ende + 1; const syllaba = erstelleSyllaba(strom, start, ende); const quantitas = quantitasAusSiglo(quantitates[offset]); return quantitas ? { ...syllaba, quantitas } : syllaba; }); }
+function erzeugeSilbenAusLexico(strom, segmentum, forma) {
+  if (!forma?.syllabae) return null;
+
+  let partes = normalisiereSyllabaeLexico(forma.syllabae)
+    .split(".")
+    .filter(Boolean);
+
+  let quantitates = String(forma.quantitates || "")
+    .toUpperCase()
+    .split("");
+
+  if (segmentum.elisum && partes.length > 0) {
+    partes = partes.slice(0, -1);
+    quantitates = quantitates.slice(0, -1);
+  }
+
+  if (partes.length === 0) return null;
+  if (quantitates.length && quantitates.length !== partes.length) return null;
+
+  let cursor = segmentum.start;
+
+  return partes.map(function(pars, offset) {
+    const parsInterna = bereiteWortVor(pars);
+    const start = cursor;
+    const ende = cursor + parsInterna.length - 1;
+    cursor = ende + 1;
+
+    const syllabaBasis = erstelleSyllaba(strom, start, Math.min(ende, strom.length - 1));
+    const quantitas = quantitasAusSiglo(quantitates[offset]);
+
+    return {
+      ...syllabaBasis,
+      textus: pars,
+      start,
+      ende,
+      monokern: /[aeiouy].*[aeiouy]/.test(pars),
+      quantitas: quantitas || syllabaBasis.quantitas
+    };
+  });
+}
 function erzeugeSilbenVariantenRekursiv(strom, kerne, kernIndex, silbenStart, bisherigeSilben, varianten) { const kern = kerne[kernIndex]; const naechsterKern = kerne[kernIndex + 1]; if (!kern) { varianten.push(bisherigeSilben); return; } if (!naechsterKern) { varianten.push([...bisherigeSilben, erstelleSyllaba(strom, silbenStart, strom.length - 1)]); return; } const zwischenStart = kern.ende + 1; const zwischenEnde = naechsterKern.start - 1; const konsonanten = strom.slice(zwischenStart, zwischenEnde + 1); if (istMutaCumLiquida(konsonanten)) { const offeneEnde = kern.ende; const geschlosseneEnde = zwischenStart; erzeugeSilbenVariantenRekursiv(strom, kerne, kernIndex + 1, offeneEnde + 1, [...bisherigeSilben, erstelleSyllaba(strom, silbenStart, offeneEnde, true)], varianten); erzeugeSilbenVariantenRekursiv(strom, kerne, kernIndex + 1, geschlosseneEnde + 1, [...bisherigeSilben, erstelleSyllaba(strom, silbenStart, geschlosseneEnde, true)], varianten); return; } let silbenEnde; if (konsonanten.length <= 1) silbenEnde = kern.ende; else if (konsonanten.startsWith("qu")) silbenEnde = kern.ende; else silbenEnde = zwischenStart; erzeugeSilbenVariantenRekursiv(strom, kerne, kernIndex + 1, silbenEnde + 1, [...bisherigeSilben, erstelleSyllaba(strom, silbenStart, silbenEnde)], varianten); }
 function quantitasAusSiglo(siglum) { if (siglum === "L") return "longa_natura_lexico"; if (siglum === "B") return "brevis_natura_lexico"; return null; }
 function indexKernInSyllaba(syllaba) { const d = indexDiphthongiInTextu(syllaba.textus); if (d >= 0) return syllaba.start + d; const v = indexPrimiVocalisInTextu(syllaba.textus); if (v >= 0) return syllaba.start + v; return -1; }
@@ -150,6 +189,23 @@ export function trenneSilbenVariantenVers(textus) {
 
   const resultata = [];
 
+const lexikalischeVarianten = silbenAusFormaeOderRegula(vorbereitet, strom);
+
+lexikalischeVarianten.forEach(function(silben, indexVariante) {
+  const silbenCumLexico = wendePositionslaengenAn(silben);
+
+  resultata.push({
+    index: resultata.length,
+    indexSyllabarum: indexVariante,
+    indexFormae: 0,
+    schema: silbenCumLexico.map(s => s.textus).join("-"),
+    silben: silbenCumLexico,
+    formaeSelectae: new Map()
+  });
+});
+
+if (resultata.length > 0) return resultata;
+  
   varianten.forEach(function(silben, indexVariante) {
   const formaeCombinationes = combinaFormas(
     vorbereitet.wortSegmente || [],
