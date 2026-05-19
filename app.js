@@ -389,23 +389,26 @@ function bearbeiteVers(index, alterVers) {
   input.className = "vers-editor";
   input.value = alterVers;
 
-  zeile.appendChild(input);
+    zeile.appendChild(input);
   passeVersEditorBreiteAn(input);
+  input.focus();
+
   input.addEventListener("input", function () {
     passeVersEditorBreiteAn(input);
-});
-  input.focus();
+  });
 
   input.addEventListener("keydown", async function (event) {
     if (event.key === "Enter") {
       const verse = aktuellesGedicht.textus.split("\n");
       verse[index] = input.value.trim();
 
+      entferneVersEditorSizer(input);
       await speichereGedichtText(verse.join("\n"));
       setStatus("Vers bearbeitet.");
     }
 
     if (event.key === "Escape") {
+      entferneVersEditorSizer(input);
       zeigeGedicht(aktuellesGedicht.textus);
     }
   });
@@ -426,6 +429,13 @@ function passeVersEditorBreiteAn(input) {
   const ziel = Math.min(Math.ceil(sizer.getBoundingClientRect().width) + 8, verfuegbar);
 
   input.style.width = ziel + "px";
+}
+
+function entferneVersEditorSizer(input) {
+  if (input._versEditorSizer) {
+    input._versEditorSizer.remove();
+    input._versEditorSizer = null;
+  }
 }
 
 async function fuegeVersHinzu() {
