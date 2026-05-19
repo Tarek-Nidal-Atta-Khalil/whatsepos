@@ -42,66 +42,7 @@ function combinaFormas(segmenta, silben) { const resultata = []; combinaFormasRe
 function silbenAusFormaeOderRegula(vorbereitet, strom) { const resultata = [[]]; for (const segmentum of vorbereitet.wortSegmente || []) { const formae = formaePerFormam.get(clavisFormae(segmentum.wort)) || []; const cumSyllabae = formae.map(f => ({ forma: f, silben: erzeugeSilbenAusLexico(strom, segmentum, f) })).filter(x => x.silben); const optionen = cumSyllabae.length > 0 ? cumSyllabae : [{ forma: null, silben: trenneSilbenWortFallback(strom, segmentum) }]; const nova = []; for (const basis of resultata) for (const x of optionen) nova.push([...basis, ...x.silben]); resultata.splice(0, resultata.length, ...nova); } return resultata; }
 function trenneSilbenWortFallback(strom, segmentum) { const teil = strom.slice(segmentum.start, segmentum.ende + 1); const kerne = findeSilbenkerne(teil); const varianten = []; if (kerne.length === 0) return []; erzeugeSilbenVariantenRekursiv(teil, kerne, 0, 0, [], varianten); return (varianten[0] || []).map(s => ({ ...s, start: s.start + segmentum.start, ende: s.ende + segmentum.start })); }
 function wendePositionslaengenAn(silben) { return silben.map(function(syllaba, index) { if (syllaba.quantitas !== "brevis_natura_lexico") return syllaba; const naechste = silben[index + 1]; if (!naechste) return syllaba; const zwischen = syllaba.textus.slice(indexPrimiVocalisInTextu(syllaba.textus) + 1) + naechste.textus.slice(0, indexPrimiVocalisInTextu(naechste.textus)); const konsonanten = zwischen.replace(/[aeiouy]/g, ""); if (konsonanten.length >= 2 && !istMutaCumLiquida(konsonanten)) return { ...syllaba, quantitas: "longa_positione_provisoria" }; return syllaba; }); }
-export function trenneSilbenVariantenVers(textus) {
-  const vorbereitet = bereiteVersstromVor(textus);
-  const strom = vorbereitet.versstrom;
-  const kerne = findeSilbenkerne(strom);
-  const varianten = [];
-
-  if (kerne.length === 0) return [];
-
-  // Gesamten Versstrom syllabifizieren
-  erzeugeSilbenVariantenRekursiv(strom, kerne, 0, 0, [], varianten);
-
-  const resultata = [];
-  const formaeCombinationes = combinaFormas(vorbereitet.wortSegmente || []);
-
-  // SQL-Quantitäten als Vorlage auf den Versstrom anwenden
-  varianten.forEach(function (silben, indexVariante) {
-    formaeCombinationes.forEach(function (formaeSelectae, indexFormae) {
-      const silbenCumLexico = wendePositionslaengenAn(
-        applicaQuantitatesLexicalesMitFormis(
-          silben,
-          vorbereitet,
-          formaeSelectae
-        )
-      );
-
-      resultata.push({
-        index: resultata.length,
-        indexSyllabarum: indexVariante,
-        indexFormae,
-        schema: silbenCumLexico.map(s => s.textus).join("-"),
-        silben: silbenCumLexico,
-        formaeSelectae
-      });
-    });
-  });
-
-  // Zusätzlich reine Lexikon-Silbengrenzen zulassen (z. B. Lauiniaque)
-  formaeCombinationes.forEach(function (formaeSelectae, indexFormae) {
-    const lexSilben = erzeugeLexikonGrenzVariante(
-      vorbereitet,
-      strom,
-      formaeSelectae
-    );
-
-    if (lexSilben) {
-      const silbenCumLexico = wendePositionslaengenAn(lexSilben);
-
-      resultata.push({
-        index: resultata.length,
-        indexSyllabarum: -1,
-        indexFormae,
-        schema: silbenCumLexico.map(s => s.textus).join("-"),
-        silben: silbenCumLexico,
-        formaeSelectae
-      });
-    }
-  });
-
-  return resultata;
-}
+export function trenneSilbenVariantenVers(textus) { const vorbereitet = bereiteVersstromVor(textus); const strom = vorbereitet.versstrom; const lexSilben = silbenAusFormaeOderRegula(vorbereitet, strom); if (lexSilben) return lexSilben.map((silben, index) => { const silbenPositione = wendePositionslaengenAn(silben); return { index, indexSyllabarum: index, indexFormae: index, schema: silbenPositione.map(s => s.textus).join("-"), silben: silbenPositione, formaeSelectae: new Map() }; }); const kerne = findeSilbenkerne(strom); const varianten = []; if (kerne.length === 0) return []; erzeugeSilbenVariantenRekursiv(strom, kerne, 0, 0, [], varianten); const resultata = []; varianten.forEach(function(silben, indexVariante) { const formaeCombinationes = combinaFormas(vorbereitet.wortSegmente || [], silben); formaeCombinationes.forEach(function(formaeSelectae, indexFormae) { const silbenCumLexico = wendePositionslaengenAn(applicaQuantitatesLexicalesMitFormis(silben, vorbereitet, formaeSelectae)); resultata.push({ index: resultata.length, indexSyllabarum: indexVariante, indexFormae, schema: silbenCumLexico.map(s => s.textus).join("-"), silben: silbenCumLexico, formaeSelectae }); }); }); return resultata; }
 export function trenneSilbenVers(textus) { const varianten = trenneSilbenVariantenVers(textus); return varianten[0]?.silben ?? []; }
 export function analysiereSilbenVorlaeufig(textus) { const vorbereitet = bereiteVersstromVor(textus); const varianten = trenneSilbenVariantenVers(textus); return { original: textus, versstrom: vorbereitet.versstrom, elisionen: vorbereitet.elisionen, mutaCumLiquida: findeMutaCumLiquidaStellen(textus), silben: varianten[0]?.silben ?? [], varianten }; }
 function quantitasSimplex(syllaba) { if (syllaba.quantitas === "longa_natura_lexico") return "longa"; if (syllaba.quantitas === "brevis_natura_lexico") return "brevis"; if (syllaba.quantitas === "longa_positione_provisoria") return "longa"; if (syllaba.quantitas === "longa_natura_diphthongo") return "longa"; if (syllaba.quantitas === "longa_natura_m_coda") return "longa"; if (syllaba.quantitas === "brevis_provisoria") return "brevis"; return "ambigua"; }
