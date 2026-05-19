@@ -85,7 +85,7 @@ function hatDiphthongum(textus) { return indexDiphthongiInTextu(textus) >= 0; }
 function hatLangeMCoda(textus) { return /[aeiouy]m$/.test(textus); }
 function erstelleSyllaba(strom, start, ende, ambigua = false) { const textusSyllabae = strom.slice(start, ende + 1); const aperta = estVokalInTextu(textusSyllabae, textusSyllabae.length - 1); let quantitas; if (hatDiphthongum(textusSyllabae)) quantitas = "longa_natura_diphthongo"; else if (hatLangeMCoda(textusSyllabae)) quantitas = "longa_natura_m_coda"; else if (ambigua) quantitas = "ambigua_muta_cum_liquida"; else quantitas = aperta ? "brevis_provisoria" : "longa_positione_provisoria"; return { textus: textusSyllabae, start, ende, aperta, ambigua_muta_cum_liquida: ambigua, quantitas }; }
 function normalisiereSyllabaeLexico(textus) { return String(textus).toLowerCase().replace(/[āáàâäǎă]/g, "a").replace(/[ēéèêëĕ]/g, "e").replace(/[īíìîïĭ]/g, "i").replace(/[ōóòôöŏ]/g, "o").replace(/[ūúùûüŭ]/g, "u").replace(/[ȳýỳŷÿ]/g, "y").replace(/[^a-z.]/g, ""); }
-export function erzeugeProfileAusSupabase(textus) {
+function erzeugeProfileAusSupabase(textus) {
   const vorbereitet = bereiteVersstromVor(textus);
 
   return vorbereitet.wortSegmente.map(function(segmentum) {
