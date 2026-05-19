@@ -161,3 +161,35 @@ export function pruefeVersVorlaeufig(textus) { const analyse = analysiereSilbenV
 export function erstelleAnalysezeile(textus) { const pruefung = pruefeVersVorlaeufig(textus); const pedesAnalyse = pruefung.pedesAnalyse; const optima = optimaVariante(pruefung.analyse.varianten); const optimaConatus = (pedesAnalyse.conatus || []).find(c => c.successit)?.silben; const silben = pedesAnalyse.successit ? (optimaConatus || pedesAnalyse.silben) : (optima?.silben ?? []); const problemIndices = tresBrevesIndices(silben); const finesPedum = new Set(); if (pedesAnalyse.successit) pedesAnalyse.pedes.forEach(pes => finesPedum.add(pes.finis - 1)); else finesPedumProvisorii(silben).forEach(index => finesPedum.add(index)); return { abschickbar: pruefung.abschickbar, grund: pruefung.grund, pedes: pedesAnalyse.pedes, schema: silben.map(s => s.textus).join("-"), elemente: silben.map(function(syllaba, index) { const quantitas = quantitasGraphica(syllaba); return { textus: syllaba.textus, textusSignatus: notaSyllabamQuantitate(syllaba, quantitas), quantitas, signum: signumQuantitatis(quantitas), problema: problemIndices.has(index), finisPedis: finesPedum.has(index) }; }) }; }
 export function analysiereHexameterRoh(textus) { const normalisiert = normalisiereLatein(textus); const woerter = normalisiert ? normalisiert.split(" ") : []; const elisionen = findeElisionen(textus); const hinweise = []; const mutaCumLiquida = findeMutaCumLiquidaStellen(textus); if (woerter.length === 0) hinweise.push("Kein Text erkannt."); if (elisionen.length > 0) hinweise.push(`${elisionen.length} mögliche Elision(en) erkannt.`); if (mutaCumLiquida.length > 0) hinweise.push(`${mutaCumLiquida.length} mögliche muta-cum-liquida-Ambiguität(en).`); return { original: textus, normalisiert, woerter, elisionen, mutaCumLiquida, hinweise, silbenanalyse: analysiereSilbenVorlaeufig(textus), pedesAnalyse: analysiereHexameterPedes(textus), pruefung: pruefeVersVorlaeufig(textus), analysezeile: erstelleAnalysezeile(textus) }; }
 window.analysiereHexameterRoh = analysiereHexameterRoh; window.normalisiereLatein = normalisiereLatein; window.findeElisionen = findeElisionen; window.bereiteVersstromVor = bereiteVersstromVor; window.trenneSilbenVers = trenneSilbenVers; window.trenneSilbenVariantenVers = trenneSilbenVariantenVers; window.analysiereSilbenVorlaeufig = analysiereSilbenVorlaeufig; window.findeMutaCumLiquidaStellen = findeMutaCumLiquidaStellen; window.analysiereHexameterPedes = analysiereHexameterPedes; window.pruefeVersVorlaeufig = pruefeVersVorlaeufig; window.erstelleAnalysezeile = erstelleAnalysezeile; window.setzeFormaeMetricas = setzeFormaeMetricas;
+window.debugSupabaseProfile = function(textus) {
+  const normalisiert = normalisiereLatein(textus);
+  const woerter = normalisiert ? normalisiert.split(" ") : [];
+
+  return woerter.map(function(wort, index) {
+    const clavis = clavisFormae(wort);
+    const formae = formaePerFormam.get(clavis) || [];
+
+    return {
+      index,
+      wort,
+      formae: formae.map(function(forma) {
+        return {
+          forma: forma.forma,
+          lemma: forma.lemma,
+          syllabae: forma.syllabae,
+          quantitates: forma.quantitates,
+          partes: normalisiereSyllabaeLexico(forma.syllabae)
+            .split(".")
+            .filter(Boolean),
+          iaAlsEinKern: normalisiereSyllabaeLexico(forma.syllabae)
+            .split(".")
+            .filter(Boolean)
+            .map(s => s.includes("ia"))
+        };
+      })
+    };
+  });
+};
+
+
+
