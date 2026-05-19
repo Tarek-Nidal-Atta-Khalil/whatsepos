@@ -245,32 +245,27 @@ export function trenneSilbenVariantenVers(textus) {
   const resultata = [];
 
   varianten.forEach(function(silben, indexVariante) {
-  const silbenVarianten = variantesCumProfilibus(strom, silben, vorbereitet);
+  const formaeCombinationes = combinaFormas(
+    vorbereitet.wortSegmente || [],
+    silben
+  );
 
-  silbenVarianten.forEach(function(silbenBasis, indexProfil) {
-    const formaeCombinationes = combinaFormas(
-      vorbereitet.wortSegmente || [],
-      silbenBasis
+  formaeCombinationes.forEach(function(formaeSelectae, indexFormae) {
+    const silbenCumLexico = wendePositionslaengenAn(
+      applicaQuantitatesLexicalesMitFormis(
+        silben,
+        vorbereitet,
+        formaeSelectae
+      )
     );
 
-    formaeCombinationes.forEach(function(formaeSelectae, indexFormae) {
-      const silbenCumLexico = wendePositionslaengenAn(
-        applicaQuantitatesLexicalesMitFormis(
-          silbenBasis,
-          vorbereitet,
-          formaeSelectae
-        )
-      );
-
-      resultata.push({
-        index: resultata.length,
-        indexSyllabarum: indexVariante,
-        indexProfil,
-        indexFormae,
-        schema: silbenCumLexico.map(s => s.textus).join("-"),
-        silben: silbenCumLexico,
-        formaeSelectae
-      });
+    resultata.push({
+      index: resultata.length,
+      indexSyllabarum: indexVariante,
+      indexFormae,
+      schema: silbenCumLexico.map(s => s.textus).join("-"),
+      silben: silbenCumLexico,
+      formaeSelectae
     });
   });
 });
