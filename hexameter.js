@@ -126,6 +126,44 @@ function hatDiphthongum(textus) { return indexDiphthongiInTextu(textus) >= 0; }
 function hatLangeMCoda(textus) { return /[aeiouy]m$/.test(textus); }
 function erstelleSyllaba(strom, start, ende, ambigua = false) { const textusSyllabae = strom.slice(start, ende + 1); const aperta = estVokalInTextu(textusSyllabae, textusSyllabae.length - 1); let quantitas; if (hatDiphthongum(textusSyllabae)) quantitas = "longa_natura_diphthongo"; else if (hatLangeMCoda(textusSyllabae)) quantitas = "longa_natura_m_coda"; else if (ambigua) quantitas = "ambigua_muta_cum_liquida"; else quantitas = aperta ? "brevis_provisoria" : "longa_positione_provisoria"; return { textus: textusSyllabae, start, ende, aperta, ambigua_muta_cum_liquida: ambigua, quantitas }; }
 function normalisiereSyllabaeLexico(textus) { return String(textus).toLowerCase().replace(/[āáàâäǎă]/g, "a").replace(/[ēéèêëĕ]/g, "e").replace(/[īíìîïĭ]/g, "i").replace(/[ōóòôöŏ]/g, "o").replace(/[ūúùûüŭ]/g, "u").replace(/[ȳýỳŷÿ]/g, "y").replace(/[^a-z.]/g, ""); }
+export function erzeugeProfileAusSupabase(textus) {
+  const vorbereitet = bereiteVersstromVor(textus);
+
+  return vorbereitet.wortSegmente.map(function(segmentum) {
+    const formae = formaePerFormam.get(clavisFormae(segmentum.wort)) || [];
+
+    return {
+      index: segmentum.index,
+      wort: segmentum.wort,
+      textus: segmentum.textus,
+      elisum: Boolean(segmentum.elisum),
+      profile: formae.map(function(forma) {
+        let partes = normalisiereSyllabaeLexico(forma.syllabae)
+          .split(".")
+          .filter(Boolean);
+
+        let quantitates = String(forma.quantitates || "")
+          .toUpperCase()
+          .split("");
+
+        if (segmentum.elisum && partes.length > 0) {
+          partes = partes.slice(0, -1);
+          quantitates = quantitates.slice(0, -1);
+        }
+
+        return {
+          forma: forma.forma,
+          lemma: forma.lemma,
+          syllabaeOriginal: forma.syllabae,
+          quantitatesOriginal: forma.quantitates,
+          partes,
+          quantitates,
+          partesInternae: partes.map(p => p.replace(/ia/g, "ja"))
+        };
+      })
+    };
+  });
+}
 function erzeugeSilbenAusLexico(strom, segmentum, forma) { if (!forma?.syllabae) return null; const partesOriginales = normalisiereSyllabaeLexico(forma.syllabae).split(".").filter(Boolean); if (partesOriginales.length === 0) return null; const partesInternae = partesOriginales.map(bereiteWortVor); const textus = partesInternae.join(""); if (textus !== segmentum.textus) return null; const quantitates = String(forma.quantitates || "").toUpperCase(); if (quantitates && quantitates.length !== partesInternae.length) return null; let cursor = segmentum.start; return partesInternae.map(function(pars, offset) { const start = cursor; const ende = cursor + pars.length - 1; cursor = ende + 1; const syllaba = erstelleSyllaba(strom, start, ende); const quantitas = quantitasAusSiglo(quantitates[offset]); return quantitas ? { ...syllaba, quantitas } : syllaba; }); }
 function erzeugeSilbenVariantenRekursiv(strom, kerne, kernIndex, silbenStart, bisherigeSilben, varianten) { const kern = kerne[kernIndex]; const naechsterKern = kerne[kernIndex + 1]; if (!kern) { varianten.push(bisherigeSilben); return; } if (!naechsterKern) { varianten.push([...bisherigeSilben, erstelleSyllaba(strom, silbenStart, strom.length - 1)]); return; } const zwischenStart = kern.ende + 1; const zwischenEnde = naechsterKern.start - 1; const konsonanten = strom.slice(zwischenStart, zwischenEnde + 1); if (istMutaCumLiquida(konsonanten)) { const offeneEnde = kern.ende; const geschlosseneEnde = zwischenStart; erzeugeSilbenVariantenRekursiv(strom, kerne, kernIndex + 1, offeneEnde + 1, [...bisherigeSilben, erstelleSyllaba(strom, silbenStart, offeneEnde, true)], varianten); erzeugeSilbenVariantenRekursiv(strom, kerne, kernIndex + 1, geschlosseneEnde + 1, [...bisherigeSilben, erstelleSyllaba(strom, silbenStart, geschlosseneEnde, true)], varianten); return; } let silbenEnde; if (konsonanten.length <= 1) silbenEnde = kern.ende; else if (konsonanten.startsWith("qu")) silbenEnde = kern.ende; else silbenEnde = zwischenStart; erzeugeSilbenVariantenRekursiv(strom, kerne, kernIndex + 1, silbenEnde + 1, [...bisherigeSilben, erstelleSyllaba(strom, silbenStart, silbenEnde)], varianten); }
 function quantitasAusSiglo(siglum) { if (siglum === "L") return "longa_natura_lexico"; if (siglum === "B") return "brevis_natura_lexico"; return null; }
