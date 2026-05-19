@@ -79,47 +79,6 @@ export function bereiteVersstromVor(textus) {
     versstrom: bearbeiteteWoerter.join("")
   };
 }
-export function erzeugeProfileAusSupabase(textus) {
-  const vorbereitet = bereiteVersstromVor(textus);
-
-  return vorbereitet.wortSegmente.map(function(segmentum) {
-    const formae = formaePerFormam.get(clavisFormae(segmentum.wort)) || [];
-
-    return {
-      index: segmentum.index,
-      wort: segmentum.wort,
-      textus: segmentum.textus,
-      vollTextus: segmentum.vollTextus,
-      elisum: segmentum.elisum,
-      profile: formae.map(function(forma) {
-        let partes = normalisiereSyllabaeLexico(forma.syllabae)
-          .split(".")
-          .filter(Boolean);
-
-        let quantitates = String(forma.quantitates || "")
-          .toUpperCase()
-          .split("");
-
-        if (segmentum.elisum && partes.length > 0) {
-          partes = partes.slice(0, -1);
-          quantitates = quantitates.slice(0, -1);
-        }
-
-        return {
-          forma: forma.forma,
-          lemma: forma.lemma,
-          syllabaeOriginal: forma.syllabae,
-          quantitatesOriginal: forma.quantitates,
-          partes,
-          quantitates,
-          partesInternae: partes.map(p =>
-            p.includes("ia") ? p.replace(/ia/g, "ja") : p
-          )
-        };
-      })
-    };
-  });
-}
 function findeSilbenkerne(strom) { const kerne = []; for (let i = 0; i < strom.length; i += 1) { if (!estVokalInTextu(strom, i)) continue; if (istDiphthong(strom, i)) { kerne.push({ start: i, ende: i + 1, kern: strom.slice(i, i + 2) }); i += 1; } else kerne.push({ start: i, ende: i, kern: strom[i] }); } return kerne; }
 export function findeMutaCumLiquidaStellen(textus) { const vorbereitet = bereiteVersstromVor(textus); const strom = vorbereitet.versstrom; const kerne = findeSilbenkerne(strom); const stellen = []; for (let i = 0; i < kerne.length - 1; i += 1) { const links = kerne[i]; const rechts = kerne[i + 1]; const zwischen = strom.slice(links.ende + 1, rechts.start); if (istMutaCumLiquida(zwischen)) stellen.push({ index: i, gruppe: zwischen, position: links.ende + 1, hinweis: `${zwischen}: ambigua muta cum liquida` }); } return stellen; }
 function hatDiphthongum(textus) { return indexDiphthongiInTextu(textus) >= 0; }
