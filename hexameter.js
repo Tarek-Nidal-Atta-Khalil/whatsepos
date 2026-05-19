@@ -145,7 +145,7 @@ function erzeugeSilbenAusLexico(strom, segmentum, forma) {
   let cursor = segmentum.start;
 
   return partes.map(function(pars, offset) {
-    const parsInterna = bereiteWortVor(pars);
+    const parsInterna = pars;
     const start = cursor;
     const ende = cursor + parsInterna.length - 1;
     cursor = ende + 1;
