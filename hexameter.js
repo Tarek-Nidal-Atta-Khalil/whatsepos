@@ -11,8 +11,17 @@ function clavisFormae(textus) { return normalisiereLatein(textus).replace(/\s+/g
 export function normalisiereLatein(textus) { return textus.toLowerCase().replace(/[āáàâäǎă]/g,"a").replace(/[ēéèêëĕ]/g,"e").replace(/[īíìîïĭ]/g,"i").replace(/[ōóòôöŏ]/g,"o").replace(/[ūúùûüŭ]/g,"u").replace(/[ȳýỳŷÿ]/g,"y").replace(/j/g,"i").replace(/v/g,"u").replace(/[^a-zA-Zāēīōūȳáéíóúàèìòùâêîôûäëïöüŷÿ\s]/g," ").replace(/\s+/g," ").trim(); }
 function estVokal(littera) { return VOKALE.includes(littera); }
 function estVokalInTextu(textus, index) { if (textus[index] === "u" && index > 0 && textus[index - 1] === "q") return false; return estVokal(textus[index]); }
-function indexPrimiVocalisInTextu(textus) { for (let i = 0; i < textus.length; i += 1) if (estVokalInTextu(textus, i)) return i; return -1; }
-function istDiphthong(textus, index) { if (!estVokalInTextu(textus, index) || !estVokalInTextu(textus, index + 1)) return false; return DIPHTHONGE.includes(textus.slice(index, index + 2)); }
+function indexPrimiVocalisInTextu(textus) {
+  for (let i = 0; i < textus.length; i += 1) {
+    if (textus[i] === "i" && i > 0 && i < textus.length - 1 && estVokal(textus[i - 1]) === false && estVokal(textus[i + 1])) {
+      continue;
+    }
+
+    if (estVokalInTextu(textus, i)) return i;
+  }
+
+  return -1;
+}function istDiphthong(textus, index) { if (!estVokalInTextu(textus, index) || !estVokalInTextu(textus, index + 1)) return false; return DIPHTHONGE.includes(textus.slice(index, index + 2)); }
 function indexDiphthongiInTextu(textus) { for (let i = 0; i < textus.length - 1; i += 1) if (istDiphthong(textus, i)) return i; return -1; }
 function istMutaCumLiquida(gruppe) { return MUTAE_CUM_LIQUIDA.includes(gruppe); }
 function endetAufElidierbarenLaut(wort) { return /(?:[aeiouy]m|[aeiouy])$/.test(wort); }
