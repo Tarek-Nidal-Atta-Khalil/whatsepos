@@ -386,3 +386,5 @@ window.debugProfilVarianten = function(textus) {
   });
 };
 window.erzeugeProfileAusSupabase = erzeugeProfileAusSupabase;
+window.silbenAusFormaeOderRegula = silbenAusFormaeOderRegula;
+window.erzeugeSilbenAusLexico = erzeugeSilbenAusLexico;
