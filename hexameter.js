@@ -41,7 +41,36 @@ function normalisiereSyllabaeLexico(textus) {
     .replace(/[ȳýỳŷÿ]/g, "y")
     .replace(/[^a-z.]/g, "");
 }
-function erzeugeSilbenAusLexico(strom, segmentum, forma) { if (!forma?.syllabae) return null; const partes = String(forma.syllabae).split(".").map(s => bereiteWortVor(normalisiereLatein(s))).filter(Boolean); if (partes.length === 0) return null; const textus = partes.join(""); if (textus !== segmentum.textus) return null; let cursor = segmentum.start; return partes.map(function(pars) { const start = cursor; const ende = cursor + pars.length - 1; cursor = ende + 1; return erstelleSyllaba(strom, start, ende); }); }
+function erzeugeSilbenAusLexico(strom, segmentum, forma) {
+  if (!forma?.syllabae) return null;
+
+  const partesOriginales = normalisiereSyllabaeLexico(forma.syllabae)
+    .split(".")
+    .filter(Boolean);
+
+  if (partesOriginales.length === 0) return null;
+
+  const partesInternae = partesOriginales.map(bereiteWortVor);
+  const textus = partesInternae.join("");
+
+  if (textus !== segmentum.textus) return null;
+
+  const quantitates = String(forma.quantitates || "").toUpperCase();
+  if (quantitates && quantitates.length !== partesInternae.length) return null;
+
+  let cursor = segmentum.start;
+
+  return partesInternae.map(function(pars, offset) {
+    const start = cursor;
+    const ende = cursor + pars.length - 1;
+    cursor = ende + 1;
+
+    const syllaba = erstelleSyllaba(strom, start, ende);
+    const quantitas = quantitasAusSiglo(quantitates[offset]);
+
+    return quantitas ? { ...syllaba, quantitas } : syllaba;
+  });
+}
 function erzeugeSilbenVariantenRekursiv(strom, kerne, kernIndex, silbenStart, bisherigeSilben, varianten) { const kern = kerne[kernIndex]; const naechsterKern = kerne[kernIndex + 1]; if (!kern) { varianten.push(bisherigeSilben); return; } if (!naechsterKern) { varianten.push([...bisherigeSilben, erstelleSyllaba(strom, silbenStart, strom.length - 1)]); return; } const zwischenStart = kern.ende + 1; const zwischenEnde = naechsterKern.start - 1; const konsonanten = strom.slice(zwischenStart, zwischenEnde + 1); if (istMutaCumLiquida(konsonanten)) { const offeneEnde = kern.ende; const geschlosseneEnde = zwischenStart; erzeugeSilbenVariantenRekursiv(strom, kerne, kernIndex + 1, offeneEnde + 1, [...bisherigeSilben, erstelleSyllaba(strom, silbenStart, offeneEnde, true)], varianten); erzeugeSilbenVariantenRekursiv(strom, kerne, kernIndex + 1, geschlosseneEnde + 1, [...bisherigeSilben, erstelleSyllaba(strom, silbenStart, geschlosseneEnde, true)], varianten); return; } let silbenEnde; if (konsonanten.length <= 1) silbenEnde = kern.ende; else if (konsonanten.startsWith("qu")) silbenEnde = kern.ende; else silbenEnde = zwischenStart; erzeugeSilbenVariantenRekursiv(strom, kerne, kernIndex + 1, silbenEnde + 1, [...bisherigeSilben, erstelleSyllaba(strom, silbenStart, silbenEnde)], varianten); }
 function quantitasAusSiglo(siglum) { if (siglum === "L") return "longa_natura_lexico"; if (siglum === "B") return "brevis_natura_lexico"; return null; }
 function indexKernInSyllaba(syllaba) { const d = indexDiphthongiInTextu(syllaba.textus); if (d >= 0) return syllaba.start + d; const v = indexPrimiVocalisInTextu(syllaba.textus); if (v >= 0) return syllaba.start + v; return -1; }
