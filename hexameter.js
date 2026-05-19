@@ -151,7 +151,8 @@ function ersetzeSegmentDurchProfil(strom, silben, segmentum, profil) {
   for (let i = endIndex + 1; i < silben.length; i += 1) nach.push(silben[i]);
 
   const textusProfilis = profil.partesInternae.join("");
-  if (textusProfilis !== segmentum.textus) return null;
+// vorläufig nicht streng vergleichen:
+// Supabase-Profile dürfen die interne i/u/v-Behandlung übersteuern.
 
   let cursor = segmentum.start;
   const profilSilben = profil.partesInternae.map(function(teil, offset) {
