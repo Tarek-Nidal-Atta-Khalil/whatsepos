@@ -203,4 +203,50 @@ window.debugSupabaseProfile = function(textus) {
     };
   });
 };
+window.debugProfilVarianten = function(textus) {
+  const normalisiert = normalisiereLatein(textus);
+  const woerter = normalisiert ? normalisiert.split(" ") : [];
+  const elisionen = findeElisionen(textus);
+  const elidierteWortIndizes = new Set(elisionen.map(e => e.index));
 
+  return woerter.map(function(wort, index) {
+    const clavis = normalisiereLatein(wort).replace(/\s+/g, "");
+    const formae = (window.formaeMetricae || [])
+      .filter(f => normalisiereLatein(f.forma).replace(/\s+/g, "") === clavis);
+
+    return {
+      index,
+      wort,
+      elidiert: elidierteWortIndizes.has(index),
+      profile: formae.map(function(forma) {
+        let partes = String(forma.syllabae || "")
+          .toLowerCase()
+          .replace(/[āáàâäǎă]/g, "a")
+          .replace(/[ēéèêëĕ]/g, "e")
+          .replace(/[īíìîïĭ]/g, "i")
+          .replace(/[ōóòôöŏ]/g, "o")
+          .replace(/[ūúùûüŭ]/g, "u")
+          .replace(/[ȳýỳŷÿ]/g, "y")
+          .replace(/[^a-z.]/g, "")
+          .split(".")
+          .filter(Boolean);
+
+        let quantitates = String(forma.quantitates || "").toUpperCase().split("");
+
+        if (elidierteWortIndizes.has(index) && partes.length > 0) {
+          partes = partes.slice(0, -1);
+          quantitates = quantitates.slice(0, -1);
+        }
+
+        return {
+          forma: forma.forma,
+          syllabaeOriginal: forma.syllabae,
+          quantitatesOriginal: forma.quantitates,
+          partes,
+          quantitates,
+          internePartes: partes.map(p => p.includes("ia") ? p.replace("ia", "ja") : p)
+        };
+      })
+    };
+  });
+};
