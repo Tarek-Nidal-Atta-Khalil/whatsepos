@@ -37,7 +37,89 @@ function entferneElidierteEndung(wort) { if (/[aeiouy]m$/.test(wort)) return wor
 function geminaIntervokalischesI(wort) { let resultatum = ""; for (let i = 0; i < wort.length; i += 1) { if (wort[i] === "i" && i > 0 && i < wort.length - 1 && estVokalInTextu(wort, i - 1) && estVokalInTextu(wort, i + 1)) resultatum += "jj"; else resultatum += wort[i]; } return resultatum; }
 function consonantificaIntervocalicumU(wort) { return wort.replace(/([aeioy])u([aeiouy])/g, "$1v$2"); }
 function bereiteWortVor(wort) { const mitKonsonantischemU = wort.replace(/^u([aeiouy])/g, "v$1"); return geminaIntervokalischesI(consonantificaIntervocalicumU(mitKonsonantischemU)); }
-export function bereiteVersstromVor(textus) { const normalisiert = normalisiereLatein(textus); const woerter = normalisiert ? normalisiert.split(" ") : []; const elisionen = findeElisionen(textus); const elisionsIndizes = new Set(elisionen.map(e => e.index)); const wortSegmente = []; let position = 0; const bearbeiteteWoerter = woerter.map(function(wort, index) { let w = wort; if (elisionsIndizes.has(index)) w = entferneElidierteEndung(w); w = bereiteWortVor(w); const start = position; const ende = position + w.length - 1; wortSegmente.push({ index, wort: woerter[index], textus: w, start, ende }); position += w.length; return w; }); return { original: textus, normalisiert, woerter, elisionen, wortSegmente, versstrom: bearbeiteteWoerter.join("") }; }
+export function bereiteVersstromVor(textus) {
+  const normalisiert = normalisiereLatein(textus);
+  const woerter = normalisiert ? normalisiert.split(" ") : [];
+  const elisionen = findeElisionen(textus);
+  const elisionsIndizes = new Set(elisionen.map(e => e.index));
+  const wortSegmente = [];
+  let position = 0;
+
+  const bearbeiteteWoerter = woerter.map(function(wort, index) {
+    const vollTextus = bereiteWortVor(wort);
+    let w = wort;
+    const elisum = elisionsIndizes.has(index);
+
+    if (elisum) w = entferneElidierteEndung(w);
+
+    w = bereiteWortVor(w);
+    const start = position;
+    const ende = position + w.length - 1;
+
+    wortSegmente.push({
+      index,
+      wort: woerter[index],
+      vollTextus,
+      textus: w,
+      start,
+      ende,
+      elisum
+    });
+
+    position += w.length;
+    return w;
+  });
+
+  return {
+    original: textus,
+    normalisiert,
+    woerter,
+    elisionen,
+    wortSegmente,
+    versstrom: bearbeiteteWoerter.join("")
+  };
+}
+export function erzeugeProfileAusSupabase(textus) {
+  const vorbereitet = bereiteVersstromVor(textus);
+
+  return vorbereitet.wortSegmente.map(function(segmentum) {
+    const formae = formaePerFormam.get(clavisFormae(segmentum.wort)) || [];
+
+    return {
+      index: segmentum.index,
+      wort: segmentum.wort,
+      textus: segmentum.textus,
+      vollTextus: segmentum.vollTextus,
+      elisum: segmentum.elisum,
+      profile: formae.map(function(forma) {
+        let partes = normalisiereSyllabaeLexico(forma.syllabae)
+          .split(".")
+          .filter(Boolean);
+
+        let quantitates = String(forma.quantitates || "")
+          .toUpperCase()
+          .split("");
+
+        if (segmentum.elisum && partes.length > 0) {
+          partes = partes.slice(0, -1);
+          quantitates = quantitates.slice(0, -1);
+        }
+
+        return {
+          forma: forma.forma,
+          lemma: forma.lemma,
+          syllabaeOriginal: forma.syllabae,
+          quantitatesOriginal: forma.quantitates,
+          partes,
+          quantitates,
+          partesInternae: partes.map(p =>
+            p.includes("ia") ? p.replace(/ia/g, "ja") : p
+          )
+        };
+      })
+    };
+  });
+}
 function findeSilbenkerne(strom) { const kerne = []; for (let i = 0; i < strom.length; i += 1) { if (!estVokalInTextu(strom, i)) continue; if (istDiphthong(strom, i)) { kerne.push({ start: i, ende: i + 1, kern: strom.slice(i, i + 2) }); i += 1; } else kerne.push({ start: i, ende: i, kern: strom[i] }); } return kerne; }
 export function findeMutaCumLiquidaStellen(textus) { const vorbereitet = bereiteVersstromVor(textus); const strom = vorbereitet.versstrom; const kerne = findeSilbenkerne(strom); const stellen = []; for (let i = 0; i < kerne.length - 1; i += 1) { const links = kerne[i]; const rechts = kerne[i + 1]; const zwischen = strom.slice(links.ende + 1, rechts.start); if (istMutaCumLiquida(zwischen)) stellen.push({ index: i, gruppe: zwischen, position: links.ende + 1, hinweis: `${zwischen}: ambigua muta cum liquida` }); } return stellen; }
 function hatDiphthongum(textus) { return indexDiphthongiInTextu(textus) >= 0; }
@@ -250,3 +332,4 @@ window.debugProfilVarianten = function(textus) {
     };
   });
 };
+window.erzeugeProfileAusSupabase = erzeugeProfileAusSupabase;
