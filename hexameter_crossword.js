@@ -65,12 +65,17 @@ function istMutaCumLiquida(gruppe) {
   return MUTAE_CUM_LIQUIDA.includes(gruppe);
 }
 
+function estFallbackSyllaba(syllaba) {
+  return !syllaba?.forma;
+}
+
 function quantitasBasis(syllaba) {
   if (syllaba.quantitas === "longa_natura_lexico") return "longa_natura_lexico";
-  if (syllaba.quantitas === "brevis_natura_lexico") return "brevis_natura_lexico";
+  if (syllaba.quantitas === "brevis_natura_lexico" && !estFallbackSyllaba(syllaba)) return "brevis_natura_lexico";
   if (hatDiphthongum(syllaba.textus)) return "longa_natura_diphthongo";
   if (/[aeiouy]m$/.test(syllaba.textus)) return "longa_natura_m_coda";
-  if (!hatVokalischenWert(syllaba.textus)) return syllaba.quantitas || "brevis_provisoria";
+  if (!hatVokalischenWert(syllaba.textus)) return syllaba.quantitas || "ambigua_provisoria";
+  if (estFallbackSyllaba(syllaba)) return "ambigua_provisoria";
   return estVokalInTextu(syllaba.textus, syllaba.textus.length - 1)
     ? "brevis_provisoria"
     : "longa_positione_provisoria";
@@ -119,9 +124,18 @@ function schliesseWortgrenzen(silben) {
   return aktualisierePositiones(resultatum);
 }
 
+function normalisiereFallbackQuantitates(silben) {
+  return silben.map(function(syllaba) {
+    if (!estFallbackSyllaba(syllaba)) return syllaba;
+    if (syllaba.quantitas === "longa_positione_provisoria" || syllaba.quantitas === "longa_natura_diphthongo" || syllaba.quantitas === "longa_natura_m_coda") return syllaba;
+    if (hatVokalischenWert(syllaba.textus)) return { ...syllaba, quantitas: "ambigua_provisoria" };
+    return syllaba;
+  });
+}
+
 function wendePositionslaengenAn(silben) {
   return silben.map(function(syllaba, index) {
-    if (syllaba.quantitas && syllaba.quantitas !== "brevis_natura_lexico" && syllaba.quantitas !== "brevis_provisoria") return syllaba;
+    if (syllaba.quantitas && syllaba.quantitas !== "brevis_natura_lexico" && syllaba.quantitas !== "brevis_provisoria" && syllaba.quantitas !== "ambigua_provisoria") return syllaba;
 
     const naechste = silben[index + 1];
     if (!naechste) return syllaba;
@@ -148,6 +162,7 @@ function quantitasSimplex(syllaba) {
   if (syllaba.quantitas === "longa_natura_diphthongo") return "longa";
   if (syllaba.quantitas === "longa_natura_m_coda") return "longa";
   if (syllaba.quantitas === "brevis_provisoria") return "brevis";
+  if (syllaba.quantitas === "ambigua_provisoria") return "ambigua";
   return "ambigua";
 }
 
@@ -207,7 +222,8 @@ function resolvePedesRekursiv(silbae, pesIndex, initium, pedes) {
 }
 
 function postprocessVariante(variante) {
-  const silben = wendePositionslaengenAn(schliesseWortgrenzen(variante.silben || []));
+  const resyllabificatae = normalisiereFallbackQuantitates(schliesseWortgrenzen(variante.silben || []));
+  const silben = wendePositionslaengenAn(resyllabificatae);
   return {
     ...variante,
     schema: silben.map(s => s.textus).join("-"),
