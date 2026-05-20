@@ -39,14 +39,20 @@ function indexDiphthongiInTextu(textus) {
   return -1;
 }
 
+function terminaturInMCoda(textus) {
+  return /[aeiouy]m$/.test(String(textus || ""));
+}
+
 function quantitasDeterminata(syllaba) {
   if (syllaba.quantitas === "longa_natura_lexico") return syllaba;
   if (syllaba.quantitas === "longa_positione_provisoria") return syllaba;
   if (syllaba.quantitas === "longa_natura_diphthongo") return syllaba;
+  if (syllaba.quantitas === "longa_natura_m_coda") return syllaba;
   if (indexDiphthongiInTextu(syllaba.textus) >= 0) return { ...syllaba, quantitas: "longa_natura_diphthongo" };
+  if (terminaturInMCoda(syllaba.textus)) return { ...syllaba, quantitas: "longa_natura_m_coda" };
 
   // Grundregel für Whatsepos:
-  // Supabase-longae, Diphthonge und vom Parser erkannte Positionslängen sind lang.
+  // Supabase-longae, Diphthonge, -m-Codae und vom Parser erkannte Positionslängen sind lang.
   // Jede andere vokalische Silbe ist kurz. Es gibt keine metrische Ambiguität.
   if (indexPrimiVocalisInTextu(syllaba.textus) >= 0) {
     return { ...syllaba, quantitas: "brevis" };
@@ -81,6 +87,7 @@ function quantitasSimplex(syllaba) {
   if (syllaba.quantitas === "longa_natura_lexico") return "longa";
   if (syllaba.quantitas === "longa_positione_provisoria") return "longa";
   if (syllaba.quantitas === "longa_natura_diphthongo") return "longa";
+  if (syllaba.quantitas === "longa_natura_m_coda") return "longa";
   return "brevis";
 }
 
@@ -158,6 +165,7 @@ function scoreVariante(variante) {
   silben.forEach(s => {
     if (s.quantitas === "longa_natura_lexico") score += 6;
     else if (s.quantitas === "longa_natura_diphthongo") score += 3;
+    else if (s.quantitas === "longa_natura_m_coda") score += 3;
     else if (s.quantitas === "longa_positione_provisoria") score += 1;
   });
   return score;
