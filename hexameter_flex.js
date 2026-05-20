@@ -2,7 +2,7 @@ import * as basis from "./hexameter_crossword.js?v=20260520-crossword-importmap-
 
 const VOCALES_LONGAE = { a: "ā", e: "ē", i: "ī", o: "ō", u: "ū", y: "ȳ" };
 const VOCALES_BREVES = { a: "ă", e: "ĕ", i: "ĭ", o: "ŏ", u: "ŭ", y: "y̆" };
-const DIPHTHONGE = ["ae", "au", "oe", "ei", "eu", "ui"];
+const DIPHTHONGE = ["ae", "oe", "au", "eu"];
 
 export const setzeFormaeMetricas = basis.setzeFormaeMetricas;
 export const normalisiereLatein = basis.normalisiereLatein;
@@ -26,7 +26,10 @@ function indexPrimiVocalisInTextu(textus) {
 
 function istDiphthong(textus, index) {
   if (!estVokalInTextu(textus, index) || !estVokalInTextu(textus, index + 1)) return false;
-  return DIPHTHONGE.includes(textus.slice(index, index + 2));
+  const duplex = textus.slice(index, index + 2);
+  if (!DIPHTHONGE.includes(duplex)) return false;
+  if ((duplex === "au" || duplex === "eu") && estVokalInTextu(textus, index + 2)) return false;
+  return true;
 }
 
 function indexDiphthongiInTextu(textus) {
@@ -39,9 +42,11 @@ function indexDiphthongiInTextu(textus) {
 function quantitasDeterminata(syllaba) {
   if (syllaba.quantitas === "longa_natura_lexico") return syllaba;
   if (syllaba.quantitas === "longa_positione_provisoria") return syllaba;
+  if (syllaba.quantitas === "longa_natura_diphthongo") return syllaba;
+  if (indexDiphthongiInTextu(syllaba.textus) >= 0) return { ...syllaba, quantitas: "longa_natura_diphthongo" };
 
   // Grundregel für Whatsepos:
-  // Nur Supabase-longae und vom Parser erkannte Positionslängen sind lang.
+  // Supabase-longae, Diphthonge und vom Parser erkannte Positionslängen sind lang.
   // Jede andere vokalische Silbe ist kurz. Es gibt keine metrische Ambiguität.
   if (indexPrimiVocalisInTextu(syllaba.textus) >= 0) {
     return { ...syllaba, quantitas: "brevis" };
@@ -75,6 +80,7 @@ export function analysiereSilbenVorlaeufig(textus) {
 function quantitasSimplex(syllaba) {
   if (syllaba.quantitas === "longa_natura_lexico") return "longa";
   if (syllaba.quantitas === "longa_positione_provisoria") return "longa";
+  if (syllaba.quantitas === "longa_natura_diphthongo") return "longa";
   return "brevis";
 }
 
@@ -151,6 +157,7 @@ function scoreVariante(variante) {
   let score = 0;
   silben.forEach(s => {
     if (s.quantitas === "longa_natura_lexico") score += 6;
+    else if (s.quantitas === "longa_natura_diphthongo") score += 3;
     else if (s.quantitas === "longa_positione_provisoria") score += 1;
   });
   return score;
