@@ -235,12 +235,29 @@ function tresBrevesIndices(silbae) {
   return indices;
 }
 
+function problemIndicesMetrice(silbae, pedesAnzeige) {
+  const indices = new Set();
+  const ultimusPes = pedesAnzeige[pedesAnzeige.length - 1];
+
+  if (!ultimusPes) return tresBrevesIndices(silbae);
+
+  const start = ultimusPes.finis;
+  if (silbae[start] && quantitasSimplex(silbae[start]) === "brevis") indices.add(start);
+
+  for (let i = start; i <= silbae.length - 3; i += 1) {
+    const tres = silbae.slice(i, i + 3);
+    if (tres.every(s => quantitasSimplex(s) === "brevis")) indices.add(i + 2);
+  }
+
+  return indices;
+}
+
 export function erstelleAnalysezeile(textus) {
   const pruefung = pruefeVersVorlaeufig(textus);
   const pedesAnalyse = pruefung.pedesAnalyse;
   const silben = pedesAnalyse.successit ? pedesAnalyse.silben : ((pruefung.analyse.varianten || [])[0]?.silben ?? []);
   const pedesAnzeige = pedesAnalyse.successit ? pedesAnalyse.pedes : resolvePedesPartiales(silben);
-  const problemIndices = tresBrevesIndices(silben);
+  const problemIndices = problemIndicesMetrice(silben, pedesAnzeige);
   const finesPedum = new Set();
   pedesAnzeige.forEach(pes => finesPedum.add(pes.finis - 1));
 
