@@ -86,8 +86,14 @@ function beginntMitKonsonantischemU(wort) {
   return /^u[aeiouy]/.test(wort);
 }
 
+function beginntMitKonsonantischemI(wort) {
+  return /^i[aeiouy]/.test(wort);
+}
+
 function beginntMitVokalOderH(wort) {
-  return beginntMitKonsonantischemU(wort) ? false : /^[aeiouyh]/.test(wort);
+  if (beginntMitKonsonantischemU(wort)) return false;
+  if (beginntMitKonsonantischemI(wort)) return false;
+  return /^[aeiouyh]/.test(wort);
 }
 
 export function findeElisionen(textus) {
@@ -126,7 +132,8 @@ function consonantificaIntervocalicumU(wort) {
 }
 
 function bereiteWortVor(wort) {
-  const mitKonsonantischemU = wort.replace(/^u([aeiouy])/g, "v$1");
+  const mitKonsonantischemI = wort.replace(/^i([aeiouy])/g, "j$1");
+  const mitKonsonantischemU = mitKonsonantischemI.replace(/^u([aeiouy])/g, "v$1");
   return geminaIntervokalischesI(consonantificaIntervocalicumU(mitKonsonantischemU));
 }
 
