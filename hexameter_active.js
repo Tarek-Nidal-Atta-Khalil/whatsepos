@@ -14,8 +14,13 @@ function estVokal(c) {
   return VOKALE.includes(c);
 }
 
+function estQuU(textus, index) {
+  return String(textus || "")[index] === "u" && index > 0 && String(textus || "")[index - 1] === "q";
+}
+
 function indexPrimiVocalis(textus) {
   for (let i = 0; i < String(textus || "").length; i += 1) {
+    if (estQuU(textus, i)) continue;
     if (estVokal(textus[i])) return i;
   }
   return -1;
@@ -23,6 +28,7 @@ function indexPrimiVocalis(textus) {
 
 function indexUltimiVocalis(textus) {
   for (let i = String(textus || "").length - 1; i >= 0; i -= 1) {
+    if (estQuU(textus, i)) continue;
     if (estVokal(textus[i])) return i;
   }
   return -1;
