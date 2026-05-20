@@ -22,7 +22,6 @@
   <button id="menuButton" type="button" onclick="toggleMenu()">☰ Menü</button>
 
   <div id="sideMenu" class="side-menu">
-  <button onclick="zeigeTab('hexameter')">Hexameter</button>
   <button onclick="zeigeTab('meineTexte')">Mei textus</button>
   <button onclick="zeigeTab('vocabularium')">Vocabularium</button>
   <button onclick="zeigeTab('veroeffentlichungen')">Bibliotheca</button>
@@ -75,9 +74,7 @@
     <div id="hexameter" class="tab-content" style="display: none;">
       <p id="status" class="status"></p>
 
-      <div id="scriptoriumStart">
-        <button onclick="starteNeuesGedicht()">Novum carmen</button>
-      </div>
+      <div id="scriptoriumStart"></div>
 
       <div id="titelEingabeBereich" style="display: none;">
         <input id="titelEingabe" type="text" placeholder="Titulum insere">
@@ -103,6 +100,10 @@
 
     <div id="meineTexte" class="tab-content" style="display: none;">
       <h2>Mei textus</h2>
+
+      <div style="margin-bottom: 1.5rem;">
+        <button onclick="zeigeTab('hexameter'); starteNeuesGedicht();">Novum carmen</button>
+      </div>
 
       <div id="meineTexteKopf" class="titel-kopfzeile">
         <span></span>
