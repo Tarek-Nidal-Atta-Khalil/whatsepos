@@ -250,7 +250,11 @@ function problemIndicesMetrice(silbae, pedesAnzeige) {
     const q2 = quantitasSimplex(silbae[i + 2]);
 
     if (q0 === "longa" && q1 === "brevis" && q2 === "longa") indices.add(i + 1);
-    if (q0 === "brevis" && q1 === "brevis" && q2 === "brevis") indices.add(i + 2);
+    if (q0 === "brevis" && q1 === "brevis" && q2 === "brevis") {
+      indices.add(i);
+      indices.add(i + 1);
+      indices.add(i + 2);
+    }
   }
 
   return indices;
