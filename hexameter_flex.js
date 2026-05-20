@@ -36,13 +36,33 @@ function indexDiphthongiInTextu(textus) {
   return -1;
 }
 
+function estFallbackSyllaba(syllaba) {
+  return !syllaba?.forma;
+}
+
+function estSyllabaAperta(syllaba) {
+  const textus = String(syllaba?.textus || "");
+  return estVokalInTextu(textus, textus.length - 1);
+}
+
 function relaxaQuantitatem(syllaba) {
   if (syllaba.quantitas === "longa_natura_lexico") return syllaba;
   if (syllaba.quantitas === "longa_positione_provisoria") return syllaba;
   if (syllaba.quantitas === "longa_natura_diphthongo") return syllaba;
   if (syllaba.quantitas === "longa_natura_m_coda") return syllaba;
-  if (indexPrimiVocalisInTextu(syllaba.textus) >= 0) return { ...syllaba, quantitas: "ambigua_provisoria" };
-  return syllaba;
+  if (syllaba.quantitas === "brevis_natura_lexico") return syllaba;
+
+  const habetVocalem = indexPrimiVocalisInTextu(syllaba.textus) >= 0;
+  if (!habetVocalem) return syllaba;
+
+  // Wichtig: fallback-Silben stammen nicht aus Supabase. Offene fallback-Silben
+  // bleiben deshalb vorläufig kurz und blockieren den Vers, bis ein Lexikonprofil existiert.
+  if (estFallbackSyllaba(syllaba) && estSyllabaAperta(syllaba)) {
+    return { ...syllaba, quantitas: "brevis_provisoria" };
+  }
+
+  // Supabase-Silben, die nicht in longae stehen, sind nicht sicher kurz.
+  return { ...syllaba, quantitas: "ambigua_provisoria" };
 }
 
 function relaxaVarianten(varianten) {
@@ -90,6 +110,15 @@ function quantitasGraphica(syllaba) {
 function longaCompatibilis(q) { return q === "longa" || q === "ambigua"; }
 function brevisCompatibilis(q) { return q === "brevis" || q === "ambigua"; }
 
+function schemataPedis(pesIndex) {
+  return pesIndex === 5
+    ? [{ nomen: "finalis", schema: ["longa", "anceps"] }]
+    : [
+        { nomen: "dactylus", schema: ["longa", "brevis", "brevis"] },
+        { nomen: "spondeus", schema: ["longa", "longa"] }
+      ];
+}
+
 function pesCompatibilis(silbae, initium, schema) {
   if (initium + schema.length > silbae.length) return false;
   return schema.every((exspectata, offset) => {
@@ -103,14 +132,8 @@ function pesCompatibilis(silbae, initium, schema) {
 
 function resolvePedesRekursiv(silbae, pesIndex, initium, pedes) {
   if (pesIndex === 6) return initium === silbae.length ? pedes : null;
-  const schemata = pesIndex === 5
-    ? [{ nomen: "finalis", schema: ["longa", "anceps"] }]
-    : [
-        { nomen: "dactylus", schema: ["longa", "brevis", "brevis"] },
-        { nomen: "spondeus", schema: ["longa", "longa"] }
-      ];
 
-  for (const schemaInfo of schemata) {
+  for (const schemaInfo of schemataPedis(pesIndex)) {
     if (!pesCompatibilis(silbae, initium, schemaInfo.schema)) continue;
     const finis = initium + schemaInfo.schema.length;
     const resultatum = resolvePedesRekursiv(
@@ -122,6 +145,21 @@ function resolvePedesRekursiv(silbae, pesIndex, initium, pedes) {
     if (resultatum) return resultatum;
   }
   return null;
+}
+
+function resolvePedesPartiales(silbae) {
+  const pedes = [];
+  let initium = 0;
+
+  for (let pesIndex = 0; pesIndex < 6; pesIndex += 1) {
+    const schemaInfo = schemataPedis(pesIndex).find(info => pesCompatibilis(silbae, initium, info.schema));
+    if (!schemaInfo) break;
+    const finis = initium + schemaInfo.schema.length;
+    pedes.push({ index: pesIndex + 1, nomen: schemaInfo.nomen, initium, finis, silbae: silbae.slice(initium, finis) });
+    initium = finis;
+  }
+
+  return pedes;
 }
 
 function numerusTriumBreuium(silbae) {
@@ -223,14 +261,15 @@ export function erstelleAnalysezeile(textus) {
   const pruefung = pruefeVersVorlaeufig(textus);
   const pedesAnalyse = pruefung.pedesAnalyse;
   const silben = pedesAnalyse.successit ? pedesAnalyse.silben : ((pruefung.analyse.varianten || [])[0]?.silben ?? []);
+  const pedesAnzeige = pedesAnalyse.successit ? pedesAnalyse.pedes : resolvePedesPartiales(silben);
   const problemIndices = tresBrevesIndices(silben);
   const finesPedum = new Set();
-  if (pedesAnalyse.successit) pedesAnalyse.pedes.forEach(pes => finesPedum.add(pes.finis - 1));
+  pedesAnzeige.forEach(pes => finesPedum.add(pes.finis - 1));
 
   return {
     abschickbar: pruefung.abschickbar,
     grund: pruefung.grund,
-    pedes: pedesAnalyse.pedes,
+    pedes: pedesAnzeige,
     schema: silben.map(s => s.textus).join("-"),
     elemente: silben.map((syllaba, index) => {
       const q = quantitasGraphica(syllaba);
