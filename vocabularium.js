@@ -2,6 +2,22 @@ const input = document.getElementById('vocabulariumQuaere');
 const status = document.getElementById('vocabulariumStatus');
 const eventus = document.getElementById('vocabulariumEventus');
 
+const zeigeTabOriginal = window.zeigeTab;
+
+window.zeigeTab = async function (tabName) {
+  const vocabularium = document.getElementById('vocabularium');
+  if (vocabularium) vocabularium.style.display = 'none';
+
+  if (typeof zeigeTabOriginal === 'function') {
+    await zeigeTabOriginal(tabName);
+  }
+
+  if (tabName === 'vocabularium' && vocabularium) {
+    vocabularium.style.display = 'block';
+    if (input) input.focus();
+  }
+};
+
 function normalisiere(textus) {
   return String(textus || '')
     .trim()
