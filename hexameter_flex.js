@@ -24,6 +24,17 @@ function indexPrimiVocalisInTextu(textus) {
   return -1;
 }
 
+function indexUltimiVocalisInTextu(textus) {
+  for (let i = String(textus || "").length - 1; i >= 0; i -= 1) {
+    if (estVokalInTextu(textus, i)) return i;
+  }
+  return -1;
+}
+
+function beginntMitVokalischemWert(textus) {
+  return indexPrimiVocalisInTextu(textus) === 0;
+}
+
 function istDiphthong(textus, index) {
   if (!estVokalInTextu(textus, index) || !estVokalInTextu(textus, index + 1)) return false;
   const duplex = textus.slice(index, index + 2);
@@ -43,6 +54,45 @@ function terminaturInMCoda(textus) {
   return /[aeiouy]m$/.test(String(textus || ""));
 }
 
+function aktualisierePositiones(silben) {
+  let cursor = 0;
+  return silben.map(syllaba => {
+    const textus = String(syllaba.textus || "");
+    const start = cursor;
+    const ende = start + textus.length - 1;
+    cursor = ende + 1;
+    return { ...syllaba, start, ende, aperta: estVokalInTextu(textus, textus.length - 1) };
+  });
+}
+
+function schliesseWortgrenzenFlex(silben) {
+  const resultatum = (silben || []).map(s => ({ ...s }));
+
+  for (let i = 0; i < resultatum.length - 1; i += 1) {
+    const links = resultatum[i];
+    const rechts = resultatum[i + 1];
+
+    if (links.wortIndex === rechts.wortIndex) continue;
+    if (!beginntMitVokalischemWert(rechts.textus)) continue;
+
+    const ultimusVocalis = indexUltimiVocalisInTextu(links.textus);
+    if (ultimusVocalis < 0 || ultimusVocalis >= links.textus.length - 1) continue;
+
+    const coda = links.textus.slice(ultimusVocalis + 1);
+    const basisLinks = links.textus.slice(0, ultimusVocalis + 1);
+    if (!coda || indexPrimiVocalisInTextu(basisLinks) < 0) continue;
+
+    links.textus = basisLinks;
+    rechts.textus = coda + rechts.textus;
+
+    if (links.quantitas === "longa_positione_provisoria" || links.quantitas === "longa_natura_m_coda") {
+      links.quantitas = "brevis";
+    }
+  }
+
+  return aktualisierePositiones(resultatum);
+}
+
 function quantitasDeterminata(syllaba) {
   if (syllaba.quantitas === "longa_natura_lexico") return syllaba;
   if (syllaba.quantitas === "longa_positione_provisoria") return syllaba;
@@ -51,9 +101,6 @@ function quantitasDeterminata(syllaba) {
   if (indexDiphthongiInTextu(syllaba.textus) >= 0) return { ...syllaba, quantitas: "longa_natura_diphthongo" };
   if (terminaturInMCoda(syllaba.textus)) return { ...syllaba, quantitas: "longa_natura_m_coda" };
 
-  // Grundregel für Whatsepos:
-  // Supabase-longae, Diphthonge, -m-Codae und vom Parser erkannte Positionslängen sind lang.
-  // Jede andere vokalische Silbe ist kurz. Es gibt keine metrische Ambiguität.
   if (indexPrimiVocalisInTextu(syllaba.textus) >= 0) {
     return { ...syllaba, quantitas: "brevis" };
   }
@@ -63,7 +110,8 @@ function quantitasDeterminata(syllaba) {
 
 function determinaVarianten(varianten) {
   return (varianten || []).map(v => {
-    const silben = (v.silben || []).map(quantitasDeterminata);
+    const resyllabificatae = schliesseWortgrenzenFlex(v.silben || []);
+    const silben = resyllabificatae.map(quantitasDeterminata);
     return { ...v, silben, schema: silben.map(s => s.textus).join("-") };
   });
 }
@@ -95,9 +143,6 @@ function quantitasGraphica(syllaba) {
   return quantitasSimplex(syllaba);
 }
 
-function longaCompatibilis(q) { return q === "longa"; }
-function brevisCompatibilis(q) { return q === "brevis"; }
-
 function schemataPedis(pesIndex) {
   return pesIndex === 5
     ? [{ nomen: "finalis", schema: ["longa", "anceps"] }]
@@ -111,8 +156,8 @@ function pesCompatibilis(silbae, initium, schema) {
   if (initium + schema.length > silbae.length) return false;
   return schema.every((exspectata, offset) => {
     const q = quantitasSimplex(silbae[initium + offset]);
-    if (exspectata === "longa") return longaCompatibilis(q);
-    if (exspectata === "brevis") return brevisCompatibilis(q);
+    if (exspectata === "longa") return q === "longa";
+    if (exspectata === "brevis") return q === "brevis";
     if (exspectata === "anceps") return true;
     return false;
   });
@@ -202,8 +247,7 @@ export function pruefeVersVorlaeufig(textus) {
 }
 
 function signumQuantitatis(q) {
-  if (q === "longa") return "¯";
-  return "˘";
+  return q === "longa" ? "¯" : "˘";
 }
 
 function litteraQuantitateNotata(littera, quantitas) {
