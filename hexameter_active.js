@@ -18,6 +18,18 @@ function estQuU(textus, index) {
   return String(textus || "")[index] === "u" && index > 0 && String(textus || "")[index - 1] === "q";
 }
 
+function indexSignandiVocalis(textus) {
+  const s = String(textus || "");
+  const ia = s.indexOf("ia");
+  if (ia >= 0) return ia + 1;
+
+  for (let i = 0; i < s.length; i += 1) {
+    if (estQuU(s, i)) continue;
+    if (estVokal(s[i])) return i;
+  }
+  return -1;
+}
+
 function indexPrimiVocalis(textus) {
   for (let i = 0; i < String(textus || "").length; i += 1) {
     if (estQuU(textus, i)) continue;
@@ -48,7 +60,7 @@ function litteraQuantitateNotata(littera, quantitas) {
 }
 
 function nota(textus, quantitas) {
-  const i = indexPrimiVocalis(textus);
+  const i = indexSignandiVocalis(textus);
   if (i < 0) return textus;
   return textus.slice(0, i) + litteraQuantitateNotata(textus[i], quantitas) + textus.slice(i + 1);
 }
