@@ -1,5 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { erstelleAnalysezeile, pruefeVersVorlaeufig, setzeFormaeMetricas } from "./hexameter.js?v=20260519-nia-kern-a-2"
+import { erstelleAnalysezeile, pruefeVersVorlaeufig, setzeFormaeMetricas } from "./hexameter.js?v=20260520-longae-pipeline-2";
 
 window.toggleMenu = function () {
   document.getElementById("sideMenu").classList.toggle("open");
@@ -69,6 +69,7 @@ const aktuellerTitel = document.getElementById("aktuellerTitel");
 let dictionariumMetricum = [];
 let dictionariumIamTentatum = false;
 let dictionariumPromissum = null;
+window.dictionariumMetricum = dictionariumMetricum;
 
 window.starteNeuesGedicht = function () {
   scriptoriumStart.style.display = "none";
@@ -171,25 +172,27 @@ async function ladeDictionariumMetricum(optiones = {}) {
   }
 
   dictionariumPromissum = (async function () {
-    if (!suggestionesMetricaeLista) return;
-
     const { data, error } = await supabase
       .from("formae")
-      .select("id, forma, lemma, pars_orationis, quantitates, syllabae, genus, numerus, casus, gradus, persona, tempus, modus, vox, notae")
+      .select("id, forma, lemma, pars_orationis, syllabae, longae, genus, numerus, casus, gradus, persona, tempus, modus, vox, notae")
+      .not("syllabae", "is", null)
       .order("forma", { ascending: true })
       .limit(5000);
 
     if (error) {
-      suggestionesMetricaeLista.innerHTML = "";
-      const div = document.createElement("div");
-      div.className = "suggestio-item suggestio-vacua";
-      div.textContent = "Dictionarium nondum legi potest.";
-      suggestionesMetricaeLista.appendChild(div);
+      if (suggestionesMetricaeLista) {
+        suggestionesMetricaeLista.innerHTML = "";
+        const div = document.createElement("div");
+        div.className = "suggestio-item suggestio-vacua";
+        div.textContent = "Dictionarium nondum legi potest.";
+        suggestionesMetricaeLista.appendChild(div);
+      }
       dictionariumIamTentatum = false;
       return;
     }
 
     dictionariumMetricum = data || [];
+    window.dictionariumMetricum = dictionariumMetricum;
     setzeFormaeMetricas(dictionariumMetricum);
     dictionariumIamTentatum = true;
 
@@ -399,7 +402,7 @@ function bearbeiteVers(index, alterVers) {
     event.stopPropagation();
   });
 
-    zeile.appendChild(input);
+  zeile.appendChild(input);
   passeVersEditorBreiteAn(input);
   input.focus();
 
@@ -676,6 +679,7 @@ window.einloggen = async function() {
 
   aktuellerUser = data.user;
   aktualisiereAuthMenu();
+  await ladeDictionariumMetricum();
   await aktualisiereMenuButton();
   document.getElementById("login_status").textContent = "Eingeloggt.";
 
@@ -722,6 +726,8 @@ async function aktualisiereMenuButton() {
 }
 
 async function pruefeSitzung() {
+  await ladeDictionariumMetricum();
+
   const { data } = await supabase.auth.getSession();
 
   if (data.session?.user) {
