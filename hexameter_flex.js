@@ -232,24 +232,10 @@ function notaSyllabamQuantitate(syllaba, quantitas) {
   return textus.slice(0, indexVocalis) + litteraQuantitateNotata(textus[indexVocalis], quantitas) + textus.slice(indexVocalis + 1);
 }
 
-function tresBrevesIndices(silbae) {
+function addeProblemataAb(silbae, initium) {
   const indices = new Set();
-  for (let i = 0; i <= silbae.length - 3; i += 1) {
-    const tres = silbae.slice(i, i + 3);
-    if (tres.every(s => quantitasSimplex(s) === "brevis")) {
-      indices.add(i); indices.add(i + 1); indices.add(i + 2);
-    }
-  }
-  return indices;
-}
+  const start = Math.max(0, initium || 0);
 
-function problemIndicesMetrice(silbae, pedesAnzeige) {
-  const indices = new Set();
-  const ultimusPes = pedesAnzeige[pedesAnzeige.length - 1];
-
-  if (!ultimusPes) return tresBrevesIndices(silbae);
-
-  const start = ultimusPes.finis;
   if (silbae[start] && quantitasSimplex(silbae[start]) === "brevis") indices.add(start);
 
   for (let i = start; i <= silbae.length - 3; i += 1) {
@@ -266,6 +252,12 @@ function problemIndicesMetrice(silbae, pedesAnzeige) {
   }
 
   return indices;
+}
+
+function problemIndicesMetrice(silbae, pedesAnzeige) {
+  const ultimusPes = pedesAnzeige[pedesAnzeige.length - 1];
+  const start = ultimusPes ? ultimusPes.finis : 0;
+  return addeProblemataAb(silbae, start);
 }
 
 export function erstelleAnalysezeile(textus) {
