@@ -245,8 +245,12 @@ function problemIndicesMetrice(silbae, pedesAnzeige) {
   if (silbae[start] && quantitasSimplex(silbae[start]) === "brevis") indices.add(start);
 
   for (let i = start; i <= silbae.length - 3; i += 1) {
-    const tres = silbae.slice(i, i + 3);
-    if (tres.every(s => quantitasSimplex(s) === "brevis")) indices.add(i + 2);
+    const q0 = quantitasSimplex(silbae[i]);
+    const q1 = quantitasSimplex(silbae[i + 1]);
+    const q2 = quantitasSimplex(silbae[i + 2]);
+
+    if (q0 === "longa" && q1 === "brevis" && q2 === "longa") indices.add(i + 1);
+    if (q0 === "brevis" && q1 === "brevis" && q2 === "brevis") indices.add(i + 2);
   }
 
   return indices;
