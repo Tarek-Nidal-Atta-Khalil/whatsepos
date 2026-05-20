@@ -23,7 +23,6 @@
 
   <div id="sideMenu" class="side-menu">
   <button onclick="zeigeTab('hexameter')">Hexameter</button>
-  <button onclick="zeigeVocabularium()">Vocabularium</button>
   <button onclick="zeigeTab('meineTexte')">Mei textus</button>
   <button onclick="zeigeTab('veroeffentlichungen')">Bibliotheca</button>
   <button onclick="zeigeTab('profil')">Persona</button>
@@ -101,16 +100,6 @@
       </div>
     </div>
 
-    <div id="vocabularium" class="tab-content" style="display: none;">
-      <section class="vocabularium-panel">
-        <h2>Vocabularium</h2>
-        <p class="vocabularium-hinweis">Quaere lemma aut formam Latinam. u/v et i/j aequiparantur; formae agnitae ad lemma referuntur.</p>
-        <input id="vocabulariumQuaere" type="search" placeholder="uerbum Latinum quaere">
-        <p id="vocabulariumStatus" class="status"></p>
-        <div id="vocabulariumEventus" class="vocabularium-eventus"></div>
-      </section>
-    </div>
-
     <div id="meineTexte" class="tab-content" style="display: none;">
       <h2>Mei textus</h2>
 
@@ -144,7 +133,6 @@
   </div>
 
   <script type="module" src="app.js?v=20260520-app-restore-1"></script>
-  <script type="module" src="vocabularium.js?v=20260520-vocabularium-1"></script>
   <script src="publications.js"></script>
 </body>
 </html>
