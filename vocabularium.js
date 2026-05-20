@@ -10,6 +10,42 @@ function normalisiere(textus) {
     .replace(/v/g, 'u');
 }
 
+function zelle(textus) {
+  const td = document.createElement('td');
+  td.textContent = textus || '';
+  return td;
+}
+
+function zeigeTabelle(items) {
+  const table = document.createElement('table');
+  table.className = 'vocabularium-tabelle';
+
+  const thead = document.createElement('thead');
+  const kopfZeile = document.createElement('tr');
+
+  ['Lemma', 'Stammform', 'Wortart'].forEach(function (titel) {
+    const th = document.createElement('th');
+    th.textContent = titel;
+    kopfZeile.appendChild(th);
+  });
+
+  thead.appendChild(kopfZeile);
+  table.appendChild(thead);
+
+  const tbody = document.createElement('tbody');
+
+  for (const item of items) {
+    const tr = document.createElement('tr');
+    tr.appendChild(zelle(item.lemma));
+    tr.appendChild(zelle(item.forma));
+    tr.appendChild(zelle(item.pars_orationis));
+    tbody.appendChild(tr);
+  }
+
+  table.appendChild(tbody);
+  eventus.appendChild(table);
+}
+
 async function quaere() {
   if (!input || !window.whatseposSupabase) return;
 
@@ -25,9 +61,9 @@ async function quaere() {
 
   const { data, error } = await supabase
     .from('formae')
-    .select('lemma, pars_orationis')
+    .select('lemma, forma, pars_orationis')
     .or(`forma.ilike.${q},lemma.ilike.${q}`)
-    .limit(20);
+    .limit(50);
 
   if (error) {
     status.textContent = error.message;
@@ -35,21 +71,22 @@ async function quaere() {
   }
 
   const visa = new Set();
+  const items = [];
 
   for (const item of data || []) {
-    const clavis = `${item.lemma || ''}|${item.pars_orationis || ''}`;
+    const clavis = `${item.lemma || ''}|${item.forma || ''}|${item.pars_orationis || ''}`;
     if (visa.has(clavis)) continue;
     visa.add(clavis);
-
-    const div = document.createElement('div');
-    div.textContent = item.pars_orationis
-      ? `${item.lemma} (${item.pars_orationis})`
-      : item.lemma;
-
-    eventus.appendChild(div);
+    items.push(item);
   }
 
-  status.textContent = visa.size === 0 ? 'Nullum lemma inventum est.' : '';
+  if (items.length === 0) {
+    status.textContent = 'Nullum lemma inventum est.';
+    return;
+  }
+
+  status.textContent = '';
+  zeigeTabelle(items);
 }
 
 if (input) {
