@@ -36,44 +36,29 @@ function indexDiphthongiInTextu(textus) {
   return -1;
 }
 
-function estFallbackSyllaba(syllaba) {
-  return !syllaba?.forma;
-}
-
-function estSyllabaAperta(syllaba) {
-  const textus = String(syllaba?.textus || "");
-  return estVokalInTextu(textus, textus.length - 1);
-}
-
-function relaxaQuantitatem(syllaba) {
+function quantitasDeterminata(syllaba) {
   if (syllaba.quantitas === "longa_natura_lexico") return syllaba;
   if (syllaba.quantitas === "longa_positione_provisoria") return syllaba;
-  if (syllaba.quantitas === "longa_natura_diphthongo") return syllaba;
-  if (syllaba.quantitas === "longa_natura_m_coda") return syllaba;
-  if (syllaba.quantitas === "brevis_natura_lexico") return syllaba;
 
-  const habetVocalem = indexPrimiVocalisInTextu(syllaba.textus) >= 0;
-  if (!habetVocalem) return syllaba;
-
-  // Wichtig: fallback-Silben stammen nicht aus Supabase. Offene fallback-Silben
-  // bleiben deshalb vorläufig kurz und blockieren den Vers, bis ein Lexikonprofil existiert.
-  if (estFallbackSyllaba(syllaba) && estSyllabaAperta(syllaba)) {
-    return { ...syllaba, quantitas: "brevis_provisoria" };
+  // Grundregel für Whatsepos:
+  // Nur Supabase-longae und vom Parser erkannte Positionslängen sind lang.
+  // Jede andere vokalische Silbe ist kurz. Es gibt keine metrische Ambiguität.
+  if (indexPrimiVocalisInTextu(syllaba.textus) >= 0) {
+    return { ...syllaba, quantitas: "brevis" };
   }
 
-  // Supabase-Silben, die nicht in longae stehen, sind nicht sicher kurz.
-  return { ...syllaba, quantitas: "ambigua_provisoria" };
+  return syllaba;
 }
 
-function relaxaVarianten(varianten) {
+function determinaVarianten(varianten) {
   return (varianten || []).map(v => {
-    const silben = (v.silben || []).map(relaxaQuantitatem);
+    const silben = (v.silben || []).map(quantitasDeterminata);
     return { ...v, silben, schema: silben.map(s => s.textus).join("-") };
   });
 }
 
 export function trenneSilbenVariantenVers(textus) {
-  return relaxaVarianten(basis.trenneSilbenVariantenVers(textus));
+  return determinaVarianten(basis.trenneSilbenVariantenVers(textus));
 }
 
 export function trenneSilbenVers(textus) {
@@ -83,32 +68,22 @@ export function trenneSilbenVers(textus) {
 
 export function analysiereSilbenVorlaeufig(textus) {
   const roh = basis.analysiereSilbenVorlaeufig(textus);
-  const varianten = relaxaVarianten(roh.varianten);
+  const varianten = determinaVarianten(roh.varianten);
   return { ...roh, varianten, silben: varianten[0]?.silben ?? [] };
 }
 
 function quantitasSimplex(syllaba) {
   if (syllaba.quantitas === "longa_natura_lexico") return "longa";
   if (syllaba.quantitas === "longa_positione_provisoria") return "longa";
-  if (syllaba.quantitas === "longa_natura_diphthongo") return "longa";
-  if (syllaba.quantitas === "longa_natura_m_coda") return "longa";
-  if (syllaba.quantitas === "brevis_natura_lexico") return "brevis";
-  if (syllaba.quantitas === "brevis_provisoria") return "brevis";
-  return "ambigua";
+  return "brevis";
 }
 
 function quantitasGraphica(syllaba) {
-  if (syllaba.quantitas === "longa_natura_lexico") return "longa";
-  if (syllaba.quantitas === "longa_positione_provisoria") return "longa";
-  if (syllaba.quantitas === "longa_natura_diphthongo") return "longa";
-  if (syllaba.quantitas === "longa_natura_m_coda") return "longa";
-  if (syllaba.quantitas === "brevis_natura_lexico") return "brevis";
-  if (syllaba.quantitas === "brevis_provisoria") return "brevis";
-  return "ambigua";
+  return quantitasSimplex(syllaba);
 }
 
-function longaCompatibilis(q) { return q === "longa" || q === "ambigua"; }
-function brevisCompatibilis(q) { return q === "brevis" || q === "ambigua"; }
+function longaCompatibilis(q) { return q === "longa"; }
+function brevisCompatibilis(q) { return q === "brevis"; }
 
 function schemataPedis(pesIndex) {
   return pesIndex === 5
@@ -176,8 +151,6 @@ function scoreVariante(variante) {
   let score = 0;
   silben.forEach(s => {
     if (s.quantitas === "longa_natura_lexico") score += 6;
-    else if (s.quantitas === "longa_natura_diphthongo") score += 3;
-    else if (s.quantitas === "longa_natura_m_coda") score += 3;
     else if (s.quantitas === "longa_positione_provisoria") score += 1;
   });
   return score;
@@ -215,14 +188,12 @@ export function pruefeVersVorlaeufig(textus) {
 
 function signumQuantitatis(q) {
   if (q === "longa") return "¯";
-  if (q === "brevis") return "˘";
-  return "?";
+  return "˘";
 }
 
 function litteraQuantitateNotata(littera, quantitas) {
   if (quantitas === "longa") return VOCALES_LONGAE[littera] || littera;
-  if (quantitas === "brevis") return VOCALES_BREVES[littera] || littera;
-  return littera;
+  return VOCALES_BREVES[littera] || littera;
 }
 
 function notaDiphthongumLongum(textus, index) {
@@ -240,8 +211,8 @@ function notaSyllabamQuantitate(syllaba, quantitas) {
   const textus = syllaba.textus;
   const indexDiphthongi = indexDiphthongiInTextu(textus);
   const indexVocalis = indexPrimiVocalisInTextu(textus);
-  if (indexDiphthongi >= 0) return textus.slice(0, indexDiphthongi) + notaDiphthongumLongum(textus, indexDiphthongi) + textus.slice(indexDiphthongi + 2);
   if (indexVocalis < 0) return textus;
+  if (quantitas === "longa" && indexDiphthongi >= 0) return textus.slice(0, indexDiphthongi) + notaDiphthongumLongum(textus, indexDiphthongi) + textus.slice(indexDiphthongi + 2);
   if (syllaba.quantitas === "longa_positione_provisoria") return notaSyllabamLongamPositione(textus, indexVocalis);
   return textus.slice(0, indexVocalis) + litteraQuantitateNotata(textus[indexVocalis], quantitas) + textus.slice(indexVocalis + 1);
 }
