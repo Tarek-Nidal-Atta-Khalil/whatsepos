@@ -4,115 +4,58 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lemma – Whatsepos</title>
-  <link rel="stylesheet" href="style.css?v=20260523-lemma-2">
-
+  <link rel="stylesheet" href="style.css?v=20260523-lemma-3">
   <style>
-    .lemma-container {
-      max-width: 900px;
-      margin: 80px auto;
-      text-align: left;
-    }
-
-    .lemma-revertere {
-      display: inline-block;
-      margin-bottom: 40px;
-      font-size: 22px;
-      color: #6b21a8;
-    }
-
-    .lemma-card {
-      background: white;
-      border-radius: 28px;
-      padding: 40px 50px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.06);
-    }
-
-    .lemma-header {
-      margin-bottom: 36px;
-    }
-
-    #lemmaTitulus {
-      margin: 0;
-      font-size: 64px;
-      font-weight: 700;
-      text-align: left;
-    }
-
-    #lemmaPars {
-      margin-top: 10px;
-      font-size: 28px;
-      color: #6b7280;
-      text-align: left;
-    }
-
-    .lemma-section {
-      margin-top: 34px;
-    }
-
-    .lemma-section h2 {
-      margin-bottom: 10px;
-      font-size: 30px;
-      text-align: left;
-    }
-
-    .lemma-section p {
-      font-size: 26px;
-      line-height: 1.6;
-      text-align: left;
-    }
-
-    .lemma-metrica-bona {
-      color: #166534;
-      font-weight: 700;
-    }
+    .lemma-container{max-width:980px;margin:120px auto 80px;text-align:left}
+    .lemma-revertere{display:inline-block;margin-bottom:34px;font-size:22px;color:#6b21a8}
+    .lemma-card{background:#fff;border-radius:28px;padding:50px 60px;box-shadow:0 10px 30px rgba(0,0,0,.06);text-align:left}
+    .lemma-header{margin-bottom:40px;text-align:left}
+    #lemmaTitulus{margin:0;font-size:72px;font-weight:700;text-align:left}
+    #lemmaPars{margin-top:14px;font-size:30px;color:#6b7280;text-align:left}
+    .lemma-section{margin-top:38px;text-align:left}
+    .lemma-section h2{margin-bottom:12px;font-size:32px;text-align:left}
+    .lemma-section p{margin:0;font-size:28px;line-height:1.7;text-align:left}
+    .lemma-metrica-bona{color:#166534;font-weight:700}
   </style>
 </head>
 <body>
+  <h1>Scriptorium</h1>
   <div class="container lemma-container">
     <a href="index.html?tab=vocabularium" class="lemma-revertere">← Ad vocabularium</a>
-
     <article class="lemma-card">
       <header class="lemma-header">
         <h1 id="lemmaTitulus">Lātīnus</h1>
         <p id="lemmaPars">adiectivum</p>
       </header>
-
       <section class="lemma-section">
         <h2>Formae principales</h2>
         <p id="lemmaFormae">Latina, Latinum</p>
       </section>
-
       <section class="lemma-section">
         <h2>Syllabae</h2>
         <p id="lemmaSyllabae">Lā.tī.nus</p>
       </section>
-
       <section class="lemma-section">
         <h2>IPA</h2>
         <p id="lemmaIpa">/laːˈtiː.nus/</p>
       </section>
-
       <section class="lemma-section">
         <h2>Compatibilitas metrica</h2>
         <p class="lemma-metrica bona">✔ hexameter compatibile</p>
       </section>
-
       <section class="lemma-section">
         <h2>Citationes</h2>
         <p>citationes nondum additae</p>
       </section>
-
       <section class="lemma-section">
         <h2>Verba cognata</h2>
         <p>Latium · Latinitas</p>
       </section>
     </article>
   </div>
-
   <script>
     const params = new URLSearchParams(window.location.search);
     const lemma = params.get('lemma');
-
     if (lemma) {
       document.getElementById('lemmaTitulus').textContent = lemma;
     }
