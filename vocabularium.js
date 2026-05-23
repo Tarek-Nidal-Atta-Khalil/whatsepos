@@ -33,6 +33,12 @@ function normalisiere(textus) {
     .replace(/v/g, 'u');
 }
 
+function aperiLemma(lemma) {
+  if (!lemma) return;
+  const url = `lemma.html?lemma=${encodeURIComponent(lemma)}`;
+  window.location.href = url;
+}
+
 function zelle(textus) {
   const td = document.createElement('td');
   td.textContent = textus || '';
@@ -64,9 +70,15 @@ function zeigeTabelle(items) {
 
   for (const item of items) {
     const tr = document.createElement('tr');
+
+    tr.addEventListener('click', function () {
+      aperiLemma(item.lemma || item.forma);
+    });
+
     tr.appendChild(zelle(item.lemma));
     tr.appendChild(zelle(item.forma));
     tr.appendChild(zelle(item.pars_orationis));
+
     tbody.appendChild(tr);
   }
 
@@ -167,8 +179,7 @@ async function quaereSuggestiones() {
 
     button.addEventListener('mousedown', function (event) {
       event.preventDefault();
-      input.value = textus;
-      quaere();
+      aperiLemma(textus);
     });
 
     suggestiones.appendChild(button);
