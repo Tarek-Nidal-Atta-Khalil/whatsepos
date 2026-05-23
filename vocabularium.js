@@ -10,6 +10,7 @@ if (input && input.parentNode) {
 }
 
 const zeigeTabOriginal = window.zeigeTab;
+const scriptoriumTitulus = document.querySelector('body > h1');
 
 window.zeigeTab = async function (tabName) {
   const vocabularium = document.getElementById('vocabularium');
@@ -17,6 +18,11 @@ window.zeigeTab = async function (tabName) {
 
   if (typeof zeigeTabOriginal === 'function') {
     await zeigeTabOriginal(tabName);
+  }
+
+  if (scriptoriumTitulus) {
+    scriptoriumTitulus.textContent =
+      tabName === 'vocabularium' ? 'Uocabularium' : 'Scriptorium';
   }
 
   if (tabName === 'vocabularium' && vocabularium) {
