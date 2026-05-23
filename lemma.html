@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="la">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lemma – Whatsepos</title>
+  <link rel="stylesheet" href="style.css?v=20260523-lemma-1">
+</head>
+<body>
+  <div class="container lemma-container">
+    <a href="index.html" class="lemma-revertere">← Ad vocabularium</a>
+
+    <article class="lemma-card">
+      <header class="lemma-header">
+        <h1 id="lemmaTitulus">Lātīnus</h1>
+        <p id="lemmaPars">adiectivum</p>
+      </header>
+
+      <section class="lemma-section">
+        <h2>Formae principales</h2>
+        <p id="lemmaFormae">Latina, Latinum</p>
+      </section>
+
+      <section class="lemma-section">
+        <h2>Syllabae</h2>
+        <p id="lemmaSyllabae">Lā.tī.nus</p>
+      </section>
+
+      <section class="lemma-section">
+        <h2>IPA</h2>
+        <p id="lemmaIpa">/laːˈtiː.nus/</p>
+      </section>
+
+      <section class="lemma-section">
+        <h2>Compatibilitas metrica</h2>
+        <p class="lemma-metrica bona">✔ hexameter compatibile</p>
+      </section>
+
+      <section class="lemma-section">
+        <h2>Citationes</h2>
+        <p>citationes nondum additae</p>
+      </section>
+
+      <section class="lemma-section">
+        <h2>Verba cognata</h2>
+        <p>Latium · Latinitas</p>
+      </section>
+    </article>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const lemma = params.get('lemma');
+
+    if (lemma) {
+      document.getElementById('lemmaTitulus').textContent = lemma;
+    }
+  </script>
+</body>
+</html>
