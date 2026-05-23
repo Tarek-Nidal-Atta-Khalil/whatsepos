@@ -4,25 +4,111 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lemma – Whatsepos</title>
-  <link rel="stylesheet" href="style.css?v=20260523-lemma-5">
+  <link rel="stylesheet" href="style.css?v=20260523-lemma-6">
   <style>
-    .lemma-container{max-width:980px;margin:72px auto 80px;text-align:left}
-    .lemma-topbar{display:flex;align-items:center;gap:18px;margin-bottom:22px}
-    .lemma-revertere{display:inline-block;font-size:20px;color:#6b21a8;white-space:nowrap}
-    #lemmaQuaere{width:420px;max-width:55vw;margin:0;padding:12px 18px;font-size:22px;line-height:1.2;border-radius:18px;border:2px solid #d1d5db;background:#fff;box-shadow:0 6px 18px rgba(0,0,0,.06)}
-    #lemmaQuaere:focus{outline:none;border-color:#93c5fd;box-shadow:0 0 0 4px rgba(147,197,253,.28),0 6px 18px rgba(0,0,0,.08)}
-    .lemma-card{background:#fff;border-radius:28px;padding:50px 60px;box-shadow:0 10px 30px rgba(0,0,0,.06);text-align:left}
+    .lemma-container{max-width:980px;margin:36px auto 80px;text-align:left}
+
+    .lemma-topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:24px;
+      margin-bottom:28px;
+    }
+
+    .lemma-revertere{
+      position:sticky;
+      top:24px;
+      align-self:flex-start;
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:12px 18px;
+      border-radius:999px;
+      background:#ffffff;
+      color:#6b21a8;
+      text-decoration:none;
+      font-size:20px;
+      font-weight:600;
+      box-shadow:0 6px 20px rgba(0,0,0,.08);
+      transition:all .18s ease;
+      white-space:nowrap;
+    }
+
+    .lemma-revertere:hover{
+      transform:translateY(-1px);
+      box-shadow:0 10px 24px rgba(0,0,0,.12);
+      background:#faf5ff;
+    }
+
+    #lemmaQuaere{
+      width:520px;
+      max-width:58vw;
+      margin:0;
+      padding:14px 22px;
+      font-size:22px;
+      line-height:1.2;
+      border-radius:20px;
+      border:2px solid #d1d5db;
+      background:#fff;
+      box-shadow:0 6px 18px rgba(0,0,0,.06);
+    }
+
+    #lemmaQuaere:focus{
+      outline:none;
+      border-color:#93c5fd;
+      box-shadow:0 0 0 4px rgba(147,197,253,.28),0 6px 18px rgba(0,0,0,.08)
+    }
+
+    .lemma-card{
+      background:#fff;
+      border-radius:28px;
+      padding:50px 60px;
+      box-shadow:0 10px 30px rgba(0,0,0,.06);
+      text-align:left
+    }
+
     .lemma-header{margin-bottom:40px;text-align:left}
-    #lemmaTitulus{position:static;z-index:auto;background:transparent;padding:0;margin:0;font-size:72px;font-weight:700;text-align:left}
-    #lemmaPars{margin-top:14px;font-size:30px;color:#6b7280;text-align:left}
+
+    #lemmaTitulus{
+      position:static;
+      z-index:auto;
+      background:transparent;
+      padding:0;
+      margin:0;
+      font-size:72px;
+      font-weight:700;
+      text-align:left
+    }
+
+    #lemmaPars{
+      margin-top:14px;
+      font-size:30px;
+      color:#6b7280;
+      text-align:left
+    }
+
     .lemma-section{margin-top:38px;text-align:left}
-    .lemma-section h2{margin-bottom:12px;font-size:32px;text-align:left}
-    .lemma-section p{margin:0;font-size:28px;line-height:1.7;text-align:left}
+
+    .lemma-section h2{
+      margin-bottom:12px;
+      font-size:32px;
+      text-align:left
+    }
+
+    .lemma-section p{
+      margin:0;
+      font-size:28px;
+      line-height:1.7;
+      text-align:left
+    }
+
     .lemma-metrica-bona{color:#166534;font-weight:700}
   </style>
 </head>
 <body>
   <h1>Uocabularium</h1>
+
   <div class="container lemma-container">
     <div class="lemma-topbar">
       <a href="index.html?tab=vocabularium" class="lemma-revertere">← Retro</a>
@@ -34,45 +120,59 @@
         <h1 id="lemmaTitulus">Lātīnus</h1>
         <p id="lemmaPars">adiectivum</p>
       </header>
+
       <section class="lemma-section">
         <h2>Formae principales</h2>
         <p id="lemmaFormae">Latina, Latinum</p>
       </section>
+
       <section class="lemma-section">
         <h2>Syllabae</h2>
         <p id="lemmaSyllabae">Lā.tī.nus</p>
       </section>
+
       <section class="lemma-section">
         <h2>IPA</h2>
         <p id="lemmaIpa">/laːˈtiː.nus/</p>
       </section>
+
       <section class="lemma-section">
         <h2>Compatibilitas metrica</h2>
         <p class="lemma-metrica bona">✔ hexameter compatibile</p>
       </section>
+
       <section class="lemma-section">
         <h2>Citationes</h2>
         <p>citationes nondum additae</p>
       </section>
+
       <section class="lemma-section">
         <h2>Verba cognata</h2>
         <p>Latium · Latinitas</p>
       </section>
     </article>
   </div>
+
   <script>
     const params = new URLSearchParams(window.location.search);
     const lemma = params.get('lemma');
+
     if (lemma) {
       document.getElementById('lemmaTitulus').textContent = lemma;
+      document.getElementById('lemmaQuaere').value = lemma;
     }
 
     const lemmaQuaere = document.getElementById('lemmaQuaere');
+
     lemmaQuaere.addEventListener('keydown', function(event) {
       if (event.key !== 'Enter') return;
+
       event.preventDefault();
+
       const q = lemmaQuaere.value.trim();
+
       if (!q) return;
+
       window.location.href = `index.html?tab=vocabularium&q=${encodeURIComponent(q)}`;
     });
   </script>
