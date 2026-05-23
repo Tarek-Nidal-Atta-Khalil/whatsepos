@@ -4,10 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lemma – Whatsepos</title>
-  <link rel="stylesheet" href="style.css?v=20260523-lemma-4">
+  <link rel="stylesheet" href="style.css?v=20260523-lemma-5">
   <style>
-    .lemma-container{max-width:980px;margin:120px auto 80px;text-align:left}
-    .lemma-revertere{display:inline-block;margin-bottom:34px;font-size:22px;color:#6b21a8}
+    .lemma-container{max-width:980px;margin:72px auto 80px;text-align:left}
+    .lemma-topbar{display:flex;align-items:center;gap:18px;margin-bottom:22px}
+    .lemma-revertere{display:inline-block;font-size:20px;color:#6b21a8;white-space:nowrap}
+    #lemmaQuaere{width:420px;max-width:55vw;margin:0;padding:12px 18px;font-size:22px;line-height:1.2;border-radius:18px;border:2px solid #d1d5db;background:#fff;box-shadow:0 6px 18px rgba(0,0,0,.06)}
+    #lemmaQuaere:focus{outline:none;border-color:#93c5fd;box-shadow:0 0 0 4px rgba(147,197,253,.28),0 6px 18px rgba(0,0,0,.08)}
     .lemma-card{background:#fff;border-radius:28px;padding:50px 60px;box-shadow:0 10px 30px rgba(0,0,0,.06);text-align:left}
     .lemma-header{margin-bottom:40px;text-align:left}
     #lemmaTitulus{position:static;z-index:auto;background:transparent;padding:0;margin:0;font-size:72px;font-weight:700;text-align:left}
@@ -21,7 +24,11 @@
 <body>
   <h1>Uocabularium</h1>
   <div class="container lemma-container">
-    <a href="index.html?tab=vocabularium" class="lemma-revertere">← Ad vocabularium</a>
+    <div class="lemma-topbar">
+      <a href="index.html?tab=vocabularium" class="lemma-revertere">← Retro</a>
+      <input id="lemmaQuaere" type="search" placeholder="Aliud verbum quaere">
+    </div>
+
     <article class="lemma-card">
       <header class="lemma-header">
         <h1 id="lemmaTitulus">Lātīnus</h1>
@@ -59,6 +66,15 @@
     if (lemma) {
       document.getElementById('lemmaTitulus').textContent = lemma;
     }
+
+    const lemmaQuaere = document.getElementById('lemmaQuaere');
+    lemmaQuaere.addEventListener('keydown', function(event) {
+      if (event.key !== 'Enter') return;
+      event.preventDefault();
+      const q = lemmaQuaere.value.trim();
+      if (!q) return;
+      window.location.href = `index.html?tab=vocabularium&q=${encodeURIComponent(q)}`;
+    });
   </script>
 </body>
 </html>
