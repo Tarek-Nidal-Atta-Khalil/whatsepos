@@ -4,22 +4,27 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lemma – Whatsepos</title>
-  <link rel="stylesheet" href="style.css?v=20260523-lemma-6">
+  <link rel="stylesheet" href="style.css?v=20260523-lemma-7">
   <style>
-    .lemma-container{max-width:980px;margin:36px auto 80px;text-align:left}
+    .lemma-container{
+      max-width:980px;
+      margin:28px auto 80px;
+      text-align:left
+    }
 
     .lemma-topbar{
       display:flex;
       align-items:center;
-      justify-content:space-between;
-      gap:24px;
-      margin-bottom:28px;
+      justify-content:flex-start;
+      gap:34px;
+      margin-bottom:24px;
     }
 
     .lemma-revertere{
-      position:sticky;
-      top:24px;
-      align-self:flex-start;
+      position:fixed;
+      left:26px;
+      top:145px;
+      z-index:40;
       display:inline-flex;
       align-items:center;
       gap:10px;
@@ -42,9 +47,9 @@
     }
 
     #lemmaQuaere{
-      width:520px;
-      max-width:58vw;
-      margin:0;
+      width:560px;
+      max-width:62vw;
+      margin-left:120px;
       padding:14px 22px;
       font-size:22px;
       line-height:1.2;
@@ -109,9 +114,10 @@
 <body>
   <h1>Uocabularium</h1>
 
+  <a href="index.html?tab=vocabularium" class="lemma-revertere">← Retro</a>
+
   <div class="container lemma-container">
     <div class="lemma-topbar">
-      <a href="index.html?tab=vocabularium" class="lemma-revertere">← Retro</a>
       <input id="lemmaQuaere" type="search" placeholder="Aliud verbum quaere">
     </div>
 
