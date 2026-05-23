@@ -10,7 +10,7 @@ if (input && input.parentNode) {
 }
 
 const zeigeTabOriginal = window.zeigeTab;
-const scriptoriumTitulus = document.querySelector('body > h1');
+const scriptoriumTitulus = document.querySelector('.container > h1');
 
 window.zeigeTab = async function (tabName) {
   const vocabularium = document.getElementById('vocabularium');
