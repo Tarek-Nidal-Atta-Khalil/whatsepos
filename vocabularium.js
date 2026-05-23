@@ -39,6 +39,98 @@ function aperiLemma(lemma) {
   window.location.href = url;
 }
 
+const macrones = {
+  a: 'ā', e: 'ē', i: 'ī', o: 'ō', u: 'ū', y: 'ȳ',
+  A: 'Ā', E: 'Ē', I: 'Ī', O: 'Ō', U: 'Ū', Y: 'Ȳ'
+};
+
+function istVokal(zeichen) {
+  return /[aeiouyAEIOUY]/.test(zeichen);
+}
+
+function markiereVokal(textus, vokalIndex) {
+  let zaehler = -1;
+  return String(textus || '').split('').map(function (zeichen) {
+    if (!istVokal(zeichen)) return zeichen;
+    zaehler += 1;
+    return zaehler === vokalIndex ? (macrones[zeichen] || zeichen) : zeichen;
+  }).join('');
+}
+
+function longaeZuIndizes(longae, vokalAnzahl) {
+  if (longae === null || longae === undefined || longae === '') return [];
+
+  if (Array.isArray(longae)) {
+    if (longae.every(function (x) { return typeof x === 'boolean'; })) {
+      return longae
+        .map(function (wert, index) { return wert ? index : -1; })
+        .filter(function (index) { return index >= 0 && index < vokalAnzahl; });
+    }
+
+    const zahlen = longae
+      .map(function (x) { return Number(x); })
+      .filter(function (x) { return Number.isInteger(x); });
+
+    if (zahlen.length === 0) return [];
+    const einbasiert = !zahlen.includes(0) && Math.max.apply(null, zahlen) <= vokalAnzahl;
+    return zahlen
+      .map(function (x) { return einbasiert ? x - 1 : x; })
+      .filter(function (x) { return x >= 0 && x < vokalAnzahl; });
+  }
+
+  const text = String(longae).trim();
+
+  try {
+    const parsed = JSON.parse(text);
+    if (Array.isArray(parsed)) return longaeZuIndizes(parsed, vokalAnzahl);
+  } catch (_error) {}
+
+  const zahlen = text.match(/\d+/g);
+  if (zahlen && zahlen.length > 0) {
+    return longaeZuIndizes(zahlen.map(Number), vokalAnzahl);
+  }
+
+  const kompakt = text.replace(/[\s.,;|/-]/g, '');
+  if (kompakt.length === vokalAnzahl) {
+    const langeZeichen = new Set(['L', 'l', '1', '—', '–', 'X', 'x']);
+    return kompakt
+      .split('')
+      .map(function (zeichen, index) { return langeZeichen.has(zeichen) ? index : -1; })
+      .filter(function (index) { return index >= 0; });
+  }
+
+  return [];
+}
+
+function cumMacronibus(textus, longae) {
+  const basis = String(textus || '');
+  const vokalAnzahl = (basis.match(/[aeiouyAEIOUY]/g) || []).length;
+  if (vokalAnzahl === 0) return basis;
+
+  const indizes = longaeZuIndizes(longae, vokalAnzahl);
+  let resultatum = basis;
+
+  indizes
+    .sort(function (a, b) { return b - a; })
+    .forEach(function (index) {
+      resultatum = markiereVokal(resultatum, index);
+    });
+
+  return resultatum;
+}
+
+function lemmaDisplay(item) {
+  if (!item) return '';
+  if (item.lemma && normalisiere(item.lemma) === normalisiere(item.forma)) {
+    return cumMacronibus(item.lemma, item.longae);
+  }
+  return item.lemma || '';
+}
+
+function formaDisplay(item) {
+  return cumMacronibus(item.forma || '', item.longae);
+}
+
 function zelle(textus) {
   const td = document.createElement('td');
   td.textContent = textus || '';
@@ -72,11 +164,11 @@ function zeigeTabelle(items) {
     const tr = document.createElement('tr');
 
     tr.addEventListener('click', function () {
-      aperiLemma(item.lemma || item.forma);
+      aperiLemma(lemmaDisplay(item) || item.lemma || item.forma);
     });
 
-    tr.appendChild(zelle(item.lemma));
-    tr.appendChild(zelle(item.forma));
+    tr.appendChild(zelle(lemmaDisplay(item)));
+    tr.appendChild(zelle(formaDisplay(item)));
     tr.appendChild(zelle(item.pars_orationis));
 
     tbody.appendChild(tr);
@@ -102,7 +194,7 @@ async function quaere() {
 
   const { data, error } = await supabase
     .from('formae')
-    .select('lemma, forma, pars_orationis')
+    .select('lemma, forma, longae, pars_orationis')
     .or(`forma.ilike.${q},lemma.ilike.${q}`)
     .limit(50);
 
@@ -115,7 +207,7 @@ async function quaere() {
   const items = [];
 
   for (const item of data || []) {
-    const clavis = `${item.lemma || ''}|${item.forma || ''}|${item.pars_orationis || ''}`;
+    const clavis = `${item.lemma || ''}|${item.forma || ''}|${item.pars_orationis || ''}|${item.longae || ''}`;
     if (visa.has(clavis)) continue;
     visa.add(clavis);
     items.push(item);
@@ -148,7 +240,7 @@ async function quaereSuggestiones() {
 
   const { data, error } = await supabase
     .from('formae')
-    .select('lemma, forma, pars_orationis')
+    .select('lemma, forma, longae, pars_orationis')
     .or(`forma.ilike.${q}%,lemma.ilike.${q}%`)
     .order('lemma', { ascending: true })
     .limit(12);
@@ -159,7 +251,8 @@ async function quaereSuggestiones() {
   const visa = new Set();
 
   for (const item of data) {
-    const textus = item.lemma || item.forma;
+    const textus = lemmaDisplay(item) || formaDisplay(item);
+    const lemmaRoh = item.lemma || item.forma;
     const clavis = `${textus || ''}|${item.pars_orationis || ''}`;
     if (!textus || visa.has(clavis)) continue;
     visa.add(clavis);
@@ -179,7 +272,7 @@ async function quaereSuggestiones() {
 
     button.addEventListener('mousedown', function (event) {
       event.preventDefault();
-      aperiLemma(textus);
+      aperiLemma(textus || lemmaRoh);
     });
 
     suggestiones.appendChild(button);
