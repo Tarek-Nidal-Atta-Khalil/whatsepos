@@ -448,6 +448,7 @@ h1 {
 #vocabularium {
   max-width: 1100px;
   margin: 120px auto 40px;
+  position: relative;
 }
 
 #vocabularium h2 {
@@ -487,6 +488,53 @@ h1 {
 
 #vocabulariumQuaere::placeholder {
   color: #9ca3af;
+}
+
+#vocabulariumSuggestiones {
+  width: min(100%, 920px);
+  margin: 8px auto 0;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 0 0 24px 24px;
+  box-shadow: 0 18px 36px rgba(0,0,0,0.12);
+  overflow: hidden;
+  text-align: left;
+  z-index: 1200;
+}
+
+.vocabularium-suggestio {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 16px 28px;
+  border: none;
+  border-bottom: 1px solid #f3f4f6;
+  border-radius: 0;
+  background: white;
+  color: #111827;
+  font-size: 24px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.vocabularium-suggestio:last-child {
+  border-bottom: none;
+}
+
+.vocabularium-suggestio:hover,
+.vocabularium-suggestio:focus {
+  background: #f9fafb;
+  outline: none;
+}
+
+.vocabularium-suggestio strong {
+  font-weight: 700;
+}
+
+.vocabularium-suggestio span {
+  color: #6b7280;
+  font-size: 20px;
+  margin-left: 8px;
 }
 
 #vocabulariumEventus {
