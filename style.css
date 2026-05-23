@@ -421,59 +421,6 @@ h1 {
 .syllaba-problema { padding: 4px 8px; border-radius: 999px; background: #fee2e2; color: #991b1b; }
 .pes-separator { color: #6b7280; padding: 4px 2px; }
 
-.vocabularium-panel {
-  max-width: 900px;
-  margin: 80px auto 40px;
-  text-align: left;
-}
-
-.vocabularium-panel input {
-  display: block;
-  width: 100%; 
-  max-width: none;
-  margin: 16px 0;
-}
-
-.vocabularium-hinweis {
-  color: #6b7280;
-  line-height: 1.6;
-}
-
-.vocabularium-eventus {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: 20px;
-}
-
-.vocabularium-card {
-  padding: 16px 20px;
-  border-radius: 16px;
-  border: 1px solid #e5e7eb;
-  background: #ffffff;
-}
-
-.vocabularium-card.compatibilis {
-  background: #dcfce7;
-  border-color: #86efac;
-}
-
-.vocabularium-card.incompatibilis {
-  background: #fed7aa;
-  border-color: #fdba74;
-}
-
-.vocabularium-lemma {
-  font-size: 28px;
-  font-weight: bold;
-}
-
-.vocabularium-meta {
-  margin-top: 4px;
-  color: #374151;
-  font-size: 18px;
-}
-
 @media (max-width: 900px) {
   #poemArea { margin-right: 0; }
   #suggestionesMetricae {
@@ -538,4 +485,45 @@ h1 {
 
 #vocabulariumQuaere::placeholder {
   color: #9ca3af;
+}
+
+#vocabulariumEventus {
+  margin-top: 40px;
+}
+
+.vocabularium-tabelle {
+  width: min(100%, 980px);
+  margin: 0 auto;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+}
+
+.vocabularium-tabelle thead {
+  background: #f3f4f6;
+}
+
+.vocabularium-tabelle th {
+  text-align: left;
+  padding: 18px 24px;
+  font-size: 18px;
+  letter-spacing: 0.03em;
+  color: #4b5563;
+}
+
+.vocabularium-tabelle td {
+  padding: 20px 24px;
+  font-size: 24px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.vocabularium-tabelle tbody tr {
+  transition: background 0.12s ease;
+  cursor: pointer;
+}
+
+.vocabularium-tabelle tbody tr:hover {
+  background: #f9fafb;
 }
