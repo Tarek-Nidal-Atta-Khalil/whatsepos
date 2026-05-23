@@ -25,6 +25,19 @@ window.zeigeTab = async function (tabName) {
   }
 };
 
+function oeffneTabAusUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const tab = params.get('tab');
+
+  if (tab === 'vocabularium' && typeof window.zeigeTab === 'function') {
+    window.zeigeTab('vocabularium');
+  }
+}
+
+window.addEventListener('load', function () {
+  setTimeout(oeffneTabAusUrl, 250);
+});
+
 function normalisiere(textus) {
   return String(textus || '')
     .trim()
