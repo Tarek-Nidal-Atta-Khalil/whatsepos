@@ -214,7 +214,7 @@ async function quaere() {
   const { data, error } = await supabase
     .from('formae')
     .select('lemma, forma, longae, pars_orationis')
-    .or(`forma.ilike.${q},lemma.ilike.${q}`)
+    .or(`forma.ilike.%${q}%,lemma.ilike.%${q}%`)
     .limit(50);
 
   if (error) {
