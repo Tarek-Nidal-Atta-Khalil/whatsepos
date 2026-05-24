@@ -96,6 +96,13 @@ style.textContent = `
   box-shadow:0 0 0 4px rgba(147,197,253,0.25);
 }
 
+.macron-hinweis {
+  display:block;
+  color:#6b7280;
+  font-size:14px;
+  line-height:1.35;
+}
+
 .form-gruppe {
   display:none;
 }
@@ -151,7 +158,8 @@ formularBox.innerHTML = `
 
   <div class="form-feld">
     <label for="novumLemma">Vokabel</label>
-    <input id="novumLemma" type="text" placeholder="z. B. puella, Troia, bonus, servus">
+    <input id="novumLemma" type="text" placeholder="z. B. puella, Tro:ia, bo:nus, servus">
+    <small class="macron-hinweis">Tipp: Schreibe a: e: i: o: u: y: für ā ē ī ō ū ȳ. Die Umwandlung geschieht beim Verlassen des Feldes oder beim Speichern.</small>
   </div>
 
   <div class="form-feld">
@@ -207,17 +215,17 @@ formularBox.innerHTML = `
 
     <div class="form-feld">
       <label for="novumPraesens">Leitform Präsens</label>
-      <input id="novumPraesens" type="text" placeholder="z. B. amo">
+      <input id="novumPraesens" type="text" placeholder="z. B. amo:">
     </div>
 
     <div class="form-feld">
       <label for="novumPerfectum">Leitform Perfekt</label>
-      <input id="novumPerfectum" type="text" placeholder="z. B. amavi">
+      <input id="novumPerfectum" type="text" placeholder="z. B. ama:vi:">
     </div>
 
     <div class="form-feld">
       <label for="novumSupinum">Leitform Supin</label>
-      <input id="novumSupinum" type="text" placeholder="z. B. amatum">
+      <input id="novumSupinum" type="text" placeholder="z. B. ama:tum">
     </div>
   </div>
 
@@ -259,8 +267,30 @@ function normalisiere(textus) {
   return String(textus || '').trim().toLowerCase().replace(/j/g, 'i').replace(/v/g, 'u');
 }
 
+function colonInMacra(textus) {
+  return String(textus || '')
+    .replace(/A:/g, 'Ā')
+    .replace(/E:/g, 'Ē')
+    .replace(/I:/g, 'Ī')
+    .replace(/O:/g, 'Ō')
+    .replace(/U:/g, 'Ū')
+    .replace(/Y:/g, 'Ȳ')
+    .replace(/a:/g, 'ā')
+    .replace(/e:/g, 'ē')
+    .replace(/i:/g, 'ī')
+    .replace(/o:/g, 'ō')
+    .replace(/u:/g, 'ū')
+    .replace(/y:/g, 'ȳ');
+}
+
 function bereinigeEingabe(textus) {
-  return String(textus || '').trim().replace(/j/g, 'i').replace(/v/g, 'u');
+  return colonInMacra(String(textus || '').trim()).replace(/j/g, 'i').replace(/v/g, 'u');
+}
+
+function macraImFeldAnwenden(id) {
+  const feld = document.getElementById(id);
+  if (!feld) return;
+  feld.value = bereinigeEingabe(feld.value);
 }
 
 function aperiLemma(lemma) {
@@ -378,6 +408,7 @@ async function quaere() {
 
 async function salvaNovumVerbum(event) {
   event.preventDefault();
+  ['novumLemma', 'novumPraesens', 'novumPerfectum', 'novumSupinum'].forEach(macraImFeldAnwenden);
   const novumStatus = document.getElementById('novumVerbumStatus');
   const lemma = bereinigeEingabe(document.getElementById('novumLemma').value);
   const pars = document.getElementById('novumPars').value;
@@ -417,6 +448,10 @@ async function salvaNovumVerbum(event) {
 const novumVerbumKnopf = document.getElementById('novumVerbumKnopf');
 const novumAbbrechen = document.getElementById('novumAbbrechen');
 const novumPars = document.getElementById('novumPars');
+['novumLemma', 'novumPraesens', 'novumPerfectum', 'novumSupinum'].forEach(function (id) {
+  const feld = document.getElementById(id);
+  if (feld) feld.addEventListener('blur', function () { macraImFeldAnwenden(id); });
+});
 if (novumVerbumKnopf) novumVerbumKnopf.addEventListener('click', function () { setzeFormularSichtbar(true); aktualisiereFormularGruppen(); });
 if (novumAbbrechen) novumAbbrechen.addEventListener('click', function () { setzeFormularSichtbar(false); });
 if (novumPars) novumPars.addEventListener('change', aktualisiereFormularGruppen);
