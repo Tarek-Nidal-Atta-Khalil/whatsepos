@@ -76,9 +76,20 @@
     const params = new URLSearchParams(window.location.search);
     const lemma = params.get('lemma');
     const lemmaQuaere = document.getElementById('lemmaQuaere');
+    let lemmaDisplayActuale = lemma || '';
 
     function normalisiere(textus) {
       return String(textus || '').trim().toLowerCase().replace(/j/g, 'i').replace(/v/g, 'u');
+    }
+
+    function estNomenProprium() {
+      return /^[A-ZĀĒĪŌŪȲ]/.test(lemmaDisplayActuale || '');
+    }
+
+    function formaProLemma(forma) {
+      const textus = String(forma || '');
+      if (!estNomenProprium() || !textus) return textus || '—';
+      return textus.charAt(0).toUpperCase() + textus.slice(1);
     }
 
     const casusOrdines = ['nom', 'gen', 'dat', 'acc', 'abl', 'voc'];
@@ -88,14 +99,14 @@
       const inventa = formae.find(function (f) {
         return f.casus === casus && f.numerus === numerus && f.genus === genus;
       });
-      return inventa ? inventa.forma : '—';
+      return inventa ? formaProLemma(inventa.forma) : '—';
     }
 
     function formaSubstantivi(formae, casus, numerus) {
       const inventa = formae.find(function (f) {
         return f.casus === casus && f.numerus === numerus;
       });
-      return inventa ? inventa.forma : '—';
+      return inventa ? formaProLemma(inventa.forma) : '—';
     }
 
     function tabellaAdiectiviNumeri(formae, numerus) {
@@ -145,9 +156,13 @@
       const table = document.createElement('table');
       table.className = 'flexio-tabelle substantivum-tabula';
 
+      const hatPlural = !estNomenProprium() && formae.some(function (f) { return f.numerus === 'pl'; });
+      const numeri = hatPlural ? ['sg', 'pl'] : ['sg'];
+      const numerusTituli = hatPlural ? ['Singularis', 'Pluralis'] : ['Singularis'];
+
       const thead = document.createElement('thead');
       const head = document.createElement('tr');
-      ['', 'Singularis', 'Pluralis'].forEach(function (text) {
+      ['', ...numerusTituli].forEach(function (text) {
         const th = document.createElement('th');
         th.textContent = text;
         head.appendChild(th);
@@ -162,7 +177,7 @@
         th.textContent = casusNomina[casus];
         tr.appendChild(th);
 
-        ['sg', 'pl'].forEach(function (numerus) {
+        numeri.forEach(function (numerus) {
           const td = document.createElement('td');
           td.textContent = formaSubstantivi(formae, casus, numerus);
           tr.appendChild(td);
@@ -220,7 +235,8 @@
       const prima = formae[0];
 
       if (prima) {
-        document.getElementById('lemmaTitulus').textContent = prima.lemma || lemma;
+        lemmaDisplayActuale = prima.lemma || lemma;
+        document.getElementById('lemmaTitulus').textContent = lemmaDisplayActuale;
         document.getElementById('lemmaPars').textContent = prima.pars_orationis || '—';
         document.getElementById('lemmaSyllabae').textContent = prima.syllabae || '—';
       }
