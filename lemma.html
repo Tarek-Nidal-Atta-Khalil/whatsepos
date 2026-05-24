@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lemma – Whatsepos</title>
-  <link rel="stylesheet" href="style.css?v=20260523-lemma-8">
+  <link rel="stylesheet" href="style.css?v=20260523-lemma-9">
   <style>
     .lemma-container{max-width:980px;margin:28px auto 80px;text-align:left}
     .lemma-topbar{display:flex;align-items:center;justify-content:flex-start;gap:34px;margin-bottom:24px}
@@ -22,7 +22,6 @@
     .lemma-metrica-bona{color:#166534;font-weight:700}
     .flexio-wrapper{overflow-x:auto;margin-top:14px}
     .flexio-tabelle{width:100%;border-collapse:collapse;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 4px 18px rgba(0,0,0,.05)}
-    .flexio-tabelle caption{text-align:left;font-size:22px;font-weight:700;margin-bottom:10px;color:#374151}
     .flexio-tabelle th,.flexio-tabelle td{padding:12px 14px;border:1px solid #e5e7eb;text-align:left;font-size:20px;white-space:nowrap}
     .flexio-tabelle th{background:#f3f4f6;color:#374151;font-weight:700}
     .flexio-tabelle td{color:#111827}
@@ -45,11 +44,6 @@
       </header>
 
       <section class="lemma-section">
-        <h2>Formae principales</h2>
-        <p id="lemmaFormae">—</p>
-      </section>
-
-      <section class="lemma-section">
         <h2>Flexio</h2>
         <div id="lemmaFlexio">Tabula nondum onerata est.</div>
       </section>
@@ -67,16 +61,6 @@
       <section class="lemma-section">
         <h2>Compatibilitas metrica</h2>
         <p class="lemma-metrica bona">✔ hexameter compatibile</p>
-      </section>
-
-      <section class="lemma-section">
-        <h2>Citationes</h2>
-        <p>citationes nondum additae</p>
-      </section>
-
-      <section class="lemma-section">
-        <h2>Verba cognata</h2>
-        <p>Latium · Latinitas</p>
       </section>
     </article>
   </div>
@@ -187,11 +171,6 @@
         document.getElementById('lemmaPars').textContent = prima.pars_orationis || '—';
         document.getElementById('lemmaSyllabae').textContent = prima.syllabae || '—';
       }
-
-      const nomSgM = formaNachMeta(formae, 'nom', 'sg', 'm');
-      const nomSgF = formaNachMeta(formae, 'nom', 'sg', 'f');
-      const nomSgN = formaNachMeta(formae, 'nom', 'sg', 'n');
-      document.getElementById('lemmaFormae').textContent = [nomSgM, nomSgF, nomSgN].filter(function (x) { return x !== '—'; }).join(', ') || '—';
 
       zeigeFlexio(formae);
     }
