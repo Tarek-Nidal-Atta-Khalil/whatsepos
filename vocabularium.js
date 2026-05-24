@@ -7,15 +7,22 @@ const style = document.createElement('style');
 style.textContent = `
 .vocabularium-search-row {
   display:flex;
-  align-items:center;
+  align-items:flex-start;
   justify-content:center;
   gap:16px;
   width:min(100%, 980px);
   margin:0 auto;
 }
 
-.vocabularium-search-row #vocabulariumQuaere {
+.vocabularium-search-column {
   flex:1;
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+}
+
+.vocabularium-search-column #vocabulariumQuaere {
+  width:100%;
   margin:0;
 }
 
@@ -56,8 +63,8 @@ document.head.appendChild(style);
 const suggestiones = document.createElement('div');
 suggestiones.id = 'vocabulariumSuggestiones';
 suggestiones.style.display = 'none';
-suggestiones.style.maxWidth = '980px';
-suggestiones.style.margin = '8px auto 0';
+suggestiones.style.width = '100%';
+suggestiones.style.margin = '8px 0 0';
 
 const adminBox = document.createElement('div');
 adminBox.className = 'vocabularium-admin';
@@ -68,10 +75,15 @@ adminBox.innerHTML = `
 if (input && vocabulariumTab) {
   const row = document.createElement('div');
   row.className = 'vocabularium-search-row';
+
+  const column = document.createElement('div');
+  column.className = 'vocabularium-search-column';
+
   input.parentNode.insertBefore(row, input);
-  row.appendChild(input);
+  row.appendChild(column);
+  column.appendChild(input);
+  column.appendChild(suggestiones);
   row.appendChild(adminBox);
-  row.insertAdjacentElement('afterend', suggestiones);
 }
 
 const zeigeTabOriginal = window.zeigeTab;
