@@ -1,12 +1,38 @@
 const input = document.getElementById('vocabulariumQuaere');
 const status = document.getElementById('vocabulariumStatus');
 const eventus = document.getElementById('vocabulariumEventus');
+const vocabulariumTab = document.getElementById('vocabularium');
 
 const suggestiones = document.createElement('div');
 suggestiones.id = 'vocabulariumSuggestiones';
 suggestiones.style.display = 'none';
 if (input && input.parentNode) {
   input.insertAdjacentElement('afterend', suggestiones);
+}
+
+const adminBox = document.createElement('div');
+adminBox.className = 'vocabularium-admin';
+adminBox.innerHTML = `
+  <button id="novumVerbumKnopf" type="button">+ Novum verbum</button>
+  <form id="novumVerbumForm" class="novum-verbum-form" style="display:none;">
+    <input id="novumLemma" type="text" placeholder="lemma, e.g. puella">
+    <select id="novumFlexio">
+      <option value="ao_adiectivum">a/o-adiectivum</option>
+      <option value="a_declinatio_substantivum">substantivum: a-declinatio</option>
+      <option value="o_declinatio_substantivum">substantivum: o-declinatio</option>
+    </select>
+    <select id="novumGenus">
+      <option value="">genus auto</option>
+      <option value="m">masculinum</option>
+      <option value="f">femininum</option>
+      <option value="n">neutrum</option>
+    </select>
+    <button type="submit">Servare</button>
+  </form>
+  <p id="novumVerbumStatus" class="status"></p>
+`;
+if (vocabulariumTab && input) {
+  vocabulariumTab.insertBefore(adminBox, input);
 }
 
 const zeigeTabOriginal = window.zeigeTab;
@@ -239,6 +265,57 @@ async function quaere() {
 
   status.textContent = '';
   zeigeTabelle(items);
+}
+
+async function salvaNovumVerbum(event) {
+  event.preventDefault();
+
+  const novumStatus = document.getElementById('novumVerbumStatus');
+  const lemma = document.getElementById('novumLemma').value.trim();
+  const flexio = document.getElementById('novumFlexio').value;
+  const genus = document.getElementById('novumGenus').value;
+
+  if (!lemma) {
+    novumStatus.textContent = 'Lemma deest.';
+    return;
+  }
+
+  if (!window.whatseposSupabase || !window.whatseposFlexio) {
+    novumStatus.textContent = 'Supabase aut flexio nondum parata est.';
+    return;
+  }
+
+  novumStatus.textContent = 'Servo…';
+
+  try {
+    if (flexio === 'ao_adiectivum') {
+      await window.whatseposFlexio.salvaFormasAO(window.whatseposSupabase, { lemma });
+    }
+
+    if (flexio === 'a_declinatio_substantivum') {
+      await window.whatseposFlexio.salvaFormasADeclinatio(window.whatseposSupabase, { lemma, genus: genus || 'f' });
+    }
+
+    if (flexio === 'o_declinatio_substantivum') {
+      await window.whatseposFlexio.salvaFormasODeclinatio(window.whatseposSupabase, { lemma, genus: genus || null });
+    }
+
+    novumStatus.textContent = `${lemma} servatum est.`;
+    input.value = lemma;
+    await quaere();
+  } catch (error) {
+    novumStatus.textContent = error.message;
+  }
+}
+
+const novumVerbumKnopf = document.getElementById('novumVerbumKnopf');
+const novumVerbumForm = document.getElementById('novumVerbumForm');
+if (novumVerbumKnopf && novumVerbumForm) {
+  novumVerbumKnopf.addEventListener('click', function () {
+    novumVerbumForm.style.display = novumVerbumForm.style.display === 'none' ? 'flex' : 'none';
+  });
+
+  novumVerbumForm.addEventListener('submit', salvaNovumVerbum);
 }
 
 let suggestioTimer = null;
