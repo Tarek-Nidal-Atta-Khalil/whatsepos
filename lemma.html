@@ -206,7 +206,7 @@
       const { data, error } = await supabase
         .from('formae')
         .select('forma, lemma, pars_orationis, genus, numerus, casus, syllabae, longae')
-        .eq('lemma', lemmaNormal)
+        .ilike('lemma', lemmaNormal)
         .order('numerus', { ascending: false })
         .order('genus', { ascending: true })
         .order('casus', { ascending: true });
@@ -220,6 +220,7 @@
       const prima = formae[0];
 
       if (prima) {
+        document.getElementById('lemmaTitulus').textContent = prima.lemma || lemma;
         document.getElementById('lemmaPars').textContent = prima.pars_orationis || '—';
         document.getElementById('lemmaSyllabae').textContent = prima.syllabae || '—';
       }
