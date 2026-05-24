@@ -4,116 +4,33 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lemma – Whatsepos</title>
-  <link rel="stylesheet" href="style.css?v=20260523-lemma-7">
+  <link rel="stylesheet" href="style.css?v=20260523-lemma-8">
   <style>
-    .lemma-container{
-      max-width:980px;
-      margin:28px auto 80px;
-      text-align:left
-    }
-
-    .lemma-topbar{
-      display:flex;
-      align-items:center;
-      justify-content:flex-start;
-      gap:34px;
-      margin-bottom:24px;
-    }
-
-    .lemma-revertere{
-      position:fixed;
-      left:26px;
-      top:145px;
-      z-index:40;
-      display:inline-flex;
-      align-items:center;
-      gap:10px;
-      padding:12px 18px;
-      border-radius:999px;
-      background:#ffffff;
-      color:#6b21a8;
-      text-decoration:none;
-      font-size:20px;
-      font-weight:600;
-      box-shadow:0 6px 20px rgba(0,0,0,.08);
-      transition:all .18s ease;
-      white-space:nowrap;
-    }
-
-    .lemma-revertere:hover{
-      transform:translateY(-1px);
-      box-shadow:0 10px 24px rgba(0,0,0,.12);
-      background:#faf5ff;
-    }
-
-    #lemmaQuaere{
-      width:560px;
-      max-width:62vw;
-      margin-left:120px;
-      padding:14px 22px;
-      font-size:22px;
-      line-height:1.2;
-      border-radius:20px;
-      border:2px solid #d1d5db;
-      background:#fff;
-      box-shadow:0 6px 18px rgba(0,0,0,.06);
-    }
-
-    #lemmaQuaere:focus{
-      outline:none;
-      border-color:#93c5fd;
-      box-shadow:0 0 0 4px rgba(147,197,253,.28),0 6px 18px rgba(0,0,0,.08)
-    }
-
-    .lemma-card{
-      background:#fff;
-      border-radius:28px;
-      padding:50px 60px;
-      box-shadow:0 10px 30px rgba(0,0,0,.06);
-      text-align:left
-    }
-
+    .lemma-container{max-width:980px;margin:28px auto 80px;text-align:left}
+    .lemma-topbar{display:flex;align-items:center;justify-content:flex-start;gap:34px;margin-bottom:24px}
+    .lemma-revertere{position:fixed;left:26px;top:145px;z-index:40;display:inline-flex;align-items:center;gap:10px;padding:12px 18px;border-radius:999px;background:#ffffff;color:#6b21a8;text-decoration:none;font-size:20px;font-weight:600;box-shadow:0 6px 20px rgba(0,0,0,.08);transition:all .18s ease;white-space:nowrap}
+    .lemma-revertere:hover{transform:translateY(-1px);box-shadow:0 10px 24px rgba(0,0,0,.12);background:#faf5ff}
+    #lemmaQuaere{width:560px;max-width:62vw;margin-left:120px;padding:14px 22px;font-size:22px;line-height:1.2;border-radius:20px;border:2px solid #d1d5db;background:#fff;box-shadow:0 6px 18px rgba(0,0,0,.06)}
+    #lemmaQuaere:focus{outline:none;border-color:#93c5fd;box-shadow:0 0 0 4px rgba(147,197,253,.28),0 6px 18px rgba(0,0,0,.08)}
+    .lemma-card{background:#fff;border-radius:28px;padding:50px 60px;box-shadow:0 10px 30px rgba(0,0,0,.06);text-align:left}
     .lemma-header{margin-bottom:40px;text-align:left}
-
-    #lemmaTitulus{
-      position:static;
-      z-index:auto;
-      background:transparent;
-      padding:0;
-      margin:0;
-      font-size:72px;
-      font-weight:700;
-      text-align:left
-    }
-
-    #lemmaPars{
-      margin-top:14px;
-      font-size:30px;
-      color:#6b7280;
-      text-align:left
-    }
-
+    #lemmaTitulus{position:static;z-index:auto;background:transparent;padding:0;margin:0;font-size:72px;font-weight:700;text-align:left}
+    #lemmaPars{margin-top:14px;font-size:30px;color:#6b7280;text-align:left}
     .lemma-section{margin-top:38px;text-align:left}
-
-    .lemma-section h2{
-      margin-bottom:12px;
-      font-size:32px;
-      text-align:left
-    }
-
-    .lemma-section p{
-      margin:0;
-      font-size:28px;
-      line-height:1.7;
-      text-align:left
-    }
-
+    .lemma-section h2{margin-bottom:12px;font-size:32px;text-align:left}
+    .lemma-section p{margin:0;font-size:28px;line-height:1.7;text-align:left}
     .lemma-metrica-bona{color:#166534;font-weight:700}
+    .flexio-wrapper{overflow-x:auto;margin-top:14px}
+    .flexio-tabelle{width:100%;border-collapse:collapse;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 4px 18px rgba(0,0,0,.05)}
+    .flexio-tabelle caption{text-align:left;font-size:22px;font-weight:700;margin-bottom:10px;color:#374151}
+    .flexio-tabelle th,.flexio-tabelle td{padding:12px 14px;border:1px solid #e5e7eb;text-align:left;font-size:20px;white-space:nowrap}
+    .flexio-tabelle th{background:#f3f4f6;color:#374151;font-weight:700}
+    .flexio-tabelle td{color:#111827}
+    .flexio-numerus{margin-top:22px;margin-bottom:10px;font-size:24px;font-weight:700;color:#4b5563}
   </style>
 </head>
 <body>
   <h1>Uocabularium</h1>
-
   <a href="index.html?tab=vocabularium" class="lemma-revertere">← Retro</a>
 
   <div class="container lemma-container">
@@ -129,17 +46,22 @@
 
       <section class="lemma-section">
         <h2>Formae principales</h2>
-        <p id="lemmaFormae">Latina, Latinum</p>
+        <p id="lemmaFormae">—</p>
+      </section>
+
+      <section class="lemma-section">
+        <h2>Flexio</h2>
+        <div id="lemmaFlexio">Tabula nondum onerata est.</div>
       </section>
 
       <section class="lemma-section">
         <h2>Syllabae</h2>
-        <p id="lemmaSyllabae">Lā.tī.nus</p>
+        <p id="lemmaSyllabae">—</p>
       </section>
 
       <section class="lemma-section">
         <h2>IPA</h2>
-        <p id="lemmaIpa">/laːˈtiː.nus/</p>
+        <p id="lemmaIpa">—</p>
       </section>
 
       <section class="lemma-section">
@@ -159,28 +81,130 @@
     </article>
   </div>
 
-  <script>
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+    const supabase = createClient(
+      "https://sdjhpovsechtfdwwakmm.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdWJhc2UiLCJyZWYiOiJzZGpocG92c2VjaHRmZHd3YWttbSIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzg3NjIyNTIsImV4cCI6MjA5NDMzODI1Mn0.cyWJGEdA84bGAKyBcNYAXtJBLcf9Lo12oYn5CEAPhf4"
+    );
+
     const params = new URLSearchParams(window.location.search);
     const lemma = params.get('lemma');
+    const lemmaQuaere = document.getElementById('lemmaQuaere');
 
-    if (lemma) {
-      document.getElementById('lemmaTitulus').textContent = lemma;
-      document.getElementById('lemmaQuaere').value = lemma;
+    function normalisiere(textus) {
+      return String(textus || '').trim().toLowerCase().replace(/j/g, 'i').replace(/v/g, 'u');
     }
 
-    const lemmaQuaere = document.getElementById('lemmaQuaere');
+    function formaNachMeta(formae, casus, numerus, genus) {
+      const inventa = formae.find(function (f) {
+        return f.casus === casus && f.numerus === numerus && f.genus === genus;
+      });
+      return inventa ? inventa.forma : '—';
+    }
+
+    function tabellaNumeri(formae, numerus) {
+      const casusOrdines = ['nom', 'gen', 'dat', 'acc', 'abl', 'voc'];
+      const casusNomina = { nom: 'Nom.', gen: 'Gen.', dat: 'Dat.', acc: 'Acc.', abl: 'Abl.', voc: 'Voc.' };
+
+      const h = document.createElement('h3');
+      h.className = 'flexio-numerus';
+      h.textContent = numerus === 'sg' ? 'Singularis' : 'Pluralis';
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'flexio-wrapper';
+
+      const table = document.createElement('table');
+      table.className = 'flexio-tabelle';
+
+      const thead = document.createElement('thead');
+      const head = document.createElement('tr');
+      ['', 'masculinum', 'femininum', 'neutrum'].forEach(function (text) {
+        const th = document.createElement('th');
+        th.textContent = text;
+        head.appendChild(th);
+      });
+      thead.appendChild(head);
+      table.appendChild(thead);
+
+      const tbody = document.createElement('tbody');
+      casusOrdines.forEach(function (casus) {
+        const tr = document.createElement('tr');
+        const th = document.createElement('th');
+        th.textContent = casusNomina[casus];
+        tr.appendChild(th);
+        ['m', 'f', 'n'].forEach(function (genus) {
+          const td = document.createElement('td');
+          td.textContent = formaNachMeta(formae, casus, numerus, genus);
+          tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+      });
+
+      table.appendChild(tbody);
+      wrapper.appendChild(table);
+      return [h, wrapper];
+    }
+
+    function zeigeFlexio(formae) {
+      const ziel = document.getElementById('lemmaFlexio');
+      ziel.innerHTML = '';
+
+      if (!formae.length) {
+        ziel.textContent = 'Nullae formae inventae sunt.';
+        return;
+      }
+
+      tabellaNumeri(formae, 'sg').forEach(function (el) { ziel.appendChild(el); });
+      tabellaNumeri(formae, 'pl').forEach(function (el) { ziel.appendChild(el); });
+    }
+
+    async function ladeLemma() {
+      if (!lemma) return;
+
+      const lemmaNormal = normalisiere(lemma);
+      document.getElementById('lemmaTitulus').textContent = lemma;
+      lemmaQuaere.value = lemma;
+
+      const { data, error } = await supabase
+        .from('formae')
+        .select('forma, lemma, pars_orationis, genus, numerus, casus, syllabae, longae')
+        .eq('lemma', lemmaNormal)
+        .order('numerus', { ascending: false })
+        .order('genus', { ascending: true })
+        .order('casus', { ascending: true });
+
+      if (error) {
+        document.getElementById('lemmaFlexio').textContent = error.message;
+        return;
+      }
+
+      const formae = data || [];
+      const prima = formae[0];
+
+      if (prima) {
+        document.getElementById('lemmaPars').textContent = prima.pars_orationis || '—';
+        document.getElementById('lemmaSyllabae').textContent = prima.syllabae || '—';
+      }
+
+      const nomSgM = formaNachMeta(formae, 'nom', 'sg', 'm');
+      const nomSgF = formaNachMeta(formae, 'nom', 'sg', 'f');
+      const nomSgN = formaNachMeta(formae, 'nom', 'sg', 'n');
+      document.getElementById('lemmaFormae').textContent = [nomSgM, nomSgF, nomSgN].filter(function (x) { return x !== '—'; }).join(', ') || '—';
+
+      zeigeFlexio(formae);
+    }
 
     lemmaQuaere.addEventListener('keydown', function(event) {
       if (event.key !== 'Enter') return;
-
       event.preventDefault();
-
       const q = lemmaQuaere.value.trim();
-
       if (!q) return;
-
       window.location.href = `index.html?tab=vocabularium&q=${encodeURIComponent(q)}`;
     });
+
+    ladeLemma();
   </script>
 </body>
 </html>
