@@ -251,14 +251,15 @@ h1 {
 .vocabularium-tabelle tbody tr:hover { background: #f9fafb; }
 
 /* Lemma pages */
-#lemmaTitulus { font-size: 3.7rem !important; line-height: 1.05; margin-bottom: .3rem; }
-#lemmaPars { font-size: 1.25rem !important; color: #6b7280; }
-.lemma-card { padding: 2.6rem 3.2rem !important; border-radius: 24px !important; }
-.lemma-section { margin-top: 2rem !important; }
-.lemma-section h2 { font-size: 1.9rem !important; margin-bottom: .8rem !important; }
-.flexio-numerus { font-size: 1.25rem !important; margin-top: 1.4rem !important; }
+#lemmaTitulus { font-size: 2.6rem !important; line-height: 1.08; margin-bottom: .25rem; }
+#lemmaPars { font-size: 1rem !important; color: #6b7280; }
+.lemma-card { padding: 2.2rem 2.8rem !important; border-radius: 22px !important; }
+.lemma-section { margin-top: 1.6rem !important; }
+.lemma-section h2 { font-size: 1.45rem !important; margin-bottom: .65rem !important; }
+.lemma-section p { font-size: 1rem !important; line-height: 1.45 !important; }
+.flexio-numerus { font-size: 1.05rem !important; margin-top: 1.2rem !important; }
 .flexio-tabelle th,
-.flexio-tabelle td { font-size: 1rem !important; padding: .65rem .85rem !important; }
+.flexio-tabelle td { font-size: .92rem !important; padding: .52rem .72rem !important; }
 
 @media (max-width: 900px) {
   .container { width: calc(100% - 40px); }
