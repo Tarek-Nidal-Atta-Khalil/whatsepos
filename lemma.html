@@ -81,6 +81,9 @@
       return String(textus || '').trim().toLowerCase().replace(/j/g, 'i').replace(/v/g, 'u');
     }
 
+    const casusOrdines = ['nom', 'gen', 'dat', 'acc', 'abl', 'voc'];
+    const casusNomina = { nom: 'Nom.', gen: 'Gen.', dat: 'Dat.', acc: 'Acc.', abl: 'Abl.', voc: 'Voc.' };
+
     function formaNachMeta(formae, casus, numerus, genus) {
       const inventa = formae.find(function (f) {
         return f.casus === casus && f.numerus === numerus && f.genus === genus;
@@ -88,10 +91,14 @@
       return inventa ? inventa.forma : '—';
     }
 
-    function tabellaNumeri(formae, numerus) {
-      const casusOrdines = ['nom', 'gen', 'dat', 'acc', 'abl', 'voc'];
-      const casusNomina = { nom: 'Nom.', gen: 'Gen.', dat: 'Dat.', acc: 'Acc.', abl: 'Abl.', voc: 'Voc.' };
+    function formaSubstantivi(formae, casus, numerus) {
+      const inventa = formae.find(function (f) {
+        return f.casus === casus && f.numerus === numerus;
+      });
+      return inventa ? inventa.forma : '—';
+    }
 
+    function tabellaAdiectiviNumeri(formae, numerus) {
       const h = document.createElement('h3');
       h.className = 'flexio-numerus';
       h.textContent = numerus === 'sg' ? 'Singularis' : 'Pluralis';
@@ -131,6 +138,44 @@
       return [h, wrapper];
     }
 
+    function tabellaSubstantivi(formae) {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'flexio-wrapper';
+
+      const table = document.createElement('table');
+      table.className = 'flexio-tabelle substantivum-tabula';
+
+      const thead = document.createElement('thead');
+      const head = document.createElement('tr');
+      ['', 'Singularis', 'Pluralis'].forEach(function (text) {
+        const th = document.createElement('th');
+        th.textContent = text;
+        head.appendChild(th);
+      });
+      thead.appendChild(head);
+      table.appendChild(thead);
+
+      const tbody = document.createElement('tbody');
+      casusOrdines.forEach(function (casus) {
+        const tr = document.createElement('tr');
+        const th = document.createElement('th');
+        th.textContent = casusNomina[casus];
+        tr.appendChild(th);
+
+        ['sg', 'pl'].forEach(function (numerus) {
+          const td = document.createElement('td');
+          td.textContent = formaSubstantivi(formae, casus, numerus);
+          tr.appendChild(td);
+        });
+
+        tbody.appendChild(tr);
+      });
+
+      table.appendChild(tbody);
+      wrapper.appendChild(table);
+      return wrapper;
+    }
+
     function zeigeFlexio(formae) {
       const ziel = document.getElementById('lemmaFlexio');
       ziel.innerHTML = '';
@@ -140,8 +185,15 @@
         return;
       }
 
-      tabellaNumeri(formae, 'sg').forEach(function (el) { ziel.appendChild(el); });
-      tabellaNumeri(formae, 'pl').forEach(function (el) { ziel.appendChild(el); });
+      const pars = formae[0]?.pars_orationis;
+
+      if (pars === 'substantivum') {
+        ziel.appendChild(tabellaSubstantivi(formae));
+        return;
+      }
+
+      tabellaAdiectiviNumeri(formae, 'sg').forEach(function (el) { ziel.appendChild(el); });
+      tabellaAdiectiviNumeri(formae, 'pl').forEach(function (el) { ziel.appendChild(el); });
     }
 
     async function ladeLemma() {
