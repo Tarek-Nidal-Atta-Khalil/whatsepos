@@ -206,7 +206,7 @@ async function speichereAddeFormular() {
   const lemmaNudum = sineMacris(lemma).toLowerCase();
   const { error } = await window.whatseposSupabase.from('formae').insert([{ forma, lemma: lemmaNudum, pars_orationis: pars, syllabae: null, longae: null }]);
   if (error) { statusAdde(error.message); return; }
-  statusAdde('Servatum est.');
+  window.location.href = `lemma.html?lemma=${encodeURIComponent(lemmaNudum)}`;
 }
 
 const zeigeTabOriginal = window.zeigeTab;
