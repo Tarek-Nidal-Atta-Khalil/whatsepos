@@ -31,6 +31,20 @@
     .forma-prima{font-size:24px;font-weight:700}
     .forma-meta{margin-top:6px;font-size:17px;color:#6b7280;line-height:1.45}
     .forma-variante{display:inline-block;margin-top:6px;margin-right:8px;padding:4px 9px;border-radius:999px;background:#f3f4f6;font-size:17px;color:#374151}
+    .verbum-tabula {
+      table-layout: fixed;
+    }
+    
+    .verbum-tabula th:first-child,
+    .verbum-tabula td:first-child {
+      width: 110px;
+      font-weight: 700;
+    }
+    
+    .verbum-tabula th:not(:first-child),
+    .verbum-tabula td:not(:first-child) {
+      width: calc((100% - 110px) / 6);
+    }
   </style>
 </head>
 <body>
