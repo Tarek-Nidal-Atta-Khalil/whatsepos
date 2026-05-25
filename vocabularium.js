@@ -8,7 +8,7 @@ const vocabulariumTab = document.getElementById('vocabularium');
 const style = document.createElement('style');
 style.textContent = `
 .vocabularium-search-row{display:flex;align-items:flex-start;justify-content:center;gap:16px;width:min(100%,980px);margin:0 auto}.vocabularium-search-column{flex:1;min-width:0;display:flex;flex-direction:column}.vocabularium-search-column #vocabulariumQuaere{width:100%;margin:0}.vocabularium-admin{display:flex;align-items:center;justify-content:center;margin:0;flex-shrink:0}.vocabularium-suggestio.is-selected{background:#eef2ff!important}.vox-button{height:62px;padding:0 24px;border:none;border-radius:18px;background:#1faa4b;color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1rem;letter-spacing:.01em;box-shadow:0 10px 24px rgba(0,0,0,.16);transition:all .18s ease;white-space:nowrap}.vox-button:hover{transform:translateY(-1px);box-shadow:0 14px 30px rgba(0,0,0,.22)}
-.adde-uerbum-panel{width:min(100%,760px);margin:0 auto 48px;padding:0;background:#f8fafc;text-align:left;border-radius:28px}.adde-uerbum-panel[hidden]{display:none}.adde-form-head{background:white;border-top:10px solid #673ab7;border-radius:14px;padding:28px 32px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.08)}.adde-form-head h2{margin:0 0 8px;font-size:34px}.adde-form-head p{margin:0;color:#6b7280}.adde-form-card{background:white;border-radius:14px;padding:24px 32px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.08)}.adde-form-card[hidden]{display:none}.adde-uerbum-field label{display:block;margin-bottom:10px;font-weight:700;color:#202124}.adde-uerbum-field input,.adde-uerbum-field select{width:100%;max-width:none;margin:0;border:none;border-bottom:2px solid #dadce0;border-radius:0;background:white;padding:10px 0;font-size:22px}.adde-uerbum-field input:focus,.adde-uerbum-field select:focus{outline:none;border-bottom-color:#673ab7;box-shadow:none}.adde-card-help{margin-top:8px;color:#6b7280;font-size:.95rem}.adde-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.adde-detail-grid[hidden]{display:none}.adde-uerbum-actions{display:flex;gap:12px;justify-content:flex-end;margin-top:20px}.adde-uerbum-actions button{border-radius:16px}.adde-uerbum-primary{border:none;background:#673ab7;color:white}.adde-uerbum-secondary{border:1px solid #dadce0;background:white;color:#3c4043}.adde-uerbum-status{min-height:1.4em;margin-top:14px;color:#374151}.adde-uerbum-primary:disabled{opacity:.45;cursor:not-allowed}
+.adde-uerbum-panel{width:min(100%,760px);margin:0 auto 48px;padding:0;background:#f8fafc;text-align:left;border-radius:28px}.adde-uerbum-panel[hidden]{display:none}.adde-form-head{background:white;border-top:10px solid #673ab7;border-radius:14px;padding:28px 32px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.08)}.adde-form-head h2{margin:0 0 8px;font-size:34px}.adde-form-head p{margin:0;color:#6b7280}.adde-form-card{background:white;border-radius:14px;padding:24px 32px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.08)}.adde-form-card[hidden]{display:none}.adde-uerbum-field label{display:block;margin-bottom:10px;font-weight:700;color:#202124}.adde-uerbum-field input,.adde-uerbum-field select{width:100%;max-width:none;margin:0;border:none;border-bottom:2px solid #dadce0;border-radius:0;background:white;padding:10px 0;font-size:22px}.adde-uerbum-field input:focus,.adde-uerbum-field select:focus{outline:none;border-bottom-color:#673ab7;box-shadow:none}.adde-card-help{margin-top:8px;color:#6b7280;font-size:.95rem}.adde-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.adde-uerbum-actions{display:flex;gap:12px;justify-content:flex-end;margin-top:20px}.adde-uerbum-actions button{border-radius:16px}.adde-uerbum-primary{border:none;background:#673ab7;color:white}.adde-uerbum-secondary{border:1px solid #dadce0;background:white;color:#3c4043}.adde-uerbum-status{min-height:1.4em;margin-top:14px;color:#374151}.adde-uerbum-primary:disabled{opacity:.45;cursor:not-allowed}
 @media(max-width:900px){.vocabularium-search-row{flex-direction:column}.vocabularium-admin{width:100%}.vox-button{width:100%}.adde-detail-grid{grid-template-columns:1fr}}
 `;
 document.head.appendChild(style);
@@ -54,8 +54,8 @@ addePanel.innerHTML = `
   </div>
   <div class="adde-form-card" id="addeSubstantivumCard" hidden>
     <div class="adde-detail-grid">
-      <div class="adde-uerbum-field"><label for="addeDeclinatio">Declinatio substantivi</label><select id="addeDeclinatio"><option value="a">a-Deklination</option><option value="o">o-Deklination</option><option value="consonantica">konsonantische Deklination</option><option value="i">i-Deklination</option><option value="mixta">gemischte Deklination</option><option value="u">u-Deklination</option><option value="e">e-Deklination</option><option value="indeclinabile">indeclinabile</option><option value="irregularis">irregulär</option><option value="graeca">graeca</option></select></div>
       <div class="adde-uerbum-field"><label for="addeGenus">Genus</label><select id="addeGenus"><option value="m">masculinum</option><option value="f">femininum</option><option value="n">neutrum</option></select></div>
+      <div class="adde-uerbum-field"><label for="addeDeclinatio">Declinatio substantivi</label><select id="addeDeclinatio"><option value="a">a-Deklination</option><option value="o">o-Deklination</option><option value="consonantica">konsonantische Deklination</option><option value="i">i-Deklination</option><option value="mixta">gemischte Deklination</option><option value="u">u-Deklination</option><option value="e">e-Deklination</option><option value="indeclinabile">indeclinabile</option><option value="irregularis">irregulär</option><option value="graeca">graeca</option></select></div>
       <div class="adde-uerbum-field"><label for="addeNumerusTyp">Numerus</label><select id="addeNumerusTyp"><option value="sg_pl">Singular + Plural</option><option value="singulare_tantum">singulare tantum</option><option value="plurale_tantum">plurale tantum</option></select></div>
     </div>
   </div>
@@ -96,14 +96,20 @@ if (input && vocabulariumTab) {
 
 const MACRA = { a:'ā', e:'ē', i:'ī', o:'ō', u:'ū', y:'ȳ', A:'Ā', E:'Ē', I:'Ī', O:'Ō', U:'Ū', Y:'Ȳ' };
 const VOCALES = 'aeiouyāēīōūȳAEIOUYĀĒĪŌŪȲ';
-const DIPHTHONGI = ['ae','au','ei','eu','oe','ui'];
+const DIPHTHONGI = ['ae','au','oe','eu'];
 
 function normalisiere(textus) { return String(textus || '').trim().toLowerCase().replace(/j/g, 'i').replace(/v/g, 'u'); }
 function sineMacris(textus) { return String(textus || '').replace(/[āăáàâä]/g,'a').replace(/[ēĕéèêë]/g,'e').replace(/[īĭíìîï]/g,'i').replace(/[ōŏóòôö]/g,'o').replace(/[ūŭúùûü]/g,'u').replace(/[ȳýỳŷÿ]/g,'y').replace(/[ĀĂÁÀÂÄ]/g,'A').replace(/[ĒĔÉÈÊË]/g,'E').replace(/[ĪĬÍÌÎÏ]/g,'I').replace(/[ŌŎÓÒÔÖ]/g,'O').replace(/[ŪŬÚÙÛÜ]/g,'U').replace(/[ȲÝỲŶŸ]/g,'Y'); }
 function exColonibusMacra(textus) { return String(textus || '').replace(/([aeiouyAEIOUY]):/g, (_, v) => MACRA[v] || v); }
 function estVocalis(c) { return VOCALES.includes(c || ''); }
 function estLongaChar(c) { return /[āēīōūȳĀĒĪŌŪȲ]/.test(c || ''); }
-function estDiphthongus(textus, i) { return DIPHTHONGI.includes(sineMacris(String(textus || '').slice(i, i + 2)).toLowerCase()); }
+function estDiphthongus(textus, i) {
+  const s = sineMacris(String(textus || '')).toLowerCase();
+  const duo = s.slice(i, i + 2);
+  if (!DIPHTHONGI.includes(duo)) return false;
+  if ((duo === 'au' || duo === 'eu') && estVocalis(s[i + 2])) return false;
+  return true;
+}
 function nucleiVocalici(textus) {
   const s = String(textus || '');
   const nuclei = [];
@@ -131,7 +137,7 @@ function trenneSilben(textus) {
   return limites.map((start, i) => s.slice(start, i + 1 < limites.length ? limites[i + 1] : s.length)).filter(Boolean);
 }
 function longaeSigla(syllabaeMacris) {
-  return syllabaeMacris.map(s => ([...s].some(estLongaChar) || /ae|au|ei|eu|oe|ui/i.test(sineMacris(s))) ? 'L' : 'B').join('');
+  return syllabaeMacris.map(s => ([...s].some(estLongaChar) || ['ae','au','oe','eu'].some(d => sineMacris(s).toLowerCase().includes(d))) ? 'L' : 'B').join('');
 }
 function recordumFormae({ formaMacris, lemmaNudum, pars, genus, numerus, casus }) {
   const syllabaeMacris = trenneSilben(formaMacris);
@@ -152,6 +158,17 @@ function generaSubstantivumA({ lemmaInput, genus, numerusTyp }) {
   return { lemmaNudum, formae };
 }
 
+function syncDeclinationesSubstantivi() {
+  const genus = document.getElementById('addeGenus')?.value;
+  const declinatio = document.getElementById('addeDeclinatio');
+  const optioA = declinatio?.querySelector('option[value="a"]');
+  if (!declinatio || !optioA) return;
+  const aIncompatibilis = genus === 'n';
+  optioA.disabled = aIncompatibilis;
+  optioA.hidden = aIncompatibilis;
+  if (aIncompatibilis && declinatio.value === 'a') declinatio.value = 'o';
+}
+
 function suggestioButtons() { return Array.from(suggestiones.querySelectorAll('.vocabularium-suggestio')); }
 function setzeSuggestioSelecta(index) { const buttons = suggestioButtons(); if (!buttons.length) { suggestioSelectaIndex = -1; return; } suggestioSelectaIndex = Math.max(0, Math.min(index, buttons.length - 1)); buttons.forEach((b,i) => { b.classList.toggle('is-selected', i === suggestioSelectaIndex); b.setAttribute('aria-selected', i === suggestioSelectaIndex ? 'true' : 'false'); }); buttons[suggestioSelectaIndex].scrollIntoView({ block:'nearest' }); }
 function leereSuggestiones() { suggestiones.innerHTML = ''; suggestiones.style.display = 'none'; suggestioSelectaIndex = -1; nullusEventusLemma = ''; }
@@ -161,11 +178,11 @@ function syncAddeForm() {
   const lemma = document.getElementById('addeLemma')?.value.trim() || '';
   const pars = document.getElementById('addePars')?.value || '';
   document.getElementById('addeParsCard').hidden = lemma.length === 0;
-  document.getElementById('addeSubstantivumCard').hidden =
-  pars !== 'substantivum';
+  document.getElementById('addeSubstantivumCard').hidden = pars !== 'substantivum';
   document.getElementById('addeAdiectivumCard').hidden = pars !== 'adiectivum';
   document.getElementById('addeLeitformen').hidden = pars !== 'verbum';
   document.getElementById('addeSave').disabled = !lemma || !pars;
+  syncDeclinationesSubstantivi();
 }
 function aperiAddeUerbum(lemmaPraeplenum = '') {
   leereSuggestiones();
@@ -196,8 +213,7 @@ async function speichereAddeFormular() {
   const pars = document.getElementById('addePars')?.value;
   if (!lemmaInput || !pars) { statusAdde('Lemma et pars orationis necessaria sunt.'); return; }
   if (pars === 'verbum') { statusAdde('Leitformen sind erfasst. Automatische Paradigmenspeicherung folgt als nächster Schritt.'); return; }
-  if (pars === 'substantivum')
-  {
+  if (pars === 'substantivum') {
     const declinatio = document.getElementById('addeDeclinatio')?.value;
     if (declinatio === 'a') {
       const { lemmaNudum, formae } = generaSubstantivumA({ lemmaInput, genus: document.getElementById('addeGenus')?.value || null, numerusTyp: document.getElementById('addeNumerusTyp')?.value || 'sg_pl' });
@@ -222,5 +238,6 @@ if (input) { let timer = null; input.addEventListener('input', () => { clearTime
 document.getElementById('novumVerbumKnopf')?.addEventListener('click', () => aperiAddeUerbum(nullusEventusLemma || input?.value.trim() || ''));
 document.getElementById('addeLemma')?.addEventListener('input', syncAddeForm);
 document.getElementById('addePars')?.addEventListener('change', syncAddeForm);
+document.getElementById('addeGenus')?.addEventListener('change', syncAddeForm);
 document.getElementById('addeCancel')?.addEventListener('click', schliesseAddeUerbum);
 document.getElementById('addeSave')?.addEventListener('click', speichereAddeFormular);
