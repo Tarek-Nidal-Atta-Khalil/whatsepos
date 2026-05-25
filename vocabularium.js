@@ -72,8 +72,10 @@ adminBox.innerHTML = `
 <button id="novumVerbumKnopf" type="button" class="vox-button">adde nouum</button>
 `;
 
+let row = null;
+
 if (input && vocabulariumTab) {
-  const row = document.createElement('div');
+  row = document.createElement('div');
   row.className = 'vocabularium-search-row';
 
   const column = document.createElement('div');
@@ -92,6 +94,10 @@ const scriptoriumTitulus = document.querySelector('.container > h1');
 window.zeigeTab = async function(tabName) {
   if (typeof zeigeTabOriginal === 'function') {
     await zeigeTabOriginal(tabName);
+  }
+
+  if (row) {
+    row.style.display = tabName === 'vocabularium' ? 'flex' : 'none';
   }
 
   if (scriptoriumTitulus) {
