@@ -62,6 +62,8 @@ h1 {
   background: white;
   border-right: 1px solid #ccc;
   padding-top: 80px;
+  padding-bottom: 20px;
+  box-sizing: border-box;
   transition: left 0.3s ease;
   z-index: 1000;
   display: flex;
@@ -72,19 +74,15 @@ h1 {
 .side-menu.open { left: 0; }
 .side-menu button { display: block; width: 200px; margin: 10px auto; text-align: left; }
 
-#authLoggedOut,
-#authLoggedIn {
-  position: absolute;
-  left: 20px;
-  bottom: 20px;
-  width: 200px;
-  z-index: 1001;
+.auth-bottom {
+  width: 100%;
+  margin-top: auto;
 }
 
 #authLoggedOut { flex-direction: column; gap: 10px; }
 #authLoggedIn { display: none; }
 #authLoggedOut button,
-#authLoggedIn button { display: block; width: 200px; margin: 0; text-align: left; background: white; }
+#authLoggedIn button { display: block; width: 200px; margin: 10px auto; text-align: left; background: white; }
 
 .auth-startseite {
   min-height: 70vh;
