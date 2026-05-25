@@ -131,7 +131,7 @@ async function quaereSuggestiones() {
 
   const { data, error } = await window.whatseposSupabase
     .from('formae')
-    .select('forma, lemma, pars_orationis, syllabae, longae, quantitates')
+    .select('forma, lemma, pars_orationis, syllabae, longae')
     .ilike('lemma', `${q}%`)
     .limit(10);
 
