@@ -48,7 +48,6 @@ addePanel.innerHTML = `
         <option value="adiectivum">adiectivum</option>
         <option value="verbum">verbum</option>
         <option value="adverbium">adverbium</option>
-        <option value="nomen proprium">nomen proprium</option>
       </select>
       <div class="adde-card-help">Deinde genus uerbi elige; tum tantum reliqua campa aperientur.</div>
     </div>
@@ -162,7 +161,8 @@ function syncAddeForm() {
   const lemma = document.getElementById('addeLemma')?.value.trim() || '';
   const pars = document.getElementById('addePars')?.value || '';
   document.getElementById('addeParsCard').hidden = lemma.length === 0;
-  document.getElementById('addeSubstantivumCard').hidden = pars !== 'substantivum' && pars !== 'nomen proprium';
+  document.getElementById('addeSubstantivumCard').hidden =
+  pars !== 'substantivum';
   document.getElementById('addeAdiectivumCard').hidden = pars !== 'adiectivum';
   document.getElementById('addeLeitformen').hidden = pars !== 'verbum';
   document.getElementById('addeSave').disabled = !lemma || !pars;
@@ -196,7 +196,8 @@ async function speichereAddeFormular() {
   const pars = document.getElementById('addePars')?.value;
   if (!lemmaInput || !pars) { statusAdde('Lemma et pars orationis necessaria sunt.'); return; }
   if (pars === 'verbum') { statusAdde('Leitformen sind erfasst. Automatische Paradigmenspeicherung folgt als nächster Schritt.'); return; }
-  if (pars === 'substantivum' || pars === 'nomen proprium') {
+  if (pars === 'substantivum')
+  {
     const declinatio = document.getElementById('addeDeclinatio')?.value;
     if (declinatio === 'a') {
       const { lemmaNudum, formae } = generaSubstantivumA({ lemmaInput, genus: document.getElementById('addeGenus')?.value || null, numerusTyp: document.getElementById('addeNumerusTyp')?.value || 'sg_pl' });
