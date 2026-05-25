@@ -52,11 +52,45 @@ addePanel.innerHTML = `
       <div class="adde-card-help">Deinde genus uerbi elige; tum tantum reliqua campa aperientur.</div>
     </div>
   </div>
-  <div class="adde-form-card" id="addeSubstantivumCard" hidden>
-    <div class="adde-detail-grid">
-      <div class="adde-uerbum-field"><label for="addeGenus">Genus</label><select id="addeGenus"><option value="m">masculinum</option><option value="f">femininum</option><option value="n">neutrum</option></select></div>
-      <div class="adde-uerbum-field"><label for="addeDeclinatio">Declinatio substantivi</label><select id="addeDeclinatio"><option value="a">a-Deklination</option><option value="o">o-Deklination</option><option value="consonantica">konsonantische Deklination</option><option value="i">i-Deklination</option><option value="mixta">gemischte Deklination</option><option value="u">u-Deklination</option><option value="e">e-Deklination</option><option value="indeclinabile">indeclinabile</option><option value="irregularis">irregulär</option><option value="graeca">graeca</option></select></div>
-      <div class="adde-uerbum-field"><label for="addeNumerusTyp">Numerus</label><select id="addeNumerusTyp"><option value="sg_pl">Singular + Plural</option><option value="singulare_tantum">singulare tantum</option><option value="plurale_tantum">plurale tantum</option></select></div>
+  <div class="adde-form-card" id="addeGenusCard" hidden>
+    <div class="adde-uerbum-field">
+      <label for="addeGenus">Genus</label>
+      <select id="addeGenus">
+        <option value="">elige...</option>
+        <option value="m">masculinum</option>
+        <option value="f">femininum</option>
+        <option value="n">neutrum</option>
+      </select>
+      <div class="adde-card-help">Erst danach werden die passenden Deklinationen angeboten.</div>
+    </div>
+  </div>
+  <div class="adde-form-card" id="addeDeclinatioCard" hidden>
+    <div class="adde-uerbum-field">
+      <label for="addeDeclinatio">Declinatio substantivi</label>
+      <select id="addeDeclinatio">
+        <option value="">elige...</option>
+        <option value="a">a-Deklination</option>
+        <option value="o">o-Deklination</option>
+        <option value="consonantica">konsonantische Deklination</option>
+        <option value="i">i-Deklination</option>
+        <option value="mixta">gemischte Deklination</option>
+        <option value="u">u-Deklination</option>
+        <option value="e">e-Deklination</option>
+        <option value="indeclinabile">indeclinabile</option>
+        <option value="irregularis">irregulär</option>
+        <option value="graeca">graeca</option>
+      </select>
+    </div>
+  </div>
+  <div class="adde-form-card" id="addeNumerusTypCard" hidden>
+    <div class="adde-uerbum-field">
+      <label for="addeNumerusTyp">Numerus</label>
+      <select id="addeNumerusTyp">
+        <option value="">elige...</option>
+        <option value="sg_pl">Singular + Plural</option>
+        <option value="singulare_tantum">singulare tantum</option>
+        <option value="plurale_tantum">plurale tantum</option>
+      </select>
     </div>
   </div>
   <div class="adde-form-card" id="addeAdiectivumCard" hidden>
@@ -136,9 +170,7 @@ function trenneSilben(textus) {
   }
   return limites.map((start, i) => s.slice(start, i + 1 < limites.length ? limites[i + 1] : s.length)).filter(Boolean);
 }
-function longaeSigla(syllabaeMacris) {
-  return syllabaeMacris.map(s => ([...s].some(estLongaChar) || ['ae','au','oe','eu'].some(d => sineMacris(s).toLowerCase().includes(d))) ? 'L' : 'B').join('');
-}
+function longaeSigla(syllabaeMacris) { return syllabaeMacris.map(s => ([...s].some(estLongaChar) || ['ae','au','oe','eu'].some(d => sineMacris(s).toLowerCase().includes(d))) ? 'L' : 'B').join(''); }
 function recordumFormae({ formaMacris, lemmaNudum, pars, genus, numerus, casus }) {
   const syllabaeMacris = trenneSilben(formaMacris);
   return { forma: sineMacris(formaMacris).toLowerCase(), lemma: lemmaNudum, pars_orationis: pars, genus, numerus, casus, syllabae: syllabaeMacris.map(s => sineMacris(s).toLowerCase()).join('.'), longae: longaeSigla(syllabaeMacris) };
@@ -149,12 +181,8 @@ function generaSubstantivumA({ lemmaInput, genus, numerusTyp }) {
   const stemma = lemmaMacris.replace(/a$/i, '');
   const formae = [];
   const add = (casus, numerus, exitus) => formae.push(recordumFormae({ formaMacris: stemma + exitus, lemmaNudum, pars:'substantivum', genus, numerus, casus }));
-  if (numerusTyp !== 'plurale_tantum') {
-    add('nom','sg','a'); add('gen','sg','ae'); add('dat','sg','ae'); add('acc','sg','am'); add('abl','sg','ā'); add('voc','sg','a');
-  }
-  if (numerusTyp !== 'singulare_tantum') {
-    add('nom','pl','ae'); add('gen','pl','ārum'); add('dat','pl','īs'); add('acc','pl','ās'); add('abl','pl','īs'); add('voc','pl','ae');
-  }
+  if (numerusTyp !== 'plurale_tantum') { add('nom','sg','a'); add('gen','sg','ae'); add('dat','sg','ae'); add('acc','sg','am'); add('abl','sg','ā'); add('voc','sg','a'); }
+  if (numerusTyp !== 'singulare_tantum') { add('nom','pl','ae'); add('gen','pl','ārum'); add('dat','pl','īs'); add('acc','pl','ās'); add('abl','pl','īs'); add('voc','pl','ae'); }
   return { lemmaNudum, formae };
 }
 
@@ -166,9 +194,8 @@ function syncDeclinationesSubstantivi() {
   const aIncompatibilis = genus === 'n';
   optioA.disabled = aIncompatibilis;
   optioA.hidden = aIncompatibilis;
-  if (aIncompatibilis && declinatio.value === 'a') declinatio.value = 'o';
+  if (aIncompatibilis && declinatio.value === 'a') declinatio.value = '';
 }
-
 function suggestioButtons() { return Array.from(suggestiones.querySelectorAll('.vocabularium-suggestio')); }
 function setzeSuggestioSelecta(index) { const buttons = suggestioButtons(); if (!buttons.length) { suggestioSelectaIndex = -1; return; } suggestioSelectaIndex = Math.max(0, Math.min(index, buttons.length - 1)); buttons.forEach((b,i) => { b.classList.toggle('is-selected', i === suggestioSelectaIndex); b.setAttribute('aria-selected', i === suggestioSelectaIndex ? 'true' : 'false'); }); buttons[suggestioSelectaIndex].scrollIntoView({ block:'nearest' }); }
 function leereSuggestiones() { suggestiones.innerHTML = ''; suggestiones.style.display = 'none'; suggestioSelectaIndex = -1; nullusEventusLemma = ''; }
@@ -177,12 +204,27 @@ function statusAdde(textus) { const p = document.getElementById('addeStatus'); i
 function syncAddeForm() {
   const lemma = document.getElementById('addeLemma')?.value.trim() || '';
   const pars = document.getElementById('addePars')?.value || '';
+  const genus = document.getElementById('addeGenus')?.value || '';
+  const declinatio = document.getElementById('addeDeclinatio')?.value || '';
+  const numerusTyp = document.getElementById('addeNumerusTyp')?.value || '';
+
   document.getElementById('addeParsCard').hidden = lemma.length === 0;
-  document.getElementById('addeSubstantivumCard').hidden = pars !== 'substantivum';
+  document.getElementById('addeGenusCard').hidden = pars !== 'substantivum';
+  document.getElementById('addeDeclinatioCard').hidden = pars !== 'substantivum' || !genus;
+  document.getElementById('addeNumerusTypCard').hidden = pars !== 'substantivum' || !genus || !declinatio;
   document.getElementById('addeAdiectivumCard').hidden = pars !== 'adiectivum';
   document.getElementById('addeLeitformen').hidden = pars !== 'verbum';
-  document.getElementById('addeSave').disabled = !lemma || !pars;
   syncDeclinationesSubstantivi();
+
+  let potestServari = Boolean(lemma && pars);
+  if (pars === 'substantivum') potestServari = Boolean(lemma && genus && declinatio && numerusTyp);
+  document.getElementById('addeSave').disabled = !potestServari;
+}
+function resetDependentiaSubstantivi() {
+  const declinatio = document.getElementById('addeDeclinatio');
+  const numerusTyp = document.getElementById('addeNumerusTyp');
+  if (declinatio) declinatio.value = '';
+  if (numerusTyp) numerusTyp.value = '';
 }
 function aperiAddeUerbum(lemmaPraeplenum = '') {
   leereSuggestiones();
@@ -192,6 +234,9 @@ function aperiAddeUerbum(lemmaPraeplenum = '') {
   addePanel.hidden = false;
   document.getElementById('addeLemma').value = lemmaPraeplenum || '';
   document.getElementById('addePars').value = '';
+  document.getElementById('addeGenus').value = '';
+  document.getElementById('addeDeclinatio').value = '';
+  document.getElementById('addeNumerusTyp').value = '';
   syncAddeForm(); statusAdde(''); document.getElementById('addeLemma').focus();
 }
 function schliesseAddeUerbum() { addePanel.hidden = true; if (row) row.style.display = 'flex'; if (eventus) eventus.style.display = ''; if (status) status.style.display = ''; input?.focus(); }
@@ -238,6 +283,8 @@ if (input) { let timer = null; input.addEventListener('input', () => { clearTime
 document.getElementById('novumVerbumKnopf')?.addEventListener('click', () => aperiAddeUerbum(nullusEventusLemma || input?.value.trim() || ''));
 document.getElementById('addeLemma')?.addEventListener('input', syncAddeForm);
 document.getElementById('addePars')?.addEventListener('change', syncAddeForm);
-document.getElementById('addeGenus')?.addEventListener('change', syncAddeForm);
+document.getElementById('addeGenus')?.addEventListener('change', () => { resetDependentiaSubstantivi(); syncAddeForm(); });
+document.getElementById('addeDeclinatio')?.addEventListener('change', () => { const numerusTyp = document.getElementById('addeNumerusTyp'); if (numerusTyp) numerusTyp.value = ''; syncAddeForm(); });
+document.getElementById('addeNumerusTyp')?.addEventListener('change', syncAddeForm);
 document.getElementById('addeCancel')?.addEventListener('click', schliesseAddeUerbum);
 document.getElementById('addeSave')?.addEventListener('click', speichereAddeFormular);
