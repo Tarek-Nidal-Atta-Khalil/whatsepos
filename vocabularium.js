@@ -148,6 +148,7 @@ function aperiAddeUerbum(lemmaPraeplenum = '') {
   const parsInput = document.getElementById('addePars');
   if (lemmaPraeplenum) lemmaInput.value = lemmaPraeplenum;
   parsInput.value = 'verbum';
+  parsInput.dispatchEvent(new Event('change', { bubbles: true }));
   mutaLeitformen();
   statusAdde('');
   lemmaInput.focus();
