@@ -6,7 +6,7 @@ function initialisiereDeclinationes() {
   if (document.getElementById('addeDeclinatio') || document.getElementById('addeAdiectivumDeclinatio')) return true;
 
   const substantivumField = document.createElement('div');
-  substantivumField.className = 'adde-uerbum-field';
+  substantivumField.className = 'adde-uerbum-field substantivum-meta-field';
   substantivumField.id = 'addeDeclinatioField';
   substantivumField.hidden = true;
   substantivumField.innerHTML = `
@@ -22,6 +22,32 @@ function initialisiereDeclinationes() {
       <option value="indeclinabile">indeclinabile</option>
       <option value="irregularis">irregulär</option>
       <option value="graeca">graeca</option>
+    </select>
+  `;
+
+  const genusField = document.createElement('div');
+  genusField.className = 'adde-uerbum-field substantivum-meta-field';
+  genusField.id = 'addeGenusField';
+  genusField.hidden = true;
+  genusField.innerHTML = `
+    <label for="addeGenus">Genus</label>
+    <select id="addeGenus">
+      <option value="m">masculinum</option>
+      <option value="f">femininum</option>
+      <option value="n">neutrum</option>
+    </select>
+  `;
+
+  const numerusTypField = document.createElement('div');
+  numerusTypField.className = 'adde-uerbum-field substantivum-meta-field';
+  numerusTypField.id = 'addeNumerusTypField';
+  numerusTypField.hidden = true;
+  numerusTypField.innerHTML = `
+    <label for="addeNumerusTyp">Numerus</label>
+    <select id="addeNumerusTyp">
+      <option value="sg_pl">Singular + Plural</option>
+      <option value="singulare_tantum">singulare tantum</option>
+      <option value="plurale_tantum">plurale tantum</option>
     </select>
   `;
 
@@ -41,10 +67,15 @@ function initialisiereDeclinationes() {
 
   const parsField = parsSelect.closest('.adde-uerbum-field');
   parsField?.insertAdjacentElement('afterend', adiectivumField);
+  parsField?.insertAdjacentElement('afterend', numerusTypField);
+  parsField?.insertAdjacentElement('afterend', genusField);
   parsField?.insertAdjacentElement('afterend', substantivumField);
 
   function syncDeclinationes() {
-    substantivumField.hidden = parsSelect.value !== 'substantivum';
+    const estSubstantivum = parsSelect.value === 'substantivum';
+    substantivumField.hidden = !estSubstantivum;
+    genusField.hidden = !estSubstantivum;
+    numerusTypField.hidden = !estSubstantivum;
     adiectivumField.hidden = parsSelect.value !== 'adiectivum';
   }
 
