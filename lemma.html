@@ -31,20 +31,9 @@
     .forma-prima{font-size:24px;font-weight:700}
     .forma-meta{margin-top:6px;font-size:17px;color:#6b7280;line-height:1.45}
     .forma-variante{display:inline-block;margin-top:6px;margin-right:8px;padding:4px 9px;border-radius:999px;background:#f3f4f6;font-size:17px;color:#374151}
-    .verbum-tabula {
-      table-layout: fixed;
-    }
-    
-    .verbum-tabula th:first-child,
-    .verbum-tabula td:first-child {
-      width: 110px;
-      font-weight: 700;
-    }
-    
-    .verbum-tabula th:not(:first-child),
-    .verbum-tabula td:not(:first-child) {
-      width: calc((100% - 110px) / 6);
-    }
+    .verbum-tabula{table-layout:fixed}
+    .verbum-tabula th:first-child,.verbum-tabula td:first-child{width:110px;font-weight:700}
+    .verbum-tabula th:not(:first-child),.verbum-tabula td:not(:first-child){width:calc((100% - 110px) / 6)}
   </style>
 </head>
 <body>
@@ -102,7 +91,6 @@
     const lemma = params.get('lemma');
     const lemmaQuaere = document.getElementById('lemmaQuaere');
     let lemmaDisplayActuale = lemma || '';
-
     const breves = { a:'ă', e:'ĕ', i:'ĭ', o:'ŏ', u:'ŭ', y:'y̆', A:'Ă', E:'Ĕ', I:'Ĭ', O:'Ŏ', U:'Ŭ', Y:'Y̆' };
 
     function normalisiere(textus) {
@@ -125,9 +113,7 @@
     }
 
     function longaeIndices(forma) {
-      if (Array.isArray(forma?.longae)) {
-        return forma.longae.map(Number).filter(n => Number.isInteger(n));
-      }
+      if (Array.isArray(forma?.longae)) return forma.longae.map(Number).filter(n => Number.isInteger(n));
       return String(forma?.longae || '').toUpperCase().replace(/[.\s-]/g, '').split('')
         .map((s, i) => s === 'L' ? i : null).filter(i => i !== null);
     }
@@ -158,7 +144,7 @@
     }
 
     const casusOrdines = ['nom', 'gen', 'dat', 'acc', 'abl', 'voc'];
-    const casusNomina = { nom: 'Nom.', gen: 'Gen.', dat: 'Dat.', acc: 'Acc.', abl: 'Abl.', voc: 'Voc.' };
+    const casusNomina = { nom:'Nom.', gen:'Gen.', dat:'Dat.', acc:'Acc.', abl:'Abl.', voc:'Voc.' };
 
     function formaNachMeta(formae, casus, numerus, genus) {
       const inventa = formae.find(f => f.casus === casus && f.numerus === numerus && f.genus === genus);
@@ -180,28 +166,31 @@
       table.className = 'flexio-tabelle';
       const thead = document.createElement('thead');
       const head = document.createElement('tr');
-      ['', 'masculinum', 'femininum', 'neutrum'].forEach(text => {
-        const th = document.createElement('th'); th.textContent = text; head.appendChild(th);
-      });
+      ['', 'masculinum', 'femininum', 'neutrum'].forEach(text => { const th = document.createElement('th'); th.textContent = text; head.appendChild(th); });
       thead.appendChild(head); table.appendChild(thead);
       const tbody = document.createElement('tbody');
       casusOrdines.forEach(casus => {
         const tr = document.createElement('tr');
         const th = document.createElement('th'); th.textContent = casusNomina[casus]; tr.appendChild(th);
-        ['m', 'f', 'n'].forEach(genus => {
-          const td = document.createElement('td'); td.textContent = formaNachMeta(formae, casus, numerus, genus); tr.appendChild(td);
-        });
+        ['m','f','n'].forEach(genus => { const td = document.createElement('td'); td.textContent = formaNachMeta(formae, casus, numerus, genus); tr.appendChild(td); });
         tbody.appendChild(tr);
       });
       table.appendChild(tbody); wrapper.appendChild(table); return [h, wrapper];
     }
 
+    function numeriSubstantivi(formae) {
+      const habetSingular = formae.some(f => f.numerus === 'sg');
+      const habetPlural = formae.some(f => f.numerus === 'pl');
+      if (habetSingular && habetPlural) return ['sg', 'pl'];
+      if (habetPlural) return ['pl'];
+      return ['sg'];
+    }
+
     function tabellaSubstantivi(formae) {
       const wrapper = document.createElement('div'); wrapper.className = 'flexio-wrapper';
       const table = document.createElement('table'); table.className = 'flexio-tabelle substantivum-tabula';
-      const hatPlural = !estNomenProprium() && formae.some(f => f.numerus === 'pl');
-      const numeri = hatPlural ? ['sg', 'pl'] : ['sg'];
-      const numerusTituli = hatPlural ? ['Singularis', 'Pluralis'] : ['Singularis'];
+      const numeri = numeriSubstantivi(formae);
+      const numerusTituli = numeri.map(n => n === 'sg' ? 'Singularis' : 'Pluralis');
       const thead = document.createElement('thead'); const head = document.createElement('tr');
       ['', ...numerusTituli].forEach(text => { const th = document.createElement('th'); th.textContent = text; head.appendChild(th); });
       thead.appendChild(head); table.appendChild(thead);
@@ -214,10 +203,7 @@
       table.appendChild(tbody); wrapper.appendChild(table); return wrapper;
     }
 
-    const personae = [
-      ['1','sg','1. Sg.'], ['2','sg','2. Sg.'], ['3','sg','3. Sg.'],
-      ['1','pl','1. Pl.'], ['2','pl','2. Pl.'], ['3','pl','3. Pl.']
-    ];
+    const personae = [ ['1','sg','1. Sg.'], ['2','sg','2. Sg.'], ['3','sg','3. Sg.'], ['1','pl','1. Pl.'], ['2','pl','2. Pl.'], ['3','pl','3. Pl.'] ];
     const tempora = ['praes', 'imperf', 'fut', 'perf', 'plqpf', 'futperf'];
     const temporaNomina = { praes:'Praesens', imperf:'Imperfectum', fut:'Futurum', perf:'Perfectum', plqpf:'Plusquamperfectum', futperf:'Futurum exactum' };
 
@@ -285,17 +271,14 @@
         .order('forma', { ascending: true });
 
       if (error) { document.getElementById('lemmaFlexio').textContent = error.message; return; }
-
       const formae = data || [];
       const headword = eligeFormamHeadword(formae);
-
       if (headword) {
         lemmaDisplayActuale = headword.lemma || lemma;
         document.getElementById('lemmaTitulus').textContent = formaSupabaseSignata({ ...headword, forma: lemmaDisplayActuale });
         document.getElementById('lemmaPars').textContent = headword.pars_orationis || '—';
         document.getElementById('lemmaSyllabae').textContent = headword.syllabae || '—';
       }
-
       zeigeFlexio(formae);
       zeigeFormaeMetricae(formae);
     }
