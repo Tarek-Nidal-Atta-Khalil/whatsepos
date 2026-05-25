@@ -1,3 +1,5 @@
+import { formaSupabaseSignata } from './hexameter_active.js?v=20260525-macra-1';
+
 const input = document.getElementById('vocabulariumQuaere');
 const status = document.getElementById('vocabulariumStatus');
 const eventus = document.getElementById('vocabulariumEventus');
@@ -129,7 +131,7 @@ async function quaereSuggestiones() {
 
   const { data, error } = await window.whatseposSupabase
     .from('formae')
-    .select('lemma, pars_orationis')
+    .select('forma, lemma, pars_orationis, syllabae, longae, quantitates')
     .ilike('lemma', `${q}%`)
     .limit(10);
 
@@ -153,7 +155,16 @@ async function quaereSuggestiones() {
     button.style.cursor = 'pointer';
     button.style.borderBottom = '1px solid #eee';
 
-    button.innerHTML = `<strong>${item.lemma}</strong> <span style="color:#6b7280">${item.pars_orationis || ''}</span>`;
+    const lemmaSignatum = formaSupabaseSignata({ ...item, forma: item.lemma });
+    const lemmaStrong = document.createElement('strong');
+    lemmaStrong.textContent = lemmaSignatum || item.lemma;
+
+    const parsSpan = document.createElement('span');
+    parsSpan.style.color = '#6b7280';
+    parsSpan.textContent = ` ${item.pars_orationis || ''}`;
+
+    button.appendChild(lemmaStrong);
+    button.appendChild(parsSpan);
 
     button.addEventListener('mousedown', function(event) {
       event.preventDefault();
