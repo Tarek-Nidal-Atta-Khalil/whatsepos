@@ -36,6 +36,10 @@ style.textContent = `
   flex-shrink:0;
 }
 
+.vocabularium-suggestio.is-selected {
+  background:#eef2ff !important;
+}
+
 .vox-button {
   height:62px;
   padding:0 24px;
@@ -75,6 +79,7 @@ adminBox.innerHTML = `
 `;
 
 let row = null;
+let suggestioSelectaIndex = -1;
 
 if (input && vocabulariumTab) {
   row = document.createElement('div');
@@ -111,9 +116,38 @@ function normalisiere(textus) {
   return String(textus || '').trim().toLowerCase().replace(/j/g, 'i').replace(/v/g, 'u');
 }
 
+function suggestioButtons() {
+  return Array.from(suggestiones.querySelectorAll('.vocabularium-suggestio'));
+}
+
+function setzeSuggestioSelecta(index) {
+  const buttons = suggestioButtons();
+
+  if (buttons.length === 0) {
+    suggestioSelectaIndex = -1;
+    return;
+  }
+
+  suggestioSelectaIndex = Math.max(0, Math.min(index, buttons.length - 1));
+
+  buttons.forEach(function(button, i) {
+    button.classList.toggle('is-selected', i === suggestioSelectaIndex);
+    button.setAttribute('aria-selected', i === suggestioSelectaIndex ? 'true' : 'false');
+  });
+
+  buttons[suggestioSelectaIndex].scrollIntoView({ block: 'nearest' });
+}
+
+function oeffneSuggestioSelecta() {
+  const button = suggestioButtons()[suggestioSelectaIndex];
+  const lemma = button?.dataset?.lemma;
+  if (lemma) aperiLemma(lemma);
+}
+
 function leereSuggestiones() {
   suggestiones.innerHTML = '';
   suggestiones.style.display = 'none';
+  suggestioSelectaIndex = -1;
 }
 
 function aperiLemma(lemma) {
@@ -146,6 +180,8 @@ async function quaereSuggestiones() {
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'vocabularium-suggestio';
+    button.dataset.lemma = item.lemma;
+    button.setAttribute('role', 'option');
     button.style.display = 'block';
     button.style.width = '100%';
     button.style.textAlign = 'left';
@@ -166,6 +202,11 @@ async function quaereSuggestiones() {
     button.appendChild(lemmaStrong);
     button.appendChild(parsSpan);
 
+    button.addEventListener('mouseenter', function() {
+      const index = suggestioButtons().indexOf(button);
+      if (index >= 0) setzeSuggestioSelecta(index);
+    });
+
     button.addEventListener('mousedown', function(event) {
       event.preventDefault();
       aperiLemma(item.lemma);
@@ -176,6 +217,7 @@ async function quaereSuggestiones() {
 
   if (suggestiones.children.length > 0) {
     suggestiones.style.display = 'block';
+    setzeSuggestioSelecta(0);
   }
 }
 
@@ -185,6 +227,28 @@ if (input) {
   input.addEventListener('input', function() {
     clearTimeout(timer);
     timer = setTimeout(quaereSuggestiones, 150);
+  });
+
+  input.addEventListener('keydown', function(event) {
+    const buttons = suggestioButtons();
+
+    if (event.key === 'ArrowDown' && buttons.length > 0) {
+      event.preventDefault();
+      setzeSuggestioSelecta(suggestioSelectaIndex < 0 ? 0 : suggestioSelectaIndex + 1);
+      return;
+    }
+
+    if (event.key === 'ArrowUp' && buttons.length > 0) {
+      event.preventDefault();
+      setzeSuggestioSelecta(suggestioSelectaIndex < 0 ? buttons.length - 1 : suggestioSelectaIndex - 1);
+      return;
+    }
+
+    if (event.key === 'Enter' && buttons.length > 0) {
+      event.preventDefault();
+      if (suggestioSelectaIndex < 0) setzeSuggestioSelecta(0);
+      oeffneSuggestioSelecta();
+    }
   });
 
   input.addEventListener('blur', function() {
