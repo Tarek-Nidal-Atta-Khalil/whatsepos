@@ -74,16 +74,12 @@ h1 {
 
 #authLoggedOut,
 #authLoggedIn {
-  position: fixed;
-  left: -260px;
+  position: absolute;
+  left: 20px;
   bottom: 20px;
   width: 200px;
-  z-index: 9999;
-  transition: left 0.3s ease;
+  z-index: 1001;
 }
-
-.side-menu.open ~ #authLoggedOut,
-.side-menu.open ~ #authLoggedIn { left: 20px; }
 
 #authLoggedOut { flex-direction: column; gap: 10px; }
 #authLoggedIn { display: none; }
