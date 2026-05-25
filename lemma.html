@@ -67,6 +67,7 @@
 
   <script type="module">
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+    import { formaSupabaseSignata } from "./hexameter_active.js?v=20260525-macra-1";
 
     const supabase = createClient(
       "https://sdjhpovsechtfdwwakmm.supabase.co",
@@ -87,7 +88,7 @@
     }
 
     function formaProLemma(forma) {
-      const textus = String(forma || '');
+      const textus = formaSupabaseSignata(forma);
       if (!estNomenProprium() || !textus) return textus || '—';
       return textus.charAt(0).toUpperCase() + textus.slice(1);
     }
@@ -99,14 +100,14 @@
       const inventa = formae.find(function (f) {
         return f.casus === casus && f.numerus === numerus && f.genus === genus;
       });
-      return inventa ? formaProLemma(inventa.forma) : '—';
+      return inventa ? formaProLemma(inventa) : '—';
     }
 
     function formaSubstantivi(formae, casus, numerus) {
       const inventa = formae.find(function (f) {
         return f.casus === casus && f.numerus === numerus;
       });
-      return inventa ? formaProLemma(inventa.forma) : '—';
+      return inventa ? formaProLemma(inventa) : '—';
     }
 
     function tabellaAdiectiviNumeri(formae, numerus) {
@@ -220,7 +221,7 @@
 
       const { data, error } = await supabase
         .from('formae')
-        .select('forma, lemma, pars_orationis, genus, numerus, casus, syllabae, longae')
+        .select('forma, lemma, pars_orationis, genus, numerus, casus, syllabae, longae, quantitates')
         .ilike('lemma', lemmaNormal)
         .order('numerus', { ascending: false })
         .order('genus', { ascending: true })
@@ -236,7 +237,7 @@
 
       if (prima) {
         lemmaDisplayActuale = prima.lemma || lemma;
-        document.getElementById('lemmaTitulus').textContent = lemmaDisplayActuale;
+        document.getElementById('lemmaTitulus').textContent = formaSupabaseSignata({ ...prima, forma: lemmaDisplayActuale });
         document.getElementById('lemmaPars').textContent = prima.pars_orationis || '—';
         document.getElementById('lemmaSyllabae').textContent = prima.syllabae || '—';
       }
