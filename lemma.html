@@ -6,8 +6,49 @@
   <title>Lemma – Whatsepos</title>
   <link rel="stylesheet" href="style.css?v=20260523-lemma-9">
   <style>
-    .lemma-container{max-width:980px;margin:28px auto 80px;text-align:left}.lemma-topbar{display:flex;align-items:center;justify-content:flex-start;gap:34px;margin-bottom:24px}.lemma-revertere{position:fixed;left:26px;top:145px;z-index:40;display:inline-flex;align-items:center;gap:10px;padding:12px 18px;border-radius:999px;background:#fff;color:#6b21a8;text-decoration:none;font-size:20px;font-weight:600;box-shadow:0 6px 20px rgba(0,0,0,.08);white-space:nowrap}.lemma-revertere:hover{background:#faf5ff}#lemmaQuaere{width:560px;max-width:62vw;margin-left:120px;padding:14px 22px;font-size:22px;line-height:1.2;border-radius:20px;border:2px solid #d1d5db;background:#fff;box-shadow:0 6px 18px rgba(0,0,0,.06)}#lemmaQuaere:focus{outline:none;border-color:#93c5fd;box-shadow:0 0 0 4px rgba(147,197,253,.28),0 6px 18px rgba(0,0,0,.08)}.lemma-card{background:#fff;border-radius:28px;padding:50px 60px;box-shadow:0 10px 30px rgba(0,0,0,.06);text-align:left}.lemma-header{margin-bottom:40px;text-align:left}#lemmaTitulus{position:static;z-index:auto;background:transparent;padding:0;margin:0;font-size:72px;font-weight:700;text-align:left}#lemmaPars{margin-top:14px;font-size:30px;color:#6b7280;text-align:left}.lemma-section{margin-top:38px;text-align:left}.lemma-section h2{margin-bottom:12px;font-size:32px;text-align:left}.lemma-section p{margin:0;font-size:28px;line-height:1.7;text-align:left}.lemma-metrica-bona{color:#166534;font-weight:700}.flexio-wrapper{overflow-x:auto;margin-top:14px}.flexio-tabelle{width:100%;border-collapse:collapse;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 4px 18px rgba(0,0,0,.05)}.flexio-tabelle th,.flexio-tabelle td{padding:12px 14px;border:1px solid #e5e7eb;text-align:left;font-size:20px;white-space:nowrap}.flexio-tabelle th{background:#f3f4f6;color:#374151;font-weight:700}.flexio-tabelle td{color:#111827}.flexio-numerus{margin-top:22px;margin-bottom:10px;font-size:24px;font-weight:700;color:#4b5563}.formae-lista{display:flex;flex-direction:column;gap:12px;margin-top:12px}.forma-card{border:1px solid #e5e7eb;border-radius:18px;padding:14px 18px;background:#fff;text-align:left}.forma-prima{font-size:24px;font-weight:700}.forma-meta{margin-top:6px;font-size:17px;color:#6b7280;line-height:1.45}.forma-variante{display:inline-block;margin-top:6px;margin-right:8px;padding:4px 9px;border-radius:999px;background:#f3f4f6;font-size:17px;color:#374151}.verbum-tabula{table-layout:fixed}.verbum-tabula th:first-child,.verbum-tabula td:first-child{width:110px;font-weight:700}.verbum-tabula th:not(:first-child),.verbum-tabula td:not(:first-child){width:calc((100% - 110px) / 6)}
-    .diphthongus{position:relative!important;display:inline-block!important;line-height:1!important;padding-top:0!important}.diphthongus::before{content:""!important;position:absolute!important;left:.10em!important;right:.10em!important;top:.06em!important;border-top:.045em solid currentColor!important;border-radius:999px!important;transform:none!important}#lemmaTitulus .diphthongus::before,.forma-prima .diphthongus::before,.flexio-tabelle .diphthongus::before{top:.06em!important;border-top-width:.045em!important}
+    .lemma-container{max-width:980px;
+                     margin:28px auto 80px;
+                     text-align:left}
+    .lemma-topbar{display:flex;
+                  align-items:center;
+                  justify-content:flex-start;
+                  gap:34px;margin-bottom:24px}
+    .lemma-revertere{position:fixed;
+                     left:26px;
+                     top:145px;
+                     z-index:40;
+                     display:inline-flex;
+                     align-items:center;
+                     gap:10px;padding:12px 18px;
+                     border-radius:999px;
+                     background:#fff;
+                     color:#6b21a8;
+                     text-decoration:none;
+                     font-size:20px;
+                     font-weight:600;
+                     box-shadow:0 6px 20px rgba(0,0,0,.08);
+                     white-space:nowrap}
+    .lemma-revertere:hover{background:#faf5ff}#lemmaQuaere{width:560px;
+                                                           max-width:62vw;margin-left:120px;
+                                                           padding:14px 22px;
+                                                           font-size:22px;
+                                                           line-height:1.2;
+                                                           border-radius:20px;
+                                                           border:2px solid #d1d5db;background:#fff;
+                                                           box-shadow:0 6px 18px rgba(0,0,0,.06)}#lemmaQuaere:focus{outline:none;border-color:#93c5fd;box-shadow:0 0 0 4px rgba(147,197,253,.28),0 6px 18px rgba(0,0,0,.08)}
+    .lemma-card{background:#fff;
+                border-radius:28px;padding:50px 60px;
+                box-shadow:0 10px 30px rgba(0,0,0,.06);
+                text-align:left}
+    .lemma-header{margin-bottom:40px;
+                  text-align:left}#lemmaTitulus{position:static;
+                                                z-index:auto;
+                                                background:transparent;
+                                                padding:0;margin:0;
+                                                font-size:72px;font-weight:700;text-align:left}#lemmaPars{margin-top:14px;font-size:30px;color:#6b7280;text-align:left}.lemma-section{margin-top:38px;text-align:left}.lemma-section h2{margin-bottom:12px;font-size:32px;text-align:left}.lemma-section p{margin:0;font-size:28px;line-height:1.7;text-align:left}.lemma-metrica-bona{color:#166534;font-weight:700}.flexio-wrapper{overflow-x:auto;margin-top:14px}.flexio-tabelle{width:100%;border-collapse:collapse;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 4px 18px rgba(0,0,0,.05)}.flexio-tabelle th,.flexio-tabelle td{padding:12px 14px;border:1px solid #e5e7eb;text-align:left;font-size:20px;white-space:nowrap}.flexio-tabelle th{background:#f3f4f6;color:#374151;font-weight:700}.flexio-tabelle td{color:#111827}.flexio-numerus{margin-top:22px;margin-bottom:10px;font-size:24px;font-weight:700;color:#4b5563}.formae-lista{display:flex;flex-direction:column;gap:12px;margin-top:12px}.forma-card{border:1px solid #e5e7eb;border-radius:18px;padding:14px 18px;background:#fff;text-align:left}.forma-prima{font-size:24px;font-weight:700}.forma-meta{margin-top:6px;font-size:17px;color:#6b7280;line-height:1.45}.forma-variante{display:inline-block;margin-top:6px;margin-right:8px;padding:4px 9px;border-radius:999px;background:#f3f4f6;font-size:17px;color:#374151}.verbum-tabula{table-layout:fixed}.verbum-tabula th:first-child,.verbum-tabula td:first-child{width:110px;font-weight:700}.verbum-tabula th:not(:first-child),.verbum-tabula td:not(:first-child){width:calc((100% - 110px) / 6)}
+    .diphthongus{position:relative!important;display:inline-block!important;line-height:1!important;padding-top:0!important}.diphthongus::before{content:""!important;position:absolute!important;left:.10em!important;right:.10em!important;top:.06em!important;
+                                                                                                                                                 border-top:.055em solid currentColor!important;
+                                                                                                                                                 border-radius:999px!important;transform:none!important}#lemmaTitulus .diphthongus::before,.forma-prima .diphthongus::before,.flexio-tabelle .diphthongus::before{top:.06em!important;border-top-width:.045em!important}
   </style>
 </head>
 <body>
