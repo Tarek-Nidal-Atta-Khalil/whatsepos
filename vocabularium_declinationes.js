@@ -3,14 +3,14 @@ function initialisiereDeclinationes() {
   const panel = document.getElementById('addeUerbumPanel');
 
   if (!parsSelect || !panel) return false;
-  if (document.getElementById('addeDeclinatio')) return true;
+  if (document.getElementById('addeDeclinatio') || document.getElementById('addeAdiectivumDeclinatio')) return true;
 
-  const field = document.createElement('div');
-  field.className = 'adde-uerbum-field';
-  field.id = 'addeDeclinatioField';
-  field.hidden = true;
-  field.innerHTML = `
-    <label for="addeDeclinatio">Declinatio</label>
+  const substantivumField = document.createElement('div');
+  substantivumField.className = 'adde-uerbum-field';
+  substantivumField.id = 'addeDeclinatioField';
+  substantivumField.hidden = true;
+  substantivumField.innerHTML = `
+    <label for="addeDeclinatio">Declinatio substantivi</label>
     <select id="addeDeclinatio">
       <option value="a">a-Deklination</option>
       <option value="o">o-Deklination</option>
@@ -25,16 +25,32 @@ function initialisiereDeclinationes() {
     </select>
   `;
 
-  const parsField = parsSelect.closest('.adde-uerbum-field');
-  parsField?.insertAdjacentElement('afterend', field);
+  const adiectivumField = document.createElement('div');
+  adiectivumField.className = 'adde-uerbum-field';
+  adiectivumField.id = 'addeAdiectivumDeclinatioField';
+  adiectivumField.hidden = true;
+  adiectivumField.innerHTML = `
+    <label for="addeAdiectivumDeclinatio">Declinatio adiectivi</label>
+    <select id="addeAdiectivumDeclinatio">
+      <option value="a_o">a-/o-Deklination</option>
+      <option value="consonantica">konsonantische Deklination</option>
+      <option value="i">i-Deklination</option>
+      <option value="indeclinabile">indeclinabile</option>
+    </select>
+  `;
 
-  function syncDeclinatio() {
-    field.hidden = parsSelect.value !== 'substantivum';
+  const parsField = parsSelect.closest('.adde-uerbum-field');
+  parsField?.insertAdjacentElement('afterend', adiectivumField);
+  parsField?.insertAdjacentElement('afterend', substantivumField);
+
+  function syncDeclinationes() {
+    substantivumField.hidden = parsSelect.value !== 'substantivum';
+    adiectivumField.hidden = parsSelect.value !== 'adiectivum';
   }
 
-  parsSelect.addEventListener('change', syncDeclinatio);
-  document.getElementById('novumVerbumKnopf')?.addEventListener('click', syncDeclinatio);
-  syncDeclinatio();
+  parsSelect.addEventListener('change', syncDeclinationes);
+  document.getElementById('novumVerbumKnopf')?.addEventListener('click', syncDeclinationes);
+  syncDeclinationes();
 
   return true;
 }
