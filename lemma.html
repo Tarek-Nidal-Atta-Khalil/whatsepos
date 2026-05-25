@@ -16,41 +16,20 @@
     .lemma-header{margin-bottom:40px;text-align:left}
     #lemmaTitulus{position:static;z-index:auto;background:transparent;padding:0;margin:0;font-size:72px;font-weight:700;text-align:left}
     #lemmaPars{margin-top:14px;font-size:30px;color:#6b7280;text-align:left}
-    .lemma-section{margin-top:38px;text-align:left}
-    .lemma-section h2{margin-bottom:12px;font-size:32px;text-align:left}
-    .lemma-section p{margin:0;font-size:28px;line-height:1.7;text-align:left}
-    .lemma-metrica-bona{color:#166534;font-weight:700}
-    .flexio-wrapper{overflow-x:auto;margin-top:14px}
-    .flexio-tabelle{width:100%;border-collapse:collapse;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 4px 18px rgba(0,0,0,.05)}
-    .flexio-tabelle th,.flexio-tabelle td{padding:12px 14px;border:1px solid #e5e7eb;text-align:left;font-size:20px;white-space:nowrap}
-    .flexio-tabelle th{background:#f3f4f6;color:#374151;font-weight:700}
-    .flexio-tabelle td{color:#111827}
-    .flexio-numerus{margin-top:22px;margin-bottom:10px;font-size:24px;font-weight:700;color:#4b5563}
-    .formae-lista{display:flex;flex-direction:column;gap:12px;margin-top:12px}
-    .forma-card{border:1px solid #e5e7eb;border-radius:18px;padding:14px 18px;background:#fff;text-align:left}
-    .forma-prima{font-size:24px;font-weight:700}
-    .forma-meta{margin-top:6px;font-size:17px;color:#6b7280;line-height:1.45}
-    .forma-variante{display:inline-block;margin-top:6px;margin-right:8px;padding:4px 9px;border-radius:999px;background:#f3f4f6;font-size:17px;color:#374151}
-    .verbum-tabula{table-layout:fixed}
-    .verbum-tabula th:first-child,.verbum-tabula td:first-child{width:110px;font-weight:700}
-    .verbum-tabula th:not(:first-child),.verbum-tabula td:not(:first-child){width:calc((100% - 110px) / 6)}
+    .lemma-section{margin-top:38px;text-align:left}.lemma-section h2{margin-bottom:12px;font-size:32px;text-align:left}.lemma-section p{margin:0;font-size:28px;line-height:1.7;text-align:left}
+    .lemma-metrica-bona{color:#166534;font-weight:700}.flexio-wrapper{overflow-x:auto;margin-top:14px}.flexio-tabelle{width:100%;border-collapse:collapse;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 4px 18px rgba(0,0,0,.05)}
+    .flexio-tabelle th,.flexio-tabelle td{padding:12px 14px;border:1px solid #e5e7eb;text-align:left;font-size:20px;white-space:nowrap}.flexio-tabelle th{background:#f3f4f6;color:#374151;font-weight:700}.flexio-tabelle td{color:#111827}
+    .flexio-numerus{margin-top:22px;margin-bottom:10px;font-size:24px;font-weight:700;color:#4b5563}.formae-lista{display:flex;flex-direction:column;gap:12px;margin-top:12px}.forma-card{border:1px solid #e5e7eb;border-radius:18px;padding:14px 18px;background:#fff;text-align:left}.forma-prima{font-size:24px;font-weight:700}.forma-meta{margin-top:6px;font-size:17px;color:#6b7280;line-height:1.45}.forma-variante{display:inline-block;margin-top:6px;margin-right:8px;padding:4px 9px;border-radius:999px;background:#f3f4f6;font-size:17px;color:#374151}
+    .verbum-tabula{table-layout:fixed}.verbum-tabula th:first-child,.verbum-tabula td:first-child{width:110px;font-weight:700}.verbum-tabula th:not(:first-child),.verbum-tabula td:not(:first-child){width:calc((100% - 110px) / 6)}
   </style>
 </head>
 <body>
   <h1>Uocabularium</h1>
   <a href="index.html?tab=vocabularium" class="lemma-revertere">← Retro</a>
-
   <div class="container lemma-container">
-    <div class="lemma-topbar">
-      <input id="lemmaQuaere" type="search" placeholder="Aliud verbum quaere">
-    </div>
-
+    <div class="lemma-topbar"><input id="lemmaQuaere" type="search" placeholder="Aliud verbum quaere"></div>
     <article class="lemma-card">
-      <header class="lemma-header">
-        <h1 id="lemmaTitulus">Lātīnus</h1>
-        <p id="lemmaPars">adiectivum</p>
-      </header>
-
+      <header class="lemma-header"><h1 id="lemmaTitulus">Lātīnus</h1><p id="lemmaPars">adiectivum</p></header>
       <section class="lemma-section"><h2>Flexio</h2><div id="lemmaFlexio">Tabula nondum onerata est.</div></section>
       <section class="lemma-section"><h2>Formae metricae</h2><div id="lemmaFormae">—</div></section>
       <section class="lemma-section"><h2>Syllabae</h2><p id="lemmaSyllabae">—</p></section>
@@ -58,24 +37,40 @@
       <section class="lemma-section"><h2>Compatibilitas metrica</h2><p class="lemma-metrica bona">✔ hexameter compatibile</p></section>
     </article>
   </div>
-
   <script type="module">
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-    import { formaSupabaseSignata } from "./hexameter_active.js?v=20260525-macra-1";
     const supabase = createClient("https://sdjhpovsechtfdwwakmm.supabase.co", "sb_publishable_HZQ-cYsIytBAD899kSCMag_I32Qeabd");
     const params = new URLSearchParams(window.location.search);
     const lemma = params.get('lemma');
     const lemmaQuaere = document.getElementById('lemmaQuaere');
     let lemmaDisplayActuale = lemma || '';
+
     const breves = { a:'ă', e:'ĕ', i:'ĭ', o:'ŏ', u:'ŭ', y:'y̆', A:'Ă', E:'Ĕ', I:'Ĭ', O:'Ŏ', U:'Ŭ', Y:'Y̆' };
-    function normalisiere(textus){return String(textus||'').trim().toLowerCase().replace(/[āăáàâä]/g,'a').replace(/[ēĕéèêë]/g,'e').replace(/[īĭíìîï]/g,'i').replace(/[ōŏóòôö]/g,'o').replace(/[ūŭúùûü]/g,'u').replace(/[ȳýỳŷÿ]/g,'y').replace(/j/g,'i').replace(/v/g,'u');}
+    const longaeNotae = { a:'ā', e:'ē', i:'ī', o:'ō', u:'ū', y:'ȳ', A:'Ā', E:'Ē', I:'Ī', O:'Ō', U:'Ū', Y:'Ȳ' };
+    const vocales = 'aeiouyAEIOUYāēīōūȳĀĒĪŌŪȲ';
+    const diphthongi = ['ae','au','oe','eu'];
+    const doubleMacron = '͞';
+
+    function sineMacris(textus){return String(textus||'').replace(/[āăáàâä]/g,'a').replace(/[ēĕéèêë]/g,'e').replace(/[īĭíìîï]/g,'i').replace(/[ōŏóòôö]/g,'o').replace(/[ūŭúùûü]/g,'u').replace(/[ȳýỳŷÿ]/g,'y').replace(/[ĀĂÁÀÂÄ]/g,'A').replace(/[ĒĔÉÈÊË]/g,'E').replace(/[ĪĬÍÌÎÏ]/g,'I').replace(/[ŌŎÓÒÔÖ]/g,'O').replace(/[ŪŬÚÙÛÜ]/g,'U').replace(/[ȲÝỲŶŸ]/g,'Y');}
+    function normalisiere(textus){return sineMacris(textus).trim().toLowerCase().replace(/j/g,'i').replace(/v/g,'u');}
+    function estVocalis(c){return vocales.includes(c||'');}
+    function indexUltimiVocalis(textus){for(let i=String(textus||'').length-1;i>=0;i-=1){if(estVocalis(textus[i]))return i;}return -1;}
+    function estDiphthongus(textus,i){const s=sineMacris(textus).toLowerCase();const duo=s.slice(i,i+2);if(!diphthongi.includes(duo))return false;if((duo==='au'||duo==='eu')&&estVocalis(s[i+2]))return false;return true;}
+    function syllabaClausaEst(syllaba){const s=sineMacris(syllaba).toLowerCase();const i=indexUltimiVocalis(s);if(i<0)return false;return [...s.slice(i+1)].some(c=>!estVocalis(c));}
+    function syllabaDiphthongoLongaEst(syllaba){const s=sineMacris(syllaba).toLowerCase();for(let i=0;i<s.length-1;i+=1){if(estDiphthongus(s,i))return true;}return false;}
+    function syllabaMacronLongaEst(syllaba){return /[āēīōūȳĀĒĪŌŪȲ]/.test(String(syllaba||''));}
+    function longaeIndices(forma){if(Array.isArray(forma?.longae))return forma.longae.map(Number).filter(n=>Number.isInteger(n));return String(forma?.longae||'').toUpperCase().replace(/[.\s-]/g,'').split('').map((s,i)=>s==='L'?i:null).filter(i=>i!==null);}
+    function longaeSiglaCompleta(forma){const syllabae=String(forma?.syllabae||'').split('.').filter(Boolean);const dataLongae=new Set(longaeIndices(forma));return syllabae.map((s,i)=>(dataLongae.has(i)||syllabaClausaEst(s)||syllabaDiphthongoLongaEst(s)||syllabaMacronLongaEst(s))?'L':'B').join('');}
+    function indexSignandiVocalis(textus){const s=String(textus||'');for(let i=0;i<s.length;i+=1){if(estVocalis(s[i]))return i;}return -1;}
+    function notaLonga(syllaba){const i=indexSignandiVocalis(syllaba);if(i<0)return syllaba;if(estDiphthongus(syllaba,i))return syllaba.slice(0,i)+syllaba[i]+doubleMacron+syllaba[i+1]+syllaba.slice(i+2);return syllaba.slice(0,i)+(longaeNotae[syllaba[i]]||syllaba[i])+syllaba.slice(i+1);}
+    function formaSignata(forma){const syllabae=String(forma?.syllabae||'').split('.').filter(Boolean);if(!syllabae.length)return String(forma?.forma||forma?.lemma||'');const sigla=longaeSiglaCompleta(forma);return syllabae.map((s,i)=>sigla[i]==='L'?notaLonga(s):s).join('');}
     function estNomenProprium(){return /^[A-ZĀĒĪŌŪȲ]/.test(lemmaDisplayActuale||'');}
     function breviaSyllabam(syllaba){return String(syllaba||'').replace(/[aeiouyAEIOUY]/,l=>breves[l]||l);}
-    function longaeIndices(forma){if(Array.isArray(forma?.longae))return forma.longae.map(Number).filter(n=>Number.isInteger(n));return String(forma?.longae||'').toUpperCase().replace(/[.\s-]/g,'').split('').map((s,i)=>s==='L'?i:null).filter(i=>i!==null);}
-    function estIambusCorreptibilis(forma){const syllabae=String(forma?.syllabae||'').split('.').filter(Boolean);const longae=new Set(longaeIndices(forma));return syllabae.length===2&&!longae.has(0)&&longae.has(1);}
+    function estIambusCorreptibilis(forma){const syllabae=String(forma?.syllabae||'').split('.').filter(Boolean);const sigla=longaeSiglaCompleta(forma);return syllabae.length===2&&sigla==='BL';}
     function formaIambiceCorrepta(forma){const syllabae=String(forma?.syllabae||'').split('.').filter(Boolean);if(syllabae.length!==2)return'';return syllabae[0]+breviaSyllabam(syllabae[1]);}
-    function formaProLemma(forma){const textus=formaSupabaseSignata(forma);if(!estNomenProprium()||!textus)return textus||'—';return textus.charAt(0).toUpperCase()+textus.slice(1);}
+    function formaProLemma(forma){const textus=formaSignata(forma);if(!estNomenProprium()||!textus)return textus||'—';return textus.charAt(0).toUpperCase()+textus.slice(1);}
     function eligeFormamHeadword(formae){const lemmaNorm=normalisiere(lemma||'');return formae.find(f=>f.pars_orationis==='substantivum'&&f.casus==='nom'&&f.numerus==='sg')||formae.find(f=>f.pars_orationis==='substantivum'&&f.casus==='nom'&&f.numerus==='pl')||formae.find(f=>f.persona==='1'&&f.numerus==='sg'&&f.tempus==='praes'&&f.modus==='ind'&&f.vox==='act')||formae.find(f=>normalisiere(f.forma)===lemmaNorm)||formae[0];}
+
     const casusOrdines=['nom','gen','dat','acc','abl','voc'];
     const casusNomina={nom:'Nom.',gen:'Gen.',dat:'Dat.',acc:'Acc.',abl:'Abl.',voc:'Voc.'};
     function formaNachMeta(formae,casus,numerus,genus){const inventa=formae.find(f=>f.casus===casus&&f.numerus===numerus&&f.genus===genus);return inventa?formaProLemma(inventa):'—';}
@@ -89,8 +84,8 @@
     function formaVerbalis(formae,persona,numerus,tempus){const inventa=formae.find(f=>f.persona===persona&&f.numerus===numerus&&f.tempus===tempus&&(!f.modus||f.modus==='ind')&&(!f.vox||f.vox==='act'));return inventa?formaProLemma(inventa):'—';}
     function tabellaVerbi(formae){const wrapper=document.createElement('div');wrapper.className='flexio-wrapper';const table=document.createElement('table');table.className='flexio-tabelle verbum-tabula';const thead=document.createElement('thead');const head=document.createElement('tr');['',...tempora.map(t=>temporaNomina[t]||t)].forEach(text=>{const th=document.createElement('th');th.textContent=text;head.appendChild(th);});thead.appendChild(head);table.appendChild(thead);const tbody=document.createElement('tbody');personae.forEach(([persona,numerus,label])=>{const tr=document.createElement('tr');const th=document.createElement('th');th.textContent=label;tr.appendChild(th);tempora.forEach(tempus=>{const td=document.createElement('td');td.textContent=formaVerbalis(formae,persona,numerus,tempus);tr.appendChild(td);});tbody.appendChild(tr);});table.appendChild(tbody);wrapper.appendChild(table);return wrapper;}
     function zeigeFlexio(formae){const ziel=document.getElementById('lemmaFlexio');ziel.innerHTML='';if(!formae.length){ziel.textContent='Nullae formae inventae sunt.';return;}const pars=formae[0]?.pars_orationis;if(pars==='substantivum'){ziel.appendChild(tabellaSubstantivi(formae));return;}if(pars==='verbum'){ziel.appendChild(tabellaVerbi(formae));return;}tabellaAdiectiviNumeri(formae,'sg').forEach(el=>ziel.appendChild(el));tabellaAdiectiviNumeri(formae,'pl').forEach(el=>ziel.appendChild(el));}
-    function zeigeFormaeMetricae(formae){const ziel=document.getElementById('lemmaFormae');ziel.innerHTML='';if(!formae.length){ziel.textContent='—';return;}const lista=document.createElement('div');lista.className='formae-lista';const visa=new Set();formae.forEach(forma=>{const clavis=[forma.forma,forma.syllabae,forma.longae].join('|');if(visa.has(clavis))return;visa.add(clavis);const card=document.createElement('div');card.className='forma-card';const prima=document.createElement('div');prima.className='forma-prima';prima.textContent=formaProLemma(forma);card.appendChild(prima);const meta=document.createElement('div');meta.className='forma-meta';meta.textContent=[forma.syllabae,forma.longae?`longae: ${forma.longae}`:''].filter(Boolean).join(' · ');card.appendChild(meta);if(estIambusCorreptibilis(forma)){const varians=document.createElement('span');varians.className='forma-variante';varians.textContent=`iambice: ${formaIambiceCorrepta(forma)}`;card.appendChild(varians);}lista.appendChild(card);});ziel.appendChild(lista);}
-    async function ladeLemma(){if(!lemma)return;const lemmaNormal=normalisiere(lemma);document.getElementById('lemmaTitulus').textContent=lemma;lemmaQuaere.value=lemma;const {data,error}=await supabase.from('formae').select('forma, lemma, pars_orationis, genus, numerus, casus, persona, tempus, modus, vox, syllabae, longae').ilike('lemma',lemmaNormal).order('forma',{ascending:true});if(error){document.getElementById('lemmaFlexio').textContent=error.message;return;}const formae=data||[];const headword=eligeFormamHeadword(formae);if(headword){lemmaDisplayActuale=headword.lemma||lemma;document.getElementById('lemmaTitulus').textContent=formaSupabaseSignata({...headword,forma:lemmaDisplayActuale});document.getElementById('lemmaPars').textContent=headword.pars_orationis||'—';document.getElementById('lemmaSyllabae').textContent=headword.syllabae||'—';}zeigeFlexio(formae);zeigeFormaeMetricae(formae);}
+    function zeigeFormaeMetricae(formae){const ziel=document.getElementById('lemmaFormae');ziel.innerHTML='';if(!formae.length){ziel.textContent='—';return;}const lista=document.createElement('div');lista.className='formae-lista';const visa=new Set();formae.forEach(forma=>{const sigla=longaeSiglaCompleta(forma);const clavis=[forma.forma,forma.syllabae,sigla].join('|');if(visa.has(clavis))return;visa.add(clavis);const card=document.createElement('div');card.className='forma-card';const prima=document.createElement('div');prima.className='forma-prima';prima.textContent=formaProLemma(forma);card.appendChild(prima);const meta=document.createElement('div');meta.className='forma-meta';meta.textContent=[forma.syllabae,sigla?`longae: ${sigla}`:''].filter(Boolean).join(' · ');card.appendChild(meta);if(estIambusCorreptibilis(forma)){const varians=document.createElement('span');varians.className='forma-variante';varians.textContent=`iambice: ${formaIambiceCorrepta(forma)}`;card.appendChild(varians);}lista.appendChild(card);});ziel.appendChild(lista);}
+    async function ladeLemma(){if(!lemma)return;const lemmaNormal=normalisiere(lemma);document.getElementById('lemmaTitulus').textContent=lemma;lemmaQuaere.value=lemma;const {data,error}=await supabase.from('formae').select('forma, lemma, pars_orationis, genus, numerus, casus, persona, tempus, modus, vox, syllabae, longae').ilike('lemma',lemmaNormal).order('forma',{ascending:true});if(error){document.getElementById('lemmaFlexio').textContent=error.message;return;}const formae=data||[];const headword=eligeFormamHeadword(formae);if(headword){lemmaDisplayActuale=headword.lemma||lemma;document.getElementById('lemmaTitulus').textContent=formaSignata({...headword,forma:lemmaDisplayActuale});document.getElementById('lemmaPars').textContent=headword.pars_orationis||'—';document.getElementById('lemmaSyllabae').textContent=headword.syllabae||'—';}zeigeFlexio(formae);zeigeFormaeMetricae(formae);}
     lemmaQuaere.addEventListener('keydown',function(event){if(event.key!=='Enter')return;event.preventDefault();const q=lemmaQuaere.value.trim();if(!q)return;window.location.href=`index.html?tab=vocabularium&q=${encodeURIComponent(q)}`;});
     ladeLemma();
   </script>
