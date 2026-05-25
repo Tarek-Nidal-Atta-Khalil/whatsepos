@@ -272,6 +272,16 @@ h1 {
   opacity: .88 !important;
 }
 
+/* Stronger than lemma.html's inline macron rules. */
+html body #lemmaTitulus .diphthongus::before,
+html body .forma-prima .diphthongus::before,
+html body .flexio-tabelle .diphthongus::before,
+html body .lemma-card .diphthongus::before {
+  top: .10em !important;
+  border-top-width: .08em !important;
+  opacity: 1 !important;
+}
+
 @media (max-width: 900px) {
   .container { width: calc(100% - 40px); }
   #poemArea { margin-right: 0; }
