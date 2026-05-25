@@ -3,7 +3,8 @@ import * as basis from "./hexameter_flex.js?v=20260520-flex-3";
 const VOCALES_LONGAE = { a: "ā", e: "ē", i: "ī", o: "ō", u: "ū", y: "ȳ" };
 const VOCALES_BREVES = { a: "ă", e: "ĕ", i: "ĭ", o: "ŏ", u: "ŭ", y: "y̆" };
 const VOKALE = "aeiouy";
-const DIPHTHONGI = ["ae", "au", "ei", "eu", "oe", "ui"];
+const DIPHTHONGI = ["ae", "au", "oe", "eu"];
+const DOUBLE_MACRON = "͞";
 
 export const setzeFormaeMetricas = basis.setzeFormaeMetricas;
 export const normalisiereLatein = basis.normalisiereLatein;
@@ -12,15 +13,23 @@ export const bereiteVersstromVor = basis.bereiteVersstromVor;
 export const findeMutaCumLiquidaStellen = basis.findeMutaCumLiquidaStellen;
 
 function estVokal(c) {
-  return VOKALE.includes(c);
+  return VOKALE.includes((c || '').toLowerCase());
 }
 
 function estQuU(textus, index) {
   return String(textus || "")[index] === "u" && index > 0 && String(textus || "")[index - 1] === "q";
 }
 
-function estDiphthongus(textus, index) {
-  return DIPHTHONGI.includes(String(textus || "").slice(index, index + 2).toLowerCase());
+function diphthongusValet(textus, index) {
+  const s = String(textus || '').toLowerCase();
+  const duo = s.slice(index, index + 2);
+  if (!DIPHTHONGI.includes(duo)) return false;
+
+  if ((duo === 'au' || duo === 'eu') && estVokal(s[index + 2])) {
+    return false;
+  }
+
+  return true;
 }
 
 function indexSignandiVocalis(textus) {
@@ -68,14 +77,17 @@ function nota(textus, quantitas) {
   const i = indexSignandiVocalis(textus);
   if (i < 0) return textus;
 
-  if (quantitas === "longa" && estDiphthongus(textus, i)) {
+  if (quantitas === 'longa' && diphthongusValet(textus, i)) {
     return textus.slice(0, i)
-      + litteraQuantitateNotata(textus[i], "longa")
-      + litteraQuantitateNotata(textus[i + 1], "longa")
+      + textus[i]
+      + DOUBLE_MACRON
+      + textus[i + 1]
       + textus.slice(i + 2);
   }
 
-  return textus.slice(0, i) + litteraQuantitateNotata(textus[i], quantitas) + textus.slice(i + 1);
+  return textus.slice(0, i)
+    + litteraQuantitateNotata(textus[i], quantitas)
+    + textus.slice(i + 1);
 }
 
 function longaeIndizesExSupabase(forma) {
