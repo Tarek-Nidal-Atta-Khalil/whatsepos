@@ -3,6 +3,7 @@ import * as basis from "./hexameter_flex.js?v=20260520-flex-3";
 const VOCALES_LONGAE = { a: "ā", e: "ē", i: "ī", o: "ō", u: "ū", y: "ȳ" };
 const VOCALES_BREVES = { a: "ă", e: "ĕ", i: "ĭ", o: "ŏ", u: "ŭ", y: "y̆" };
 const VOKALE = "aeiouy";
+const DIPHTHONGI = ["ae", "au", "ei", "eu", "oe", "ui"];
 
 export const setzeFormaeMetricas = basis.setzeFormaeMetricas;
 export const normalisiereLatein = basis.normalisiereLatein;
@@ -16,6 +17,10 @@ function estVokal(c) {
 
 function estQuU(textus, index) {
   return String(textus || "")[index] === "u" && index > 0 && String(textus || "")[index - 1] === "q";
+}
+
+function estDiphthongus(textus, index) {
+  return DIPHTHONGI.includes(String(textus || "").slice(index, index + 2).toLowerCase());
 }
 
 function indexSignandiVocalis(textus) {
@@ -62,6 +67,14 @@ function litteraQuantitateNotata(littera, quantitas) {
 function nota(textus, quantitas) {
   const i = indexSignandiVocalis(textus);
   if (i < 0) return textus;
+
+  if (quantitas === "longa" && estDiphthongus(textus, i)) {
+    return textus.slice(0, i)
+      + litteraQuantitateNotata(textus[i], "longa")
+      + litteraQuantitateNotata(textus[i + 1], "longa")
+      + textus.slice(i + 2);
+  }
+
   return textus.slice(0, i) + litteraQuantitateNotata(textus[i], quantitas) + textus.slice(i + 1);
 }
 
