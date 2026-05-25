@@ -32,7 +32,7 @@ addePanel.innerHTML = `
   <div class="adde-uerbum-grid">
     <div class="adde-uerbum-field">
       <label for="addeLemma">Lemma / Headword</label>
-      <input id="addeLemma" type="text" placeholder="canō">
+      <input id="addeLemma" type="text" placeholder="Ro:ma">
     </div>
     <div class="adde-uerbum-field">
       <label for="addePars">Pars orationis</label>
@@ -43,14 +43,6 @@ addePanel.innerHTML = `
         <option value="adverbium">adverbium</option>
         <option value="nomen proprium">nomen proprium</option>
       </select>
-    </div>
-    <div class="adde-uerbum-field">
-      <label for="addeSyllabae">Syllabae</label>
-      <input id="addeSyllabae" type="text" placeholder="ca.no">
-    </div>
-    <div class="adde-uerbum-field">
-      <label for="addeLongae">Longae</label>
-      <input id="addeLongae" type="text" placeholder="1">
     </div>
   </div>
   <div id="addeLeitformen" class="adde-uerbum-verbum" hidden>
@@ -131,11 +123,7 @@ function statusAdde(textus) {
 function mutaLeitformen() {
   const pars = document.getElementById('addePars')?.value;
   const leitformen = document.getElementById('addeLeitformen');
-  const syllabae = document.getElementById('addeSyllabae')?.closest('.adde-uerbum-field');
-  const longae = document.getElementById('addeLongae')?.closest('.adde-uerbum-field');
   if (leitformen) leitformen.hidden = pars !== 'verbum';
-  if (syllabae) syllabae.hidden = pars === 'verbum';
-  if (longae) longae.hidden = pars === 'verbum';
 }
 
 function aperiAddeUerbum(lemmaPraeplenum = '') {
@@ -231,8 +219,6 @@ async function speichereAddeFormular() {
   if (!window.whatseposSupabase) return;
   const lemma = document.getElementById('addeLemma')?.value.trim();
   const pars = document.getElementById('addePars')?.value;
-  const syllabae = document.getElementById('addeSyllabae')?.value.trim() || null;
-  const longae = document.getElementById('addeLongae')?.value.trim() || null;
   if (!lemma || !pars) { statusAdde('Lemma et pars orationis necessaria sunt.'); return; }
 
   if (pars === 'verbum') {
@@ -244,7 +230,7 @@ async function speichereAddeFormular() {
   const lemmaNudum = sineMacris(lemma).toLowerCase();
   const { error } = await window.whatseposSupabase
     .from('formae')
-    .insert([{ forma, lemma: lemmaNudum, pars_orationis: pars, syllabae, longae }]);
+    .insert([{ forma, lemma: lemmaNudum, pars_orationis: pars, syllabae: null, longae: null }]);
   if (error) { statusAdde(error.message); return; }
   statusAdde('Servatum est.');
 }
