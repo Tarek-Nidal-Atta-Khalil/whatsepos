@@ -20,6 +20,18 @@ function estQuU(textus, index) {
   return String(textus || "")[index] === "u" && index > 0 && String(textus || "")[index - 1] === "q";
 }
 
+function estUConsonansIntervocalicum(textus, index, contextus = {}) {
+  const s = String(textus || "").toLowerCase();
+  if (s[index] !== "u") return false;
+  if (index !== 0) return false;
+  if (!estVokal(s[index + 1])) return false;
+
+  const praecedens = String(contextus?.praecedens || "").toLowerCase();
+  if (!praecedens) return false;
+
+  return estVokal(praecedens[praecedens.length - 1]);
+}
+
 function diphthongusValet(textus, index) {
   const s = String(textus || '').toLowerCase();
   const duo = s.slice(index, index + 2);
@@ -32,13 +44,14 @@ function diphthongusValet(textus, index) {
   return true;
 }
 
-function indexSignandiVocalis(textus) {
+function indexSignandiVocalis(textus, contextus = {}) {
   const s = String(textus || "");
   const ia = s.indexOf("ia");
   if (ia >= 0) return ia + 1;
 
   for (let i = 0; i < s.length; i += 1) {
     if (estQuU(s, i)) continue;
+    if (estUConsonansIntervocalicum(s, i, contextus)) continue;
     if (estVokal(s[i])) return i;
   }
   return -1;
@@ -73,8 +86,8 @@ function litteraQuantitateNotata(littera, quantitas) {
   return VOCALES_BREVES[littera] || littera;
 }
 
-function nota(textus, quantitas) {
-  const i = indexSignandiVocalis(textus);
+function nota(textus, quantitas, contextus = {}) {
+  const i = indexSignandiVocalis(textus, contextus);
   if (i < 0) return textus;
 
   if (quantitas === 'longa' && diphthongusValet(textus, i)) {
@@ -114,7 +127,8 @@ export function formaSupabaseSignata(forma) {
 
   const longae = new Set(longaeIndizesExSupabase(forma));
   return syllabae.map(function(syllaba, index) {
-    return longae.has(index) ? nota(syllaba, "longa") : syllaba;
+    const contextus = { praecedens: syllabae[index - 1] || "" };
+    return longae.has(index) ? nota(syllaba, "longa", contextus) : syllaba;
   }).join("");
 }
 
