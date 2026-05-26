@@ -33,10 +33,7 @@ function diphthongusValet(textus, index) {
 }
 
 function indexSignandiVocalis(textus) {
-  const s = String(textus || "").toLowerCase();
-  const ui = s.indexOf("ui");
-  if (ui >= 0) return ui + 1;
-
+  const s = String(textus || "");
   const ia = s.indexOf("ia");
   if (ia >= 0) return ia + 1;
 
