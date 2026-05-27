@@ -14,8 +14,31 @@ function istFormaHexameterCompatibilis(sigla) {
 function liesLongaeSigla(card) {
   const meta = card.querySelector('.forma-meta');
   const textus = meta?.textContent || '';
-  const match = textus.match(/longae:\s*([LB]+)/i);
+  const match = textus.match(/longae:\s*([LB()]+)/i);
   return match ? match[1] : '';
+}
+
+function siglaOhneElidierteUltima(sigla) {
+  return String(sigla || '')
+    .toUpperCase()
+    .replace(/\(([LB])\)\s*$/, '')
+    .replace(/[^LB]/g, '');
+}
+
+function istElidierbaresWort(textus) {
+  const s = String(textus || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/͞/g, '');
+
+  return /[aeiouy]m?$/.test(s);
+}
+
+function siglaMitElidierterUltima(sigla, textus) {
+  const s = String(sigla || '').toUpperCase().replace(/[^LB]/g, '');
+  if (!s || s.length < 2 || !istElidierbaresWort(textus)) return s;
+  return `${s.slice(0, -1)}(${s.slice(-1)})`;
 }
 
 function entferneGlobaleCompatibilitasMetrica() {
@@ -27,11 +50,22 @@ function entferneGlobaleCompatibilitasMetrica() {
   });
 }
 
+function aktualisiereMetaMitElision(card, siglaElidenda) {
+  const meta = card.querySelector('.forma-meta');
+  if (!meta || !siglaElidenda) return;
+
+  meta.textContent = meta.textContent.replace(/longae:\s*[LB()]+/i, `longae: ${siglaElidenda}`);
+}
+
 function markiereFormaeMetricae() {
   document.querySelectorAll('.forma-card').forEach(card => {
     const sigla = liesLongaeSigla(card);
-    const compatibilis = istFormaHexameterCompatibilis(sigla);
+    const textus = card.querySelector('.forma-prima')?.textContent || '';
+    const siglaElidenda = siglaMitElidierterUltima(sigla, textus);
+    const basisSigla = siglaOhneElidierteUltima(siglaElidenda);
+    const compatibilis = istFormaHexameterCompatibilis(basisSigla);
 
+    aktualisiereMetaMitElision(card, siglaElidenda);
     card.classList.toggle('forma-metrice-bona', compatibilis);
     card.classList.toggle('forma-metrice-dubia', !compatibilis);
   });
