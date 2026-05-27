@@ -53,7 +53,7 @@
     function formaSignataHtml(forma){   forma=formaCorrecta(forma);   const syllabae=String(forma?.syllabae||'').split('.').filter(Boolean);   let html=syllabae.length     ? syllabae.map((s,i)=>longaeSiglaSignandae(forma)[i]==='L'?notaLongaHtml(s,{praecedens:syllabae[i-1]||''}):escapeHtml(s)).join('')     : escapeHtml(forma?.forma||forma?.lemma||'');    if (/^[A-ZĀĒĪŌŪȲ]/.test(forma?.lemma||lemma||'')) {     html = html.charAt(0).toUpperCase() + html.slice(1);   }    return html; }
     function estNomenProprium(){return/^[A-ZĀĒĪŌŪȲ]/.test(lemmaDisplayActuale||'');}
     function formaProLemma(forma){   const textus=formaSignata(forma);   if(!textus)return '—';   if(estNomenProprium())return textus.charAt(0).toUpperCase()+textus.slice(1);   return textus; }
-    function formaProLemmaHtml(forma){const html=formaSignataHtml(forma);if(!estNomenProprium()||!html)return html||'—';const textus=formaSignata(forma);return escapeHtml(textus.charAt(0))+html.slice(escapeHtml(textus.charAt(0)).length);}
+    function formaProLemmaHtml(forma){const html=formaSignataHtml(forma);return html||'—';}
     function breviaSyllabam(syllaba){return String(syllaba||'').replace(/[aeiouyAEIOUY]/,l=>breves[l]||l);}
     function estIambusCorreptibilis(forma){const syllabae=String(forma?.syllabae||'').split('.').filter(Boolean);return syllabae.length===2&&longaeSiglaMetricae(forma)==='BL';}
     function formaIambiceCorrepta(forma){const syllabae=String(forma?.syllabae||'').split('.').filter(Boolean);if(syllabae.length!==2)return'';return syllabae[0]+breviaSyllabam(syllabae[1]);}
