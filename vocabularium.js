@@ -199,7 +199,7 @@ function syncDeclinationesSubstantivi() {
 function suggestioButtons() { return Array.from(suggestiones.querySelectorAll('.vocabularium-suggestio')); }
 function setzeSuggestioSelecta(index) { const buttons = suggestioButtons(); if (!buttons.length) { suggestioSelectaIndex = -1; return; } suggestioSelectaIndex = Math.max(0, Math.min(index, buttons.length - 1)); buttons.forEach((b,i) => { b.classList.toggle('is-selected', i === suggestioSelectaIndex); b.setAttribute('aria-selected', i === suggestioSelectaIndex ? 'true' : 'false'); }); buttons[suggestioSelectaIndex].scrollIntoView({ block:'nearest' }); }
 function leereSuggestiones() { suggestiones.innerHTML = ''; suggestiones.style.display = 'none'; suggestioSelectaIndex = -1; nullusEventusLemma = ''; }
-function aperiLemma(lemma) { if (lemma) window.location.href = `lemma.html?lemma=${encodeURIComponent(lemma)}`; }
+function aperiLemma(lemma, lexemeId = '') {   if (lexemeId) {     window.location.href = `lemma.html?lexeme_id=${encodeURIComponent(lexemeId)}`;     return;   }    if (lemma) {     window.location.href = `lemma.html?lemma=${encodeURIComponent(lemma)}`;   } }
 function statusAdde(textus) { const p = document.getElementById('addeStatus'); if (p) p.textContent = textus || ''; }
 function syncAddeForm() {
   const lemma = document.getElementById('addeLemma')?.value.trim() || '';
@@ -245,11 +245,11 @@ function oeffneSuggestioSelecta() { const b = suggestioButtons()[suggestioSelect
 async function quaereSuggestiones() {
   if (!window.whatseposSupabase || !input) return;
   const qOriginal = input.value.trim(); const q = normalisiere(qOriginal); leereSuggestiones(); if (q.length < 2) return;
-  const { data, error } = await window.whatseposSupabase.from('formae').select('forma, lemma, pars_orationis, syllabae, longae').ilike('lemma', `${q}%`).limit(10);
+  const { data, error } = await window.whatseposSupabase.from('formae').select('forma, lemma, pars_orationis, syllabae, longae, lexeme_id').ilike('lemma', `${q}%`).limit(10);
   if (error) return;
   if (!data || !data.length) { nullusEventusLemma = qOriginal; erzeugeAddeSuggestio(qOriginal); return; }
   const visa = new Set();
-  data.forEach(item => { if (!item.lemma || visa.has(item.lemma)) return; visa.add(item.lemma); const b = document.createElement('button'); b.type='button'; b.className='vocabularium-suggestio'; b.dataset.lemma=item.lemma; b.setAttribute('role','option'); b.style.cssText='display:block;width:100%;text-align:left;padding:14px 18px;border:none;background:white;cursor:pointer;border-bottom:1px solid #eee'; const strong=document.createElement('strong'); strong.textContent=formaSupabaseSignata({ ...item, forma:item.lemma }) || item.lemma; const span=document.createElement('span'); span.style.color='#6b7280'; span.textContent=` ${item.pars_orationis || ''}`; b.appendChild(strong); b.appendChild(span); b.addEventListener('mouseenter', () => { const i=suggestioButtons().indexOf(b); if (i >= 0) setzeSuggestioSelecta(i); }); b.addEventListener('mousedown', e => { e.preventDefault(); aperiLemma(item.lemma); }); suggestiones.appendChild(b); });
+  data.forEach(item => { if (!item.lemma || visa.has(item.lemma)) return; visa.add(item.lemma); const b = document.createElement('button'); b.type='button'; b.className='vocabularium-suggestio'; b.dataset.lemma=item.lemma; b.setAttribute('role','option'); b.style.cssText='display:block;width:100%;text-align:left;padding:14px 18px;border:none;background:white;cursor:pointer;border-bottom:1px solid #eee'; const strong=document.createElement('strong'); strong.textContent=formaSupabaseSignata({ ...item, forma:item.lemma }) || item.lemma; const span=document.createElement('span'); span.style.color='#6b7280'; span.textContent=` ${item.pars_orationis || ''}`; b.appendChild(strong); b.appendChild(span); b.addEventListener('mouseenter', () => { const i=suggestioButtons().indexOf(b); if (i >= 0) setzeSuggestioSelecta(i); }); b.addEventListener('mousedown', e => { e.preventDefault(); aperiLemma(item.lemma, item.lexeme_id); }); suggestiones.appendChild(b); });
   if (suggestiones.children.length > 0) { suggestiones.style.display='block'; setzeSuggestioSelecta(0); }
 }
 async function speichereAddeFormular() {
