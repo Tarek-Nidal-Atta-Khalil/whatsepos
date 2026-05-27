@@ -62,7 +62,10 @@
     function formaSignataHtml(forma){forma=formaCorrecta(forma);const syllabae=String(forma?.syllabae||'').split('.').filter(Boolean);let html=syllabae.length?syllabae.map((s,i)=>longaeSiglaSignandae(forma)[i]==='L'?notaLongaHtml(s,{praecedens:syllabae[i-1]||''}):escapeHtml(s)).join(''):escapeHtml(forma?.forma||forma?.lemma||'');if(initialisMaiuscula(forma)&&html)html=html.charAt(0).toUpperCase()+html.slice(1);return html;}
     function formaProLemmaHtml(forma){return formaSignataHtml(forma)||'—';}
     function breviaSyllabam(syllaba){return String(syllaba||'').replace(/[aeiouyAEIOUY]/,l=>breves[l]||l);}
-    function estIambusCorreptibilis(forma){const syllabae=String(forma?.syllabae||'').split('.').filter(Boolean);return syllabae.length===2&&longaeSiglaMetricae(forma)==='BL';}
+    function estAblativusSingularisLongaeDeclinationis(forma){if(normalisiere(forma?.casus)!=='abl'||normalisiere(forma?.numerus)!=='sg')return false;return /[aoieu]$/.test(normalisiere(forma?.forma||''));}
+    function syllabaNaturaliterLongaEst(forma,index){const syllabae=String(forma?.syllabae||'').split('.').filter(Boolean);const dataLongae=new Set(longaeIndices(forma));const syllaba=syllabae[index]||'';return dataLongae.has(index)||syllabaDiphthongoLongaEst(syllaba)||syllabaMacronLongaEst(syllaba);}
+    function syllabaNaturaliterBrevisEst(forma,index){return !syllabaNaturaliterLongaEst(forma,index);}
+    function estIambusCorreptibilis(forma){const syllabae=String(forma?.syllabae||'').split('.').filter(Boolean);return syllabae.length===2&&syllabaNaturaliterBrevisEst(forma,0)&&syllabaNaturaliterLongaEst(forma,1)&&!estAblativusSingularisLongaeDeclinationis(forma);}
     function formaIambiceCorrepta(forma){const syllabae=String(forma?.syllabae||'').split('.').filter(Boolean);if(syllabae.length!==2)return'';return syllabae[0]+breviaSyllabam(syllabae[1]);}
     function istElidierbar(textus){const s=sineMacris(textus).toLowerCase().replace(/͞/g,'');return /[aeiouy]m?$/.test(s);}
     function siglaMitElision(sigla,textus){const s=String(sigla||'').toUpperCase().replace(/[^LB]/g,'');if(!s||s.length<2||!istElidierbar(textus))return s;return `${s.slice(0,-1)}(${s.slice(-1)})`;}
