@@ -6,9 +6,14 @@ function normalisiereVocabulariumEnter(textus) {
     .replace(/v/g, 'u');
 }
 
-function oeffneLemmaVocabulariumEnter(lemma) {
-  if (lemma) {
-    window.location.href = `lemma.html?lemma=${encodeURIComponent(lemma)}`;
+function oeffneLemmaVocabulariumEnter(item) {
+  if (item && item.lexeme_id) {
+    window.location.href = `lemma.html?lexeme_id=${encodeURIComponent(item.lexeme_id)}`;
+    return;
+  }
+
+  if (item && item.lemma) {
+    window.location.href = `lemma.html?lemma=${encodeURIComponent(item.lemma)}`;
   }
 }
 
@@ -18,20 +23,37 @@ async function sucheUndOeffneVocabulariumLemma(input) {
 
   if (!q || q.length < 2 || !window.whatseposSupabase) return;
 
-  const { data, error } = await window.whatseposSupabase
+  const basis = 'forma, lemma, pars_orationis, lexeme_id';
+
+  const formaeResult = await window.whatseposSupabase
     .from('formae')
-    .select('lemma')
-    .ilike('lemma', `${q}%`)
-    .limit(10);
+    .select(basis)
+    .ilike('forma', `${q}%`)
+    .limit(20);
 
-  if (error) return;
+  if (formaeResult.error) return;
 
-  const lemmata = Array.from(new Set((data || []).map(item => item.lemma).filter(Boolean)));
-  const exakt = lemmata.find(lemma => normalisiereVocabulariumEnter(lemma) === q);
-  const lemma = exakt || lemmata[0];
+  let resultata = formaeResult.data || [];
 
-  if (lemma) {
-    oeffneLemmaVocabulariumEnter(lemma);
+  if (!resultata.length) {
+    const lemmaResult = await window.whatseposSupabase
+      .from('formae')
+      .select(basis)
+      .ilike('lemma', `${q}%`)
+      .limit(20);
+
+    if (lemmaResult.error) return;
+    resultata = lemmaResult.data || [];
+  }
+
+  const exakt = resultata.find(item =>
+    normalisiereVocabulariumEnter(item.forma) === q ||
+    normalisiereVocabulariumEnter(item.lemma) === q
+  );
+  const item = exakt || resultata[0];
+
+  if (item && (item.lemma || item.lexeme_id)) {
+    oeffneLemmaVocabulariumEnter(item);
     return;
   }
 
