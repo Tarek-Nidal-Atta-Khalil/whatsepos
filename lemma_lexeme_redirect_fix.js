@@ -5,10 +5,13 @@ async function whatseposLemmaLexemeRedirectFix() {
 
   if (lemma || !lexemeId) return;
 
-  const supabaseGlobal = window.whatseposSupabase;
-  if (!supabaseGlobal) return;
+  const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2');
+  const supabase = createClient(
+    'https://sdjhpovsechtfdwwakmm.supabase.co',
+    'sb_publishable_HZQ-cYsIytBAD899kSCMag_I32Qeabd'
+  );
 
-  const { data, error } = await supabaseGlobal
+  const { data, error } = await supabase
     .from('formae')
     .select('lemma')
     .eq('lexeme_id', lexemeId)
