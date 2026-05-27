@@ -1,0 +1,41 @@
+function whatseposNorm(textus) {
+  return String(textus || '')
+    .trim()
+    .toLowerCase()
+    .replace(/j/g, 'i')
+    .replace(/v/g, 'u');
+}
+
+function whatseposDisplayLemma(textus) {
+  const roh = String(textus || '');
+  const norm = whatseposNorm(roh);
+
+  if (norm.startsWith('lauini')) {
+    return 'Lauini' + norm.slice('lauini'.length);
+  }
+
+  return roh;
+}
+
+function repariereVocabulariumSuggestionesGrossschreibung() {
+  const suggestiones = document.getElementById('vocabulariumSuggestiones');
+  if (!suggestiones) return;
+
+  suggestiones.querySelectorAll('.vocabularium-suggestio strong').forEach(strong => {
+    strong.textContent = whatseposDisplayLemma(strong.textContent);
+  });
+}
+
+const observer = new MutationObserver(repariereVocabulariumSuggestionesGrossschreibung);
+
+function starteVocabulariumGrossschreibungFix() {
+  const suggestiones = document.getElementById('vocabulariumSuggestiones');
+  if (!suggestiones) return;
+
+  observer.observe(suggestiones, { childList: true, subtree: true, characterData: true });
+  repariereVocabulariumSuggestionesGrossschreibung();
+}
+
+window.addEventListener('DOMContentLoaded', starteVocabulariumGrossschreibungFix);
+setTimeout(starteVocabulariumGrossschreibungFix, 250);
+setTimeout(starteVocabulariumGrossschreibungFix, 1000);
