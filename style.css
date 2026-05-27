@@ -48,6 +48,17 @@ body > h1 {
   padding: 5px 10px;
 }
 
+#lemmaTitulus {
+  font-size: 72px;
+  font-weight: 700;
+  text-align: left;
+  margin: 0;
+}
+
+#lemmaPars {
+  text-align: left;
+}
+
 .status { min-height: 1.5em; margin-top: 10px; }
 
 #menuButton {
