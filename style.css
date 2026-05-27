@@ -33,10 +33,6 @@ input {
   width: min(100%, 320px);
 }
 
-h1 {
-  margin: 0;
-}
-
 body > h1 {
   position: fixed;
   top: 20px;
@@ -46,10 +42,6 @@ body > h1 {
   z-index: 1001;
   background: white;
   padding: 5px 10px;
-}
-
-#lemmaTitulus {
-  text-align: left;
 }
 
 .status { min-height: 1.5em; margin-top: 10px; }
@@ -126,3 +118,174 @@ body > h1 {
 }
 .auth-karte h2 { margin-top: 0; margin-bottom: 12px; font-size: 42px; }
 .auth-hinweis { color: #6b7280; line-height: 1.6; }
+.auth-register-karte { background: linear-gradient(135deg, #84cc16, #65a30d); color: white; }
+.auth-register-karte .auth-hinweis { color: rgba(255,255,255,.92); }
+.auth-primary,
+.auth-cta {
+  width: 100%;
+  margin-top: 18px;
+  padding: 18px 28px;
+  border: none;
+  border-radius: 18px;
+  font-size: 24px;
+  font-weight: bold;
+}
+.auth-primary { background: #111827; color: white; }
+.auth-cta { background: #84cc16; color: white; }
+.auth-secondary {
+  width: 100%;
+  margin-top: 12px;
+  padding: 14px 24px;
+  border: 2px solid #d1d5db;
+  border-radius: 18px;
+  background: white;
+  color: #374151;
+  font-weight: bold;
+}
+
+#meineTexteListe { margin-top: 30px; text-align: left; }
+.titel-kopfzeile,
+.titel-zeile {
+  display: grid;
+  grid-template-columns: 120px minmax(260px, 1fr) 180px 180px 50px;
+  align-items: center;
+  gap: 14px;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.titel-kopfzeile { font-weight: bold; font-size: 20px; padding: 8px 12px; border-bottom: 2px solid #999; margin-top: 24px; margin-bottom: 12px; }
+.titel-zeile { position: relative; padding: 8px 12px; font-size: 22px; border-radius: 10px; cursor: pointer; }
+.titel-zeile:hover { background: #dbeafe; }
+.titel-spalte { text-align: left; }
+.datum-spalte { text-align: center; font-size: 18px; }
+.veroeffentlichen-knopf { width: 110px; padding: 8px 12px; border: none; border-radius: 12px; background: #d4af37; color: #4a2f00; font-weight: bold; font-size: 18px; }
+.loesch-knopf { width: 38px; height: 38px; border: none; border-radius: 12px; background: #dc2626; color: white; font-size: 22px; font-weight: bold; padding: 0; }
+
+#scriptoriumLayout { display: block; }
+#poemArea { position: relative; height: calc(100vh - 220px); margin-right: 340px; }
+#nuntii { position: absolute; top: 0; left: 0; right: 0; bottom: 170px; overflow-y: auto; text-align: center; padding-bottom: 20px; display: flex; flex-direction: column; justify-content: flex-end; }
+.nuntius { padding: 6px 0; font-size: 24px; white-space: pre-wrap; }
+#campus {
+  position: fixed;
+  bottom: 32px;
+  left: calc((100vw - 340px) / 2);
+  transform: translateX(-50%);
+  width: min(40vw, calc(100vw - 390px));
+  max-width: 620px;
+  min-width: 360px;
+  height: 54px;
+  resize: none;
+  text-align: center;
+  font-size: 22px;
+  line-height: 30px;
+  padding: 10px 22px;
+  border: 2px solid #d1d5db;
+  border-radius: 999px;
+  background: white;
+  box-shadow: 0 8px 24px rgba(0,0,0,.12);
+  outline: none;
+  z-index: 950;
+}
+#hexameterVorschau { position: fixed; bottom: 98px; left: calc((100vw - 340px) / 2); transform: translateX(-50%); width: min(76vw, calc(100vw - 390px)); min-height: 36px; display: flex; justify-content: center; gap: 8px; white-space: nowrap; overflow-x: auto; z-index: 950; }
+.verbum-ok,.verbum-malum { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 18px; font-weight: 600; }
+.verbum-ok { background: #dcfce7; color: #166534; }
+.verbum-malum { background: #fee2e2; color: #991b1b; }
+
+#suggestionesMetricae {
+  position: fixed;
+  top: 120px;
+  right: 0;
+  bottom: 24px;
+  width: 300px;
+  min-width: 300px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-right: none;
+  border-radius: 24px 0 0 24px;
+  padding: 20px;
+  box-shadow: -12px 0 30px rgba(0,0,0,.08);
+  text-align: left;
+  z-index: 900;
+}
+.suggestio-item { display: block; width: 100%; box-sizing: border-box; padding: 8px 12px; border-radius: 12px; background: #f8fafc; font-size: 18px; }
+
+/* Vocabularium */
+#vocabularium {
+  max-width: 1100px;
+  margin: 120px auto 40px;
+  position: relative;
+}
+
+#vocabulariumQuaere {
+  display: block;
+  width: min(100%, 760px);
+  margin: 0 auto;
+  padding: 16px 22px;
+  font-size: 24px;
+  line-height: 1.2;
+  border-radius: 22px;
+  border: 2px solid #d1d5db;
+  background: #ffffff;
+  box-shadow: 0 8px 24px rgba(0,0,0,.08);
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+#vocabulariumQuaere:focus { outline: none; border-color: #93c5fd; box-shadow: 0 0 0 4px rgba(147,197,253,.28), 0 10px 28px rgba(0,0,0,.10); }
+#vocabulariumQuaere::placeholder { color: #9ca3af; }
+#vocabulariumSuggestiones { width: min(100%, 760px); margin: 8px auto 0; background: white; border: 1px solid #e5e7eb; border-radius: 0 0 18px 18px; box-shadow: 0 12px 28px rgba(0,0,0,.10); overflow: hidden; text-align: left; z-index: 1200; }
+.vocabularium-suggestio { display: block; width: 100%; margin: 0; padding: 12px 20px; border: none; border-bottom: 1px solid #f3f4f6; border-radius: 0; background: white; color: #111827; font-size: 18px; text-align: left; cursor: pointer; }
+.vocabularium-suggestio span { color: #6b7280; font-size: 16px; margin-left: 8px; }
+#vocabulariumEventus { margin-top: 32px; }
+.vocabularium-tabelle { width: min(100%, 920px); margin: 0 auto; border-collapse: collapse; background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,.06); }
+.vocabularium-tabelle thead { background: #f3f4f6; }
+.vocabularium-tabelle th { text-align: left; padding: 14px 20px; font-size: 16px; letter-spacing: .03em; color: #4b5563; }
+.vocabularium-tabelle td { padding: 16px 20px; font-size: 19px; border-top: 1px solid #e5e7eb; text-align: left; }
+.vocabularium-tabelle tbody tr { transition: background .12s ease; cursor: pointer; }
+.vocabularium-tabelle tbody tr:hover { background: #f9fafb; }
+
+/* Lemma pages */
+#lemmaTitulus { font-size: 2.6rem !important; line-height: 1.08; margin-bottom: .25rem; }
+#lemmaPars { font-size: 1rem !important; color: #6b7280; }
+.lemma-card { padding: 2.2rem 2.8rem !important; border-radius: 22px !important; }
+.lemma-section { margin-top: 1.6rem !important; }
+.lemma-section h2 { font-size: 1.45rem !important; margin-bottom: .65rem !important; }
+.lemma-section p { font-size: 1rem !important; line-height: 1.45 !important; }
+.flexio-numerus { font-size: 1.05rem !important; margin-top: 1.2rem !important; }
+.flexio-tabelle th,
+.flexio-tabelle td { font-size: .92rem !important; padding: .52rem .72rem !important; }
+
+/* refined diphthong macrons */
+.diphthongus {
+  position: relative !important;
+  display: inline-block !important;
+  line-height: 1 !important;
+}
+.diphthongus::before {
+  content: "" !important;
+  position: absolute !important;
+  left: .10em !important;
+  right: .10em !important;
+  top: .06em !important;
+  border-top: .038em solid currentColor !important;
+  border-radius: 999px !important;
+  opacity: .88 !important;
+}
+
+/* Stronger than lemma.html's inline macron rules. */
+html body #lemmaTitulus .diphthongus::before,
+html body .forma-prima .diphthongus::before,
+html body .flexio-tabelle .diphthongus::before,
+html body .lemma-card .diphthongus::before {
+  top: .10em !important;
+  border-top-width: .08em !important;
+  opacity: 1 !important;
+}
+
+@media (max-width: 900px) {
+  .container { width: calc(100% - 40px); }
+  #poemArea { margin-right: 0; }
+  #suggestionesMetricae { top: auto; left: 0; right: 0; bottom: 0; width: auto; min-width: 0; height: 180px; border-radius: 24px 24px 0 0; }
+  #hexameterVorschau,
+  #campus { left: 50%; width: calc(100vw - 40px); max-width: calc(100vw - 40px); }
+}
