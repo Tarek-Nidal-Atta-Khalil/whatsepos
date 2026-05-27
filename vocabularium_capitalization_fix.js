@@ -22,17 +22,25 @@ function repariereVocabulariumSuggestionesGrossschreibung() {
   if (!suggestiones) return;
 
   suggestiones.querySelectorAll('.vocabularium-suggestio strong').forEach(strong => {
-    strong.textContent = whatseposDisplayLemma(strong.textContent);
+    const korrigiert = whatseposDisplayLemma(strong.textContent);
+
+    if (strong.textContent !== korrigiert) {
+      strong.textContent = korrigiert;
+    }
   });
 }
 
-const observer = new MutationObserver(repariereVocabulariumSuggestionesGrossschreibung);
-
 function starteVocabulariumGrossschreibungFix() {
   const suggestiones = document.getElementById('vocabulariumSuggestiones');
-  if (!suggestiones) return;
+  if (!suggestiones || suggestiones.dataset.capitalizationFix === 'true') return;
 
-  observer.observe(suggestiones, { childList: true, subtree: true, characterData: true });
+  suggestiones.dataset.capitalizationFix = 'true';
+
+  const observer = new MutationObserver(() => {
+    window.requestAnimationFrame(repariereVocabulariumSuggestionesGrossschreibung);
+  });
+
+  observer.observe(suggestiones, { childList: true, subtree: true });
   repariereVocabulariumSuggestionesGrossschreibung();
 }
 
