@@ -1,9 +1,21 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { erstelleAnalysezeile, pruefeVersVorlaeufig, setzeFormaeMetricas } from "./hexameter.js?v=20260520-longae-pipeline-2";
 
+const sideMenu = document.getElementById("sideMenu");
+const menuButton = document.getElementById("menuButton");
+
 window.toggleMenu = function () {
-  document.getElementById("sideMenu").classList.toggle("open");
+  sideMenu.classList.toggle("open");
 };
+
+document.addEventListener("click", function (event) {
+  const klickImMenu = sideMenu.contains(event.target);
+  const klickAufButton = menuButton.contains(event.target);
+
+  if (!klickImMenu && !klickAufButton) {
+    sideMenu.classList.remove("open");
+  }
+});
 
 async function legeGedichtMitTitelAn() {
   const titulus = titelEingabe.value.trim();
