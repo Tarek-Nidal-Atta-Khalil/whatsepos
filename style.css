@@ -34,6 +34,10 @@ input {
 }
 
 h1 {
+  margin: 0;
+}
+
+body > h1 {
   position: fixed;
   top: 20px;
   right: 20px;
@@ -42,18 +46,6 @@ h1 {
   z-index: 1001;
   background: white;
   padding: 5px 10px;
-}
-
-#lemmaTitulus {
-  position: static !important;
-  top: auto !important;
-  right: auto !important;
-  z-index: auto !important;
-  background: transparent !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  font-size: 72px !important;
-  text-align: left !important;
 }
 
 .status { min-height: 1.5em; margin-top: 10px; }
