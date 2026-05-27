@@ -289,3 +289,14 @@ html body .lemma-card .diphthongus::before {
   #hexameterVorschau,
   #campus { left: 50%; width: calc(100vw - 40px); max-width: calc(100vw - 40px); }
 }
+
+#siteTitle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  margin: 0;
+  font-size: 32px;
+  z-index: 1001;
+  background: white;
+  padding: 5px 10px;
+}
