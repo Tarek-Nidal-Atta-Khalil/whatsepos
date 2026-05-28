@@ -218,7 +218,9 @@ function resyllabificaElemente(elemente, textus) {
     }
   }
 
-  return positioniere(resultatum).map(e => ({
+  const cumIConsonante = aplicaIConsonansIntervocalicum(resultatum);
+
+  return positioniere(cumIConsonante).map(e => ({
     ...e,
     textusSignatus: nota(e.textus, e.quantitas),
     signum: signumQuantitatis(e.quantitas)
