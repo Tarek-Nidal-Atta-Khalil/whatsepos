@@ -156,9 +156,31 @@ function positioniere(elemente) {
   });
 }
 
+function aplicaIConsonansIntervocalicum(elemente) {
+  const resultatum = (elemente || []).map(e => ({ ...e }));
+
+  for (let i = 0; i < resultatum.length - 1; i += 1) {
+    const links = resultatum[i];
+    const rechts = resultatum[i + 1];
+
+    const l = String(links.textus || "");
+    const r = String(rechts.textus || "");
+
+    if (!l || !r) continue;
+    if (!estVokal(l[l.length - 1])) continue;
+    if (r[0] !== "i") continue;
+    if (!estVokal(r[1])) continue;
+
+    links.textus = l + "j";
+    rechts.textus = "j" + r.slice(1);
+  }
+
+  return resultatum;
+}
+
 function resyllabificaElemente(elemente, textus) {
   const grenzen = wordBoundaries(textus);
-  const resultatum = positioniere(elemente).map(e => ({ ...e }));
+  const resultatum = positioniere(aplicaIConsonansIntervocalicum(elemente)).map(e => ({ ...e }));
 
   for (let i = 0; i < resultatum.length - 1; i += 1) {
     const links = resultatum[i];
