@@ -403,13 +403,7 @@ function zeigeFormaeMetricae(formae) {
     const clavis = [
       textus,
       forma.syllabae || '',
-      sigla,
-      forma.pars_orationis || '',
-      forma.tempus || '',
-      forma.modus || '',
-      forma.vox || '',
-      forma.persona || '',
-      forma.numerus || ''
+      sigla
     ].join('|');
 
     if (visa.has(clavis)) return;
