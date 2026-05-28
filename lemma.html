@@ -493,7 +493,7 @@ formae.forEach(raw => {
 
   const siglaRoh = habetSyllabas ? longaeSiglaMetricae(forma) : '';
   const textus = formaSignata(forma);
-  const sigla = habetSyllabas ? siglaMitElision(siglaRoh, textus) : '';
+  const sigla = habetSyllabas ? siglaMitElisionEtLiaison(forma, siglaRoh, textus) : '';
 
   const clavis = [
     textus,
