@@ -25,7 +25,49 @@ const personae=[['1','sg','1. Sg.'],['2','sg','2. Sg.'],['3','sg','3. Sg.'],['1'
 function escapeHtml(t){return String(t||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 function sineMacris(t){return String(t||'').replace(/[āăáàâä]/g,'a').replace(/[ēĕéèêë]/g,'e').replace(/[īĭíìîï]/g,'i').replace(/[ōŏóòôö]/g,'o').replace(/[ūŭúùûü]/g,'u').replace(/[ȳýỳŷÿ]/g,'y').replace(/[ĀĂÁÀÂÄ]/g,'A').replace(/[ĒĔÉÈÊË]/g,'E').replace(/[ĪĬÍÌÎÏ]/g,'I').replace(/[ŌŎÓÒÔÖ]/g,'O').replace(/[ŪŬÚÙÛÜ]/g,'U').replace(/[ȲÝỲŶŸ]/g,'Y');}
 function normalisiere(t){return sineMacris(t).trim().toLowerCase().replace(/j/g,'i').replace(/v/g,'u');}
-function normalisiereModus(m){const s=normalisiere(m);if(['ind','indicativus','indicative'].includes(s))return'ind';if(['coni','conj','coniunctivus','conjunctivus','subi','subj','subiunctivus','subjunctivus'].includes(s))return'coni';if(['imp','imper','imperativus','imperative'].includes(s))return'imp';if(['inf','infinitivus','infinitive'].includes(s))return'inf';if(['part','participium','participialis','participle'].includes(s))return'part';if(['ger','gerundivum','gerundive'].includes(s))return'gerundivum';return s;}
+function normalisiereModus(m){
+  const s=normalisiere(m);
+  if(['ind','indicativus','indicative'].includes(s))
+    return'ind';
+  if(['coni','conj','coniunctivus','conjunctivus','subi','subj','subiunctivus','subjunctivus'].includes(s))
+    return'coni';
+  if(['imp','imper','imperativus','imperative'].includes(s))
+    return'imp';
+  if(['inf','infinitivus','infinitive'].includes(s))
+    return'inf';
+  if(['part','participium','participialis','participle'].includes(s))
+    return'part';
+  if(['ger','gerundivum','gerundive'].includes(s))
+    return'gerundivum';
+  return s;
+}
+
+function normalisiereTempus(t){
+  const s = normalisiere(t);
+
+  if (['praes', 'praesens', 'pres', 'present'].includes(s)) return 'praes';
+  if (['imperf', 'imperfectum', 'imperfect'].includes(s)) return 'imperf';
+  if (['fut', 'futurum', 'future'].includes(s)) return 'fut';
+  if (['perf', 'perfectum', 'perfect'].includes(s)) return 'perf';
+  if (['plqpf', 'plusquamperfectum', 'plusquamperfekt'].includes(s)) return 'plqpf';
+  if (['futperf', 'futurum_exactum', 'futurum exactum'].includes(s)) return 'futperf';
+
+  return s;
+}
+
+function normalisierePars(p){
+  const s = normalisiere(p);
+
+  if (['verb', 'verbum'].includes(s)) return 'verbum';
+  if (['inf', 'infinitiv', 'infinitivus', 'infinitivum', 'infinitive'].includes(s)) return 'infinitivus';
+  if (['part', 'participium', 'participialis', 'participle'].includes(s)) return 'participium';
+  if (['ger', 'gerundiv', 'gerundivum', 'gerundivus', 'gerundive'].includes(s)) return 'gerundivum';
+  if (['supinum1', 'supinum_i', 'supinum i', 'supinum primum'].includes(s)) return 'supinum_i';
+  if (['supinum2', 'supinum_ii', 'supinum ii', 'supinum secundum'].includes(s)) return 'supinum_ii';
+
+  return s;
+}
+  
 function estVocalis(c){return vocales.includes(c||'');}
 function estDiphthongus(t,i){const s=sineMacris(t).toLowerCase(),duo=s.slice(i,i+2);if(!diphthongi.includes(duo))return false;if((duo==='au'||duo==='eu')&&estVocalis(s[i+2]))return false;return true;}
 function indexUltimiVocalis(t){for(let i=String(t||'').length-1;i>=0;i--)if(estVocalis(t[i]))return i;return-1;}
@@ -74,19 +116,32 @@ function formaGerundiviHtml(formae){const f=formae.find(x=>normalisiereModus(x.m
 function addeModus(tbody,t){const tr=document.createElement('tr');tr.className='verbum-modus-row';const th=document.createElement('th');th.textContent=t;th.colSpan=7;tr.appendChild(th);tbody.appendChild(tr);}
 function addeVerbum(tbody,formae,label,m,t){const tr=document.createElement('tr'),th=document.createElement('th');th.textContent=label;tr.appendChild(th);personae.forEach(([p,n])=>tr.appendChild(td(formaVerbalisHtml(formae,p,n,t,m))));tbody.appendChild(tr);}
 function addeNonFin(tbody,label,html){const tr=document.createElement('tr'),th=document.createElement('th');th.textContent=label;tr.appendChild(th);const cell=td(html);cell.className='verbum-nonfinitum';cell.colSpan=6;tr.appendChild(cell);tbody.appendChild(tr);}
+
 function formaInfinitaHtml(formae, pars, tempus = null) {
+  const parsNorm = normalisierePars(pars);
+  const tempusNorm = tempus === null ? null : normalisiereTempus(tempus);
+
   const f = formae.find(x =>
-    normalisiere(x.pars_orationis) === pars &&
-    (tempus === null || x.tempus === tempus)
+    normalisierePars(x.pars_orationis) === parsNorm &&
+    (tempusNorm === null || normalisiereTempus(x.tempus) === tempusNorm)
   );
+
   return f ? formaProLemmaHtml(f) : '—';
 }
 
 function formaInfinitiviNovaHtml(formae, tempus) {
+  const tempusNorm = normalisiereTempus(tempus);
+
   const f = formae.find(x =>
-    normalisiere(x.pars_orationis) === 'infinitivus' &&
-    x.tempus === tempus
+    (
+      normalisierePars(x.pars_orationis) === 'infinitivus' ||
+      normalisiereModus(x.modus) === 'inf' ||
+      normalisiere(x.persona) === 'inf' ||
+      normalisiere(x.casus) === 'infinitivus'
+    ) &&
+    normalisiereTempus(x.tempus) === tempusNorm
   );
+
   return f ? formaProLemmaHtml(f) : '—';
 }
 
@@ -176,7 +231,7 @@ function zeigeFlexio(formae){
     return;
   }
 
-  const partes = new Set(formae.map(f => normalisiere(f.pars_orationis)));
+  const partes = new Set(formae.map(f => normalisierePars(f.pars_orationis)));
 
   const estParadigmaVerbale =
     partes.has('verbum') ||
