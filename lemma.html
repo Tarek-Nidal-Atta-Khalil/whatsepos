@@ -173,7 +173,7 @@ function formaInfinitaHtml(formae, pars, tempus = null, vox = null) {
   return f ? formaProLemmaHtml(f) : '—';
 }
 
-function addeFormaeInfinitae(tbody, formae) {
+function addeFormaeInfinitae(tbody, formae, vox = 'act') {
   addeModus(tbody, 'Formae infinitae');
 
   function addeRowSineTempore(label, html) {
@@ -190,6 +190,84 @@ function addeFormaeInfinitae(tbody, formae) {
 
     tbody.appendChild(tr);
   }
+
+  function addeRow(label, cellae) {
+    const tr = document.createElement('tr');
+
+    const th = document.createElement('th');
+    th.textContent = label;
+    tr.appendChild(th);
+
+    cellae.forEach(html => {
+      const cell = td(html);
+      cell.className = 'verbum-nonfinitum';
+      cell.colSpan = 2;
+      tr.appendChild(cell);
+    });
+
+    tbody.appendChild(tr);
+  }
+
+  if (vox === 'pass') {
+    addeRowSineTempore(
+      'Gerundivum',
+      formaInfinitaHtml(formae, 'gerundivum', null, 'pass')
+    );
+
+    addeRowSineTempore(
+      'Supinum I',
+      formaInfinitaHtml(formae, 'supinum_i')
+    );
+
+    addeRowSineTempore(
+      'Supinum II',
+      formaInfinitaHtml(formae, 'supinum_ii')
+    );
+  }
+
+  const trHead = document.createElement('tr');
+
+  const thLeer = document.createElement('th');
+  thLeer.textContent = '';
+  trHead.appendChild(thLeer);
+
+  ['Praesens', 'Perfectum', 'Futurum'].forEach(textus => {
+    const th = document.createElement('th');
+    th.textContent = textus;
+    th.colSpan = 2;
+    trHead.appendChild(th);
+  });
+
+  tbody.appendChild(trHead);
+
+  if (vox === 'act') {
+    addeRow('Infinitivus', [
+      formaInfinitaHtml(formae, 'infinitivus', 'praes', 'act'),
+      formaInfinitaHtml(formae, 'infinitivus', 'perf', 'act'),
+      formaInfinitaHtml(formae, 'infinitivus', 'fut', 'act')
+    ]);
+
+    addeRow('Participium', [
+      formaInfinitaHtml(formae, 'participium', 'praes', 'act'),
+      '—',
+      formaInfinitaHtml(formae, 'participium', 'fut', 'act')
+    ]);
+  }
+
+  if (vox === 'pass') {
+    addeRow('Infinitivus', [
+      formaInfinitaHtml(formae, 'infinitivus', 'praes', 'pass'),
+      formaInfinitaHtml(formae, 'infinitivus', 'perf', 'pass'),
+      formaInfinitaHtml(formae, 'infinitivus', 'fut', 'pass')
+    ]);
+
+    addeRow('Participium', [
+      '—',
+      formaInfinitaHtml(formae, 'participium', 'perf', 'pass'),
+      '—'
+    ]);
+  }
+}
 
   function addeRow(label, cellae) {
     const tr = document.createElement('tr');
