@@ -138,9 +138,6 @@ function formaVerbalisHtml(formae, p, n, t, m = 'ind', vox = 'act') {
   return f ? formaProLemmaHtml(f) : '—';
 }
   
-  function formaInfinitiviHtml(formae,t){const f=formae.find(x=>x.tempus===t&&(normalisiereModus(x.modus)==='inf'||normalisiere(x.persona)==='inf'||normalisiere(x.casus)==='infinitivus'));return f?formaProLemmaHtml(f):'—';}
-function formaParticipiiHtml(formae,t){const f=formae.find(x=>x.tempus===t&&(normalisiereModus(x.modus)==='part'||normalisiere(x.pars_orationis).includes('particip')));return f?formaProLemmaHtml(f):'—';}
-function formaGerundiviHtml(formae){const f=formae.find(x=>normalisiereModus(x.modus)==='gerundivum'||normalisiere(x.pars_orationis)==='gerundivum'||(normalisiereModus(x.modus)==='part'&&x.tempus==='fut'&&x.vox==='pass'));return f?formaProLemmaHtml(f):'—';}
 function addeModus(tbody,t){const tr=document.createElement('tr');tr.className='verbum-modus-row';const th=document.createElement('th');th.textContent=t;th.colSpan=7;tr.appendChild(th);tbody.appendChild(tr);}
 
 function addeVerbum(tbody, formae, label, m, t, vox = 'act') {
@@ -156,8 +153,6 @@ function addeVerbum(tbody, formae, label, m, t, vox = 'act') {
 
   tbody.appendChild(tr);
 }
-  
-function addeNonFin(tbody,label,html){const tr=document.createElement('tr'),th=document.createElement('th');th.textContent=label;tr.appendChild(th);const cell=td(html);cell.className='verbum-nonfinitum';cell.colSpan=6;tr.appendChild(cell);tbody.appendChild(tr);}
 
 function formaInfinitaHtml(formae, pars, tempus = null, vox = null) {
   const parsNorm = normalisierePars(pars);
