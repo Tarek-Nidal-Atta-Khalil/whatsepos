@@ -176,7 +176,7 @@ function siglaMitElisionEtLiaison(forma,sigla,textus){
   }
 
   if(ultimaSyllabaAnteVocalemBrevisFit(forma,s)){
-    return `${s.slice(0,-1)}B(${s.slice(-1)})`;
+    return `${s.slice(0,-1)}(${s.slice(-1)})`;
   }
 
   return s;
