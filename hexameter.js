@@ -292,6 +292,25 @@ function syllabaeFallbackWort(wort) {
   });
 }
 
+function partesInternaeContextu(partes) {
+  return partes.map(function(pars, index) {
+    let parsInterna = bereiteWortVor(pars);
+
+    const praecedens = partes[index - 1] || "";
+
+    if (
+      index > 0 &&
+      pars.startsWith("i") &&
+      estVokalInTextu(praecedens, praecedens.length - 1) &&
+      estVokalInTextu(pars, 1)
+    ) {
+      parsInterna = "j" + parsInterna;
+    }
+
+    return parsInterna;
+  });
+}
+
 function profileSupabaseWort(wort) {
   const formae = formaePerFormam.get(clavisFormae(wort)) || [];
   const profile = [];
@@ -301,7 +320,7 @@ function profileSupabaseWort(wort) {
     if (partes.length === 0) return;
     
     const longae = new Set(longaeIndizes(forma));
-    const partesInternae = partes.map(pars => bereiteWortVor(pars));
+    const partesInternae = partesInternaeContextu(partes);
     const internus = bereiteWortVor(clavisFormae(wort));
     let cursor = 0;
     
