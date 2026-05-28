@@ -58,12 +58,29 @@ function normalisiereTempus(t){
 function normalisierePars(p){
   const s = normalisiere(p);
 
-  if (['verb', 'verbum'].includes(s)) return 'verbum';
-  if (['inf', 'infinitiv', 'infinitivus', 'infinitivum', 'infinitive'].includes(s)) return 'infinitivus';
-  if (['part', 'participium', 'participialis', 'participle'].includes(s)) return 'participium';
-  if (['ger', 'gerundiv', 'gerundivum', 'gerundivus', 'gerundive'].includes(s)) return 'gerundivum';
-  if (['supinum1', 'supinum_i', 'supinum i', 'supinum primum'].includes(s)) return 'supinum_i';
-  if (['supinum2', 'supinum_ii', 'supinum ii', 'supinum secundum'].includes(s)) return 'supinum_ii';
+  if (['subst', 'substantivum', 'substantiuum'].includes(s))
+    return 'substantivum';
+
+  if (['adi', 'adiectivum', 'adiectiuum', 'adiectivus', 'adiectiuus'].includes(s))
+    return 'adiectivum';
+
+  if (['verb', 'uerb', 'verbum', 'uerbum'].includes(s))
+    return 'verbum';
+
+  if (['inf', 'infinitiv', 'infinitiu', 'infinitivus', 'infinitiuus', 'infinitivum', 'infinitiuum', 'infinitive'].includes(s))
+    return 'infinitivus';
+
+  if (['part', 'participium', 'participialis', 'participle'].includes(s))
+    return 'participium';
+
+  if (['ger', 'gerundiv', 'gerundiu', 'gerundivum', 'gerundiuum', 'gerundivus', 'gerundiuus', 'gerundive'].includes(s))
+    return 'gerundivum';
+
+  if (['supinum1', 'supinum_i', 'supinum i', 'supinum primum'].includes(s))
+    return 'supinum_i';
+
+  if (['supinum2', 'supinum_ii', 'supinum ii', 'supinum secundum'].includes(s))
+    return 'supinum_ii';
 
   return s;
 }
