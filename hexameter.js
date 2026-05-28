@@ -293,22 +293,22 @@ function syllabaeFallbackWort(wort) {
 }
 
 function partesInternaeContextu(partes) {
-  return partes.map(function(pars, index) {
-    let parsInterna = bereiteWortVor(pars);
+  const resultata = partes.map(pars => bereiteWortVor(pars));
 
+  for (let index = 1; index < partes.length; index += 1) {
     const praecedens = partes[index - 1] || "";
+    const pars = partes[index] || "";
 
     if (
-      index > 0 &&
       pars.startsWith("i") &&
       estVokalInTextu(praecedens, praecedens.length - 1) &&
       estVokalInTextu(pars, 1)
     ) {
-      parsInterna = "j" + parsInterna;
+      resultata[index - 1] += "j";
     }
+  }
 
-    return parsInterna;
-  });
+  return resultata;
 }
 
 function profileSupabaseWort(wort) {
