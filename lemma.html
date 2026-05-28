@@ -386,67 +386,97 @@ function zeigeFormaeMetricae(formae) {
 
   const visa = new Set();
 
-  formae.forEach(raw => {
-    const formaRoh = String(raw?.forma || '').trim();
+  const formaePraeparatae = [];
 
-    // Mehrwortformen wie "cantus esse", "cantum īrī" weiterhin nicht als Formenkarte
-    if (!formaRoh || formaRoh.includes(' ')) return;
+formae.forEach(raw => {
+  const formaRoh = String(raw?.forma || '').trim();
 
-    const forma = formaCorrecta(raw);
-    const syllabae = syllabaeFormae(forma);
-    const habetSyllabas = syllabae.length > 0;
+  // Mehrwortformen wie "cantus esse", "cantum īrī" weiterhin nicht als Formenkarte
+  if (!formaRoh || formaRoh.includes(' ')) return;
 
-    const siglaRoh = habetSyllabas ? longaeSiglaMetricae(forma) : '';
-    const textus = formaSignata(forma);
-    const sigla = habetSyllabas ? siglaMitElision(siglaRoh, textus) : '';
+  const forma = formaCorrecta(raw);
+  const syllabae = syllabaeFormae(forma);
+  const habetSyllabas = syllabae.length > 0;
 
-    const clavis = [
-      textus,
-      forma.syllabae || '',
-      sigla
-    ].join('|');
+  const siglaRoh = habetSyllabas ? longaeSiglaMetricae(forma) : '';
+  const textus = formaSignata(forma);
+  const sigla = habetSyllabas ? siglaMitElision(siglaRoh, textus) : '';
 
-    if (visa.has(clavis)) return;
-    visa.add(clavis);
+  const clavis = [
+    textus,
+    forma.syllabae || '',
+    sigla
+  ].join('|');
 
-    const card = document.createElement('div');
+  if (visa.has(clavis)) return;
+  visa.add(clavis);
 
-    card.className =
-      'forma-card ' +
-      (
-        habetSyllabas
-          ? (istHexameterCompatibilis(sigla) ? 'forma-metrice-bona' : 'forma-metrice-dubia')
-          : 'forma-metrice-incerta'
-      );
+  const status = habetSyllabas
+    ? (istHexameterCompatibilis(sigla) ? 'bona' : 'dubia')
+    : 'incerta';
 
-    const prima = document.createElement('div');
-    prima.className = 'forma-prima';
-    prima.innerHTML = formaProLemmaHtml(forma);
-    card.appendChild(prima);
-
-    const meta = document.createElement('div');
-    meta.className = 'forma-meta';
-
-    if (habetSyllabas) {
-      meta.textContent = [
-        forma.syllabae,
-        sigla ? `longae: ${sigla}` : ''
-      ].filter(Boolean).join(' · ');
-    } else {
-      meta.textContent = 'syllabae nondum definitae';
-    }
-
-    card.appendChild(meta);
-
-    if (habetSyllabas && estIambusCorreptibilis(forma)) {
-      const v = document.createElement('span');
-      v.className = 'forma-variante';
-      v.textContent = `iambice: ${formaIambiceCorrepta(forma)}`;
-      card.appendChild(v);
-    }
-
-    lista.appendChild(card);
+  formaePraeparatae.push({
+    forma,
+    textus,
+    sigla,
+    status,
+    ordo: formaePraeparatae.length
   });
+});
+
+formaePraeparatae.sort((a, b) => {
+  const ordoStatus = { bona: 0, dubia: 1, incerta: 2 };
+
+  return (
+    ordoStatus[a.status] - ordoStatus[b.status] ||
+    a.textus.localeCompare(b.textus, 'la') ||
+    a.ordo - b.ordo
+  );
+});
+
+formaePraeparatae.forEach(({ forma, textus, sigla, status }) => {
+  const habetSyllabas = syllabaeFormae(forma).length > 0;
+
+  const card = document.createElement('div');
+
+  card.className =
+    'forma-card ' +
+    (
+      status === 'bona'
+        ? 'forma-metrice-bona'
+        : status === 'dubia'
+          ? 'forma-metrice-dubia'
+          : 'forma-metrice-incerta'
+    );
+
+  const prima = document.createElement('div');
+  prima.className = 'forma-prima';
+  prima.innerHTML = formaProLemmaHtml(forma);
+  card.appendChild(prima);
+
+  const meta = document.createElement('div');
+  meta.className = 'forma-meta';
+
+  if (habetSyllabas) {
+    meta.textContent = [
+      forma.syllabae,
+      sigla ? `longae: ${sigla}` : ''
+    ].filter(Boolean).join(' · ');
+  } else {
+    meta.textContent = 'syllabae nondum definitae';
+  }
+
+  card.appendChild(meta);
+
+  if (habetSyllabas && estIambusCorreptibilis(forma)) {
+    const v = document.createElement('span');
+    v.className = 'forma-variante';
+    v.textContent = `iambice: ${formaIambiceCorrepta(forma)}`;
+    card.appendChild(v);
+  }
+
+  lista.appendChild(card);
+});
 
   z.appendChild(lista);
 }
