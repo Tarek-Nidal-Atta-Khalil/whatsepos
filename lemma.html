@@ -181,11 +181,11 @@ function addeFormaeInfinitae(tbody, formae) {
   }
 
   addeRow('Infinitivus', [
-    formaInfinitiviNovaHtml(formae, 'praes'),
-    formaInfinitiviNovaHtml(formae, 'perf'),
-    formaInfinitiviNovaHtml(formae, 'fut')
-  ]);
-
+  formaInfinitaHtml(formae, 'infinitivus', 'praes'),
+  formaInfinitaHtml(formae, 'infinitivus', 'perf'),
+  formaInfinitaHtml(formae, 'infinitivus', 'fut')
+]);
+  
   addeRow('Participium', [
     formaInfinitaHtml(formae, 'participium', 'praes'),
     formaInfinitaHtml(formae, 'participium', 'perf'),
