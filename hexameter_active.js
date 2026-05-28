@@ -164,6 +164,16 @@ function hatDiphthongumNachJ(textus) {
   return false;
 }
 
+function diphthongusInSyllaba(textus) {
+  const s = String(textus || "").toLowerCase();
+
+  for (let i = 0; i < s.length - 1; i += 1) {
+    if (diphthongusValet(s, i)) return true;
+  }
+
+  return false;
+}
+
 function aplicaIConsonansIntervocalicum(elemente) {
   const resultatum = (elemente || []).map(e => ({ ...e }));
 
@@ -176,15 +186,24 @@ function aplicaIConsonansIntervocalicum(elemente) {
 
     if (!l || !r) continue;
     if (!estVokal(l[l.length - 1])) continue;
-    if (r[0] !== "i") continue;
-    if (!estVokal(r[1])) continue;
 
-    links.textus = l + "j";
-    rechts.textus = "j" + r.slice(1);
+    // Fall: tro + iae → troj + jae
+    if (r[0] === "i" && estVokal(r[1])) {
+      links.textus = l + "j";
+      rechts.textus = "j" + r.slice(1);
+    }
 
-    if (hatDiphthongumNachJ(rechts.textus)) {
+    // Fall: die Basisanalyse hat schon jae erzeugt
+    else if (r[0] === "j" && estVokal(r[1])) {
+      links.textus = l + "j";
+    }
+
+    else {
+      continue;
+    }
+
+    if (diphthongusInSyllaba(rechts.textus)) {
       rechts.quantitas = "longa";
-      rechts.signum = signumQuantitatis("longa");
     }
   }
 
@@ -193,7 +212,7 @@ function aplicaIConsonansIntervocalicum(elemente) {
 
 function resyllabificaElemente(elemente, textus) {
   const grenzen = wordBoundaries(textus);
-  const resultatum = positioniere(aplicaIConsonansIntervocalicum(elemente)).map(e => ({ ...e }));
+  const resultatum = positioniere(elemente).map(e => ({ ...e }));
 
   for (let i = 0; i < resultatum.length - 1; i += 1) {
     const links = resultatum[i];
