@@ -166,6 +166,7 @@ function tabellaVerbi(formae){
                               addeModus(tbody,'Imperativus');[['Praesens','praes'],['Futurum','fut']].forEach(x=>addeVerbum(tbody,formae,x[0],'imp',x[1]));
                               addeFormaeInfinitae(tbody, formae);table.appendChild(tbody);w.appendChild(table);
   return w;}
+
 function zeigeFlexio(formae){
   const z = document.getElementById('lemmaFlexio');
   z.innerHTML = '';
@@ -179,6 +180,7 @@ function zeigeFlexio(formae){
 
   const estParadigmaVerbale =
     partes.has('verbum') ||
+    partes.has('verb') ||
     partes.has('infinitivus') ||
     partes.has('participium') ||
     partes.has('gerundivum') ||
@@ -198,6 +200,7 @@ function zeigeFlexio(formae){
   tabellaGenusNumerus(formae, 'sg').forEach(e => z.appendChild(e));
   tabellaGenusNumerus(formae, 'pl').forEach(e => z.appendChild(e));
 }
+  
 function zeigeFormaeMetricae(formae){const z=document.getElementById('lemmaFormae');z.innerHTML='';if(!formae.length){z.textContent='—';return}const lista=document.createElement('div');lista.className='formae-lista';const visa=new Set();formae.forEach(raw=>{if(String(raw?.forma||'').trim().includes(' '))return;if(!syllabaeFormae(raw).length)return;const forma=formaCorrecta(raw),siglaRoh=longaeSiglaMetricae(forma),textus=formaSignata(forma),sigla=siglaMitElision(siglaRoh,textus),clavis=[textus,forma.syllabae,sigla].join('|');if(visa.has(clavis))return;visa.add(clavis);const card=document.createElement('div');card.className='forma-card '+(istHexameterCompatibilis(sigla)?'forma-metrice-bona':'forma-metrice-dubia');const prima=document.createElement('div');prima.className='forma-prima';prima.innerHTML=formaProLemmaHtml(forma);card.appendChild(prima);const meta=document.createElement('div');meta.className='forma-meta';meta.textContent=[forma.syllabae,sigla?`longae: ${sigla}`:''].filter(Boolean).join(' · ');card.appendChild(meta);if(estIambusCorreptibilis(forma)){const v=document.createElement('span');v.className='forma-variante';v.textContent=`iambice: ${formaIambiceCorrepta(forma)}`;card.appendChild(v)}lista.appendChild(card)});z.appendChild(lista);}
 async function lemmaExLexemeId(){if(lemma||!lexemeId)return;const{data,error}=await supabase.from('formae').select('lemma').eq('lexeme_id',lexemeId).limit(1);if(!error&&data&&data[0]?.lemma){lemma=data[0].lemma;lemmaDisplayActuale=lemma}}
 async function ladeLemma(){await lemmaExLexemeId();if(!lemma&&!lexemeId)return;const lemmaNormal=normalisiere(lemma);document.getElementById('lemmaTitulus').textContent=lemma||'—';lemmaQuaere.value=lemma||'';const basis=supabase.from('formae').select('forma, lemma, pars_orationis, genus, numerus, casus, persona, tempus, modus, vox, syllabae, longae, lexeme_id');const query=lexemeId?basis.eq('lexeme_id',lexemeId):basis.ilike('lemma',lemmaNormal);const{data,error}=await query.order('forma',{ascending:true});if(error){document.getElementById('lemmaFlexio').textContent=error.message;return}const formae=(data||[]).map(formaCorrecta);const head=eligeFormamHeadword(formae);if(head){lemmaDisplayActuale=head.lemma||lemma;document.getElementById('lemmaTitulus').innerHTML=formaProLemmaHtml({...head,forma:lemmaDisplayActuale});document.getElementById('lemmaPars').textContent=head.pars_orationis||'—'}zeigeFlexio(formae);zeigeFormaeMetricae(formae);}
