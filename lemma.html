@@ -129,22 +129,6 @@ function formaInfinitaHtml(formae, pars, tempus = null) {
   return f ? formaProLemmaHtml(f) : '—';
 }
 
-function formaInfinitiviNovaHtml(formae, tempus) {
-  const tempusNorm = normalisiereTempus(tempus);
-
-  const f = formae.find(x =>
-    (
-      normalisierePars(x.pars_orationis) === 'infinitivus' ||
-      normalisiereModus(x.modus) === 'inf' ||
-      normalisiere(x.persona) === 'inf' ||
-      normalisiere(x.casus) === 'infinitivus'
-    ) &&
-    normalisiereTempus(x.tempus) === tempusNorm
-  );
-
-  return f ? formaProLemmaHtml(f) : '—';
-}
-
 function addeFormaeInfinitae(tbody, formae) {
   addeModus(tbody, 'Formae infinitae');
 
