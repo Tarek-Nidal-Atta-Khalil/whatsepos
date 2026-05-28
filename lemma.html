@@ -126,6 +126,30 @@ function indexSignandiVocalis(t,ctx={}){
 function notaLongaHtml(syllaba,ctx={}){const i=indexSignandiVocalis(syllaba,ctx);if(i<0)return escapeHtml(syllaba);if(estDiphthongus(syllaba,i))return escapeHtml(syllaba.slice(0,i))+`<span class="diphthongus">${escapeHtml(syllaba[i]+syllaba[i+1])}</span>`+escapeHtml(syllaba.slice(i+2));return escapeHtml(syllaba.slice(0,i)+(longaeNotae[syllaba[i]]||syllaba[i])+syllaba.slice(i+1));}
 function formaCorrecta(forma){const f={...forma};if(normalisiere(f.lemma||'').startsWith('lauini')||normalisiere(f.forma||'').startsWith('lauini')){const indices=new Set(longaeIndices(f));indices.add(0);indices.add(1);f.longae=[...indices].sort((a,b)=>a-b);}return f;}
 function syllabaeFormae(forma){return String(forma?.syllabae||'').split('.').filter(Boolean);}
+function syllabaeDisplayFormae(forma){
+  const syllabae = syllabaeFormae(forma)
+    .map(s => sineMacris(s).toLowerCase());
+
+  const partes = [];
+
+  syllabae.forEach((s, i) => {
+    let pars = s;
+
+    if (
+      i > 0 &&
+      pars.startsWith('i') &&
+      syllabae[i - 1] &&
+      estVocalis(syllabae[i - 1][syllabae[i - 1].length - 1])
+    ) {
+      partes[partes.length - 1] = partes[partes.length - 1] + 'j';
+      pars = 'j' + pars.slice(1);
+    }
+
+    partes.push(pars);
+  });
+
+  return partes.join('.');
+}
 function longaeSiglaMetricae(forma){forma=formaCorrecta(forma);const syllabae=syllabaeFormae(forma),dataLongae=new Set(longaeIndices(forma));return syllabae.map((s,i)=>(dataLongae.has(i)||syllabaPositioneLongaEst(syllabae,i)||syllabaDiphthongoLongaEst(s)||syllabaMacronLongaEst(s))?'L':'B').join('');}
 function longaeSiglaSignandae(forma){forma=formaCorrecta(forma);const syllabae=syllabaeFormae(forma),dataLongae=new Set(longaeIndices(forma));return syllabae.map((s,i)=>(dataLongae.has(i)||syllabaDiphthongoLongaEst(s)||syllabaMacronLongaEst(s))?'L':'B').join('');}
 function initialisMaiuscula(forma){return /^[A-ZĀĒĪŌŪȲ]/.test(String(forma?.lemma||lemmaDisplayActuale||lemma||''));}
@@ -552,7 +576,7 @@ formaePraeparatae.forEach(({ forma, textus, sigla, status }) => {
 
   if (habetSyllabas) {
     meta.textContent = [
-      forma.syllabae,
+      syllabaeDisplayFormae(forma),
       sigla ? `longae: ${sigla}` : ''
     ].filter(Boolean).join(' · ');
   } else {
