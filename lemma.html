@@ -389,25 +389,8 @@ function tabellaVerbi(formae) {
       ['Futurum', 'fut']
     ].forEach(x => addeVerbum(tbody, formae, x[0], 'imp', x[1], vox));
 
-    if (vox === 'pass') {
-  addeModus(tbody, 'Formae infinitae');
-
-  const tr = document.createElement('tr');
-
-  const th = document.createElement('th');
-  th.textContent = 'Participium perfectum';
-  tr.appendChild(th);
-
-  const cell = td(formaInfinitaHtml(formae, 'participium', 'perf', 'pass'));
-  cell.className = 'verbum-nonfinitum';
-  cell.colSpan = 6;
-  tr.appendChild(cell);
-
-  tbody.appendChild(tr);
-}
-    
     if (addereInfinita) {
-      addeFormaeInfinitae(tbody, formae);
+      addeFormaeInfinitae(tbody, formae, vox);
     }
 
     table.appendChild(tbody);
@@ -415,7 +398,7 @@ function tabellaVerbi(formae) {
   }
 
   w.appendChild(facTabellamVox('Vox activa', 'act', true));
-  w.appendChild(facTabellamVox('Vox passiva', 'pass', false));
+  w.appendChild(facTabellamVox('Vox passiva', 'pass', true));
 
   return w;
 }
