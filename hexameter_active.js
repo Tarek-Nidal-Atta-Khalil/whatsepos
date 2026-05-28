@@ -156,6 +156,14 @@ function positioniere(elemente) {
   });
 }
 
+function hatDiphthongumNachJ(textus) {
+  const s = String(textus || "").toLowerCase();
+  for (let i = 0; i < s.length - 1; i += 1) {
+    if (diphthongusValet(s, i)) return true;
+  }
+  return false;
+}
+
 function aplicaIConsonansIntervocalicum(elemente) {
   const resultatum = (elemente || []).map(e => ({ ...e }));
 
@@ -173,6 +181,11 @@ function aplicaIConsonansIntervocalicum(elemente) {
 
     links.textus = l + "j";
     rechts.textus = "j" + r.slice(1);
+
+    if (hatDiphthongumNachJ(rechts.textus)) {
+      rechts.quantitas = "longa";
+      rechts.signum = signumQuantitatis("longa");
+    }
   }
 
   return resultatum;
