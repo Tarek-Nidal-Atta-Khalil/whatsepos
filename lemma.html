@@ -94,15 +94,23 @@ function addeFormaeInfinitae(tbody, formae) {
   addeModus(tbody, 'Formae infinitae');
 
   const trHead = document.createElement('tr');
-  ['', 'Praesens', 'Perfectum', 'Futurum'].forEach(textus => {
+
+  const thLeer = document.createElement('th');
+  thLeer.textContent = '';
+  trHead.appendChild(thLeer);
+
+  ['Praesens', 'Perfectum', 'Futurum'].forEach(textus => {
     const th = document.createElement('th');
     th.textContent = textus;
+    th.colSpan = 2;
     trHead.appendChild(th);
   });
+
   tbody.appendChild(trHead);
 
   function addeRow(label, cellae) {
     const tr = document.createElement('tr');
+
     const th = document.createElement('th');
     th.textContent = label;
     tr.appendChild(th);
@@ -110,6 +118,7 @@ function addeFormaeInfinitae(tbody, formae) {
     cellae.forEach(html => {
       const cell = td(html);
       cell.className = 'verbum-nonfinitum';
+      cell.colSpan = 2;
       tr.appendChild(cell);
     });
 
