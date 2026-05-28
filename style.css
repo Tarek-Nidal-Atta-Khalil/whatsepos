@@ -300,3 +300,8 @@ html body .lemma-card .diphthongus::before {
   background: white;
   padding: 5px 10px;
 }
+
+.forma-metrice-incerta{
+  border-color:#d1d5db;
+  box-shadow:0 4px 18px rgba(107,114,128,.10);
+}
