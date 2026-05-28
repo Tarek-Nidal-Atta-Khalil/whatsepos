@@ -109,12 +109,54 @@ function tabellaSubstantivi(formae){const wrapper=document.createElement('div');
 function formaNachMetaHtml(formae,casus,numerus,genus){const f=formae.find(x=>x.casus===casus&&x.numerus===numerus&&x.genus===genus);return f?formaProLemmaHtml(f):'—';}
 function tabellaGenusNumerus(formae,numerus){const h=document.createElement('h3');h.className='flexio-numerus';h.textContent=numerus==='sg'?'Singularis':'Pluralis';const wrapper=document.createElement('div');wrapper.className='flexio-wrapper';const table=document.createElement('table');table.className='flexio-tabelle';const head=document.createElement('tr');['','masculinum','femininum','neutrum'].forEach(t=>{const th=document.createElement('th');th.textContent=t;head.appendChild(th)});const thead=document.createElement('thead');thead.appendChild(head);table.appendChild(thead);const tbody=document.createElement('tbody');casusOrdines.forEach(c=>{const tr=document.createElement('tr'),th=document.createElement('th');th.textContent=casusNomina[c];tr.appendChild(th);['m','f','n'].forEach(g=>tr.appendChild(td(formaNachMetaHtml(formae,c,numerus,g))));tbody.appendChild(tr)});table.appendChild(tbody);wrapper.appendChild(table);return[h,wrapper];}
 function modusEst(x,m){const mm=normalisiereModus(x.modus);return m==='ind'?!mm||mm==='ind':mm===m;}
-function formaVerbalisHtml(formae,p,n,t,m='ind'){const f=formae.find(x=>x.persona===p&&x.numerus===n&&x.tempus===t&&modusEst(x,m)&&(!x.vox||x.vox==='act'));return f?formaProLemmaHtml(f):'—';}
-function formaInfinitiviHtml(formae,t){const f=formae.find(x=>x.tempus===t&&(normalisiereModus(x.modus)==='inf'||normalisiere(x.persona)==='inf'||normalisiere(x.casus)==='infinitivus'));return f?formaProLemmaHtml(f):'—';}
+
+function voxEst(x, vox) {
+  const v = normalisiere(x.vox);
+
+  if (vox === 'act') {
+    return !v || v === 'act';
+  }
+
+  if (vox === 'pass') {
+    return v === 'pass';
+  }
+
+  return true;
+}
+
+function formaVerbalisHtml(formae, p, n, t, m = 'ind', vox = 'act') {
+  const tempus = normalisiereTempus(t);
+
+  const f = formae.find(x =>
+    String(x.persona) === String(p) &&
+    normalisiere(x.numerus) === normalisiere(n) &&
+    normalisiereTempus(x.tempus) === tempus &&
+    modusEst(x, m) &&
+    voxEst(x, vox)
+  );
+
+  return f ? formaProLemmaHtml(f) : '—';
+}
+  
+  function formaInfinitiviHtml(formae,t){const f=formae.find(x=>x.tempus===t&&(normalisiereModus(x.modus)==='inf'||normalisiere(x.persona)==='inf'||normalisiere(x.casus)==='infinitivus'));return f?formaProLemmaHtml(f):'—';}
 function formaParticipiiHtml(formae,t){const f=formae.find(x=>x.tempus===t&&(normalisiereModus(x.modus)==='part'||normalisiere(x.pars_orationis).includes('particip')));return f?formaProLemmaHtml(f):'—';}
 function formaGerundiviHtml(formae){const f=formae.find(x=>normalisiereModus(x.modus)==='gerundivum'||normalisiere(x.pars_orationis)==='gerundivum'||(normalisiereModus(x.modus)==='part'&&x.tempus==='fut'&&x.vox==='pass'));return f?formaProLemmaHtml(f):'—';}
 function addeModus(tbody,t){const tr=document.createElement('tr');tr.className='verbum-modus-row';const th=document.createElement('th');th.textContent=t;th.colSpan=7;tr.appendChild(th);tbody.appendChild(tr);}
-function addeVerbum(tbody,formae,label,m,t){const tr=document.createElement('tr'),th=document.createElement('th');th.textContent=label;tr.appendChild(th);personae.forEach(([p,n])=>tr.appendChild(td(formaVerbalisHtml(formae,p,n,t,m))));tbody.appendChild(tr);}
+
+function addeVerbum(tbody, formae, label, m, t, vox = 'act') {
+  const tr = document.createElement('tr');
+  const th = document.createElement('th');
+
+  th.textContent = label;
+  tr.appendChild(th);
+
+  personae.forEach(([p, n]) =>
+    tr.appendChild(td(formaVerbalisHtml(formae, p, n, t, m, vox)))
+  );
+
+  tbody.appendChild(tr);
+}
+  
 function addeNonFin(tbody,label,html){const tr=document.createElement('tr'),th=document.createElement('th');th.textContent=label;tr.appendChild(th);const cell=td(html);cell.className='verbum-nonfinitum';cell.colSpan=6;tr.appendChild(cell);tbody.appendChild(tr);}
 
 function formaInfinitaHtml(formae, pars, tempus = null) {
@@ -207,16 +249,79 @@ function addeFormaeInfinitae(tbody, formae) {
   ]);
 }
   
-function tabellaVerbi(formae){
-  const w=document.createElement('div');w.className='flexio-wrapper';
-  const table=document.createElement('table');table.className='flexio-tabelle verbum-tabula';
-  const head=document.createElement('tr');['',...personae.map(p=>p[2])].forEach(t=>{const th=document.createElement('th');th.textContent=t;head.appendChild(th)});
-  const thead=document.createElement('thead');thead.appendChild(head);table.appendChild(thead);
-  const tbody=document.createElement('tbody');addeModus(tbody,'Indicativus');[['Praesens','praes'],['Imperfectum','imperf'],['Futurum','fut'],['Perfectum','perf'],['Plusquamperfectum','plqpf'],['Futurum exactum','futperf']].forEach(x=>addeVerbum(tbody,formae,x[0],'ind',x[1]));
-                              addeModus(tbody,'Coniunctivus');[['Praesens','praes'],['Imperfectum','imperf'],['Perfectum','perf'],['Plusquamperfectum','plqpf']].forEach(x=>addeVerbum(tbody,formae,x[0],'coni',x[1]));
-                              addeModus(tbody,'Imperativus');[['Praesens','praes'],['Futurum','fut']].forEach(x=>addeVerbum(tbody,formae,x[0],'imp',x[1]));
-                              addeFormaeInfinitae(tbody, formae);table.appendChild(tbody);w.appendChild(table);
-  return w;}
+function tabellaVerbi(formae) {
+  const w = document.createElement('div');
+  w.className = 'flexio-wrapper';
+
+  function facTabellamVox(titulus, vox, addereInfinita = false) {
+    const table = document.createElement('table');
+    table.className = 'flexio-tabelle verbum-tabula';
+
+    if (vox === 'pass') {
+      table.style.marginTop = '28px';
+    }
+
+    const thead = document.createElement('thead');
+
+    const trVox = document.createElement('tr');
+    trVox.className = 'verbum-modus-row';
+
+    const thVox = document.createElement('th');
+    thVox.textContent = titulus;
+    thVox.colSpan = 7;
+    trVox.appendChild(thVox);
+
+    thead.appendChild(trVox);
+
+    const head = document.createElement('tr');
+    ['', ...personae.map(p => p[2])].forEach(t => {
+      const th = document.createElement('th');
+      th.textContent = t;
+      head.appendChild(th);
+    });
+
+    thead.appendChild(head);
+    table.appendChild(thead);
+
+    const tbody = document.createElement('tbody');
+
+    addeModus(tbody, 'Indicativus');
+    [
+      ['Praesens', 'praes'],
+      ['Imperfectum', 'imperf'],
+      ['Futurum', 'fut'],
+      ['Perfectum', 'perf'],
+      ['Plusquamperfectum', 'plqpf'],
+      ['Futurum exactum', 'futperf']
+    ].forEach(x => addeVerbum(tbody, formae, x[0], 'ind', x[1], vox));
+
+    addeModus(tbody, 'Coniunctivus');
+    [
+      ['Praesens', 'praes'],
+      ['Imperfectum', 'imperf'],
+      ['Perfectum', 'perf'],
+      ['Plusquamperfectum', 'plqpf']
+    ].forEach(x => addeVerbum(tbody, formae, x[0], 'coni', x[1], vox));
+
+    addeModus(tbody, 'Imperativus');
+    [
+      ['Praesens', 'praes'],
+      ['Futurum', 'fut']
+    ].forEach(x => addeVerbum(tbody, formae, x[0], 'imp', x[1], vox));
+
+    if (addereInfinita) {
+      addeFormaeInfinitae(tbody, formae);
+    }
+
+    table.appendChild(tbody);
+    return table;
+  }
+
+  w.appendChild(facTabellamVox('Vox activa', 'act', true));
+  w.appendChild(facTabellamVox('Vox passiva', 'pass', false));
+
+  return w;
+}
 
 function zeigeFlexio(formae){
   const z = document.getElementById('lemmaFlexio');
