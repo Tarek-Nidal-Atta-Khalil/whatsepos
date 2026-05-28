@@ -241,7 +241,17 @@ function aperiAddeUerbum(lemmaPraeplenum = '') {
 }
 function schliesseAddeUerbum() { addePanel.hidden = true; if (row) row.style.display = 'flex'; if (eventus) eventus.style.display = ''; if (status) status.style.display = ''; input?.focus(); }
 function erzeugeAddeSuggestio(lemmaNeu) { const b = document.createElement('button'); b.type='button'; b.className='vocabularium-suggestio is-selected'; b.dataset.action='adde'; b.dataset.lemma=lemmaNeu; b.style.cssText='display:block;width:100%;text-align:left;padding:14px 18px;border:none;background:white;cursor:pointer;border-bottom:1px solid #eee'; b.innerHTML=`<strong>${lemmaNeu}</strong> <span style="color:#6b7280">adde ut nouum headword</span>`; b.addEventListener('mousedown', e => { e.preventDefault(); aperiAddeUerbum(lemmaNeu); }); suggestiones.appendChild(b); suggestiones.style.display='block'; suggestioSelectaIndex=0; }
-function oeffneSuggestioSelecta() { const b = suggestioButtons()[suggestioSelectaIndex]; const lemma = b?.dataset?.lemma; if (!lemma) return; b.dataset.action === 'adde' ? aperiAddeUerbum(lemma) : aperiLemma(lemma); }
+function oeffneSuggestioSelecta() {
+  const b = suggestioButtons()[suggestioSelectaIndex];
+  const lemma = b?.dataset?.lemma;
+  const lexemeId = b?.dataset?.lexemeId || '';
+
+  if (!lemma) return;
+
+  b.dataset.action === 'adde'
+    ? aperiAddeUerbum(lemma)
+    : aperiLemma(lemma, lexemeId);
+}
 async function quaereSuggestiones() {
   if (!window.whatseposSupabase || !input) return;
   const qOriginal = input.value.trim(); const q = normalisiere(qOriginal); leereSuggestiones(); if (q.length < 2) return;
@@ -249,7 +259,30 @@ async function quaereSuggestiones() {
   if (error) return;
   if (!data || !data.length) { nullusEventusLemma = qOriginal; erzeugeAddeSuggestio(qOriginal); return; }
   const visa = new Set();
-  data.forEach(item => { if (!item.lemma || visa.has(item.lemma)) return; visa.add(item.lemma); const b = document.createElement('button'); b.type='button'; b.className='vocabularium-suggestio'; b.dataset.lemma=item.lemma; b.setAttribute('role','option'); b.style.cssText='display:block;width:100%;text-align:left;padding:14px 18px;border:none;background:white;cursor:pointer;border-bottom:1px solid #eee'; const strong=document.createElement('strong'); strong.textContent=formaSupabaseSignata({ ...item, forma:item.lemma }) || item.lemma; const span=document.createElement('span'); span.style.color='#6b7280'; span.textContent=` ${item.pars_orationis || ''}`; b.appendChild(strong); b.appendChild(span); b.addEventListener('mouseenter', () => { const i=suggestioButtons().indexOf(b); if (i >= 0) setzeSuggestioSelecta(i); }); b.addEventListener('mousedown', e => { e.preventDefault(); aperiLemma(item.lemma, item.lexeme_id); }); suggestiones.appendChild(b); });
+  data.forEach(item => { if (!item.lemma || visa.has(item.lemma)) return; 
+                        visa.add(item.lemma); 
+                        const b = document.createElement('button'); 
+                        b.type='button'; b.className='vocabularium-suggestio'; 
+                        b.dataset.lemma=item.lemma;
+                        b.dataset.lexemeId = item.lexeme_id || '';
+                        b.setAttribute('role','option'); 
+                        b.style.cssText='display:block;width:100%;text-align:left;padding:14px 18px;border:none;background:white;cursor:pointer;border-bottom:1px solid #eee'; 
+                        const strong=document.createElement('strong'); 
+                        strong.textContent=formaSupabaseSignata({ ...item, forma:item.lemma }) || item.lemma;
+                        const span=document.createElement('span'); 
+                        span.style.color='#6b7280'; 
+                        span.textContent=` ${item.pars_orationis || ''}`; 
+                        b.appendChild(strong); 
+                        b.appendChild(span); 
+                        b.addEventListener('mouseenter', () => { 
+                          const i=suggestioButtons().indexOf(b); 
+                          if (i >= 0) setzeSuggestioSelecta(i);
+                        });
+                        b.addEventListener('mousedown', e => { 
+                          e.preventDefault(); 
+                          aperiLemma(item.lemma, item.lexeme_id);
+                          }); 
+                        suggestiones.appendChild(b); });
   if (suggestiones.children.length > 0) { suggestiones.style.display='block'; setzeSuggestioSelecta(0); }
 }
 async function speichereAddeFormular() {
