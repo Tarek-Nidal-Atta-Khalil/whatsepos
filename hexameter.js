@@ -299,20 +299,22 @@ function profileSupabaseWort(wort) {
   formae.forEach(function(forma) {
     const partes = partesFormae(forma);
     if (partes.length === 0) return;
-
+    
     const longae = new Set(longaeIndizes(forma));
+    const partesInternae = partes.map(pars => bereiteWortVor(pars));
     const internus = bereiteWortVor(clavisFormae(wort));
     let cursor = 0;
-
-    const syllabae = partes.map(function(pars, index) {
-      const textus = internus.slice(cursor, cursor + pars.length) || pars;
-      cursor += pars.length;
+    
+    const syllabae = partesInternae.map(function(parsInterna, index) {
+      const textus = internus.slice(cursor, cursor + parsInterna.length) || parsInterna;
+      cursor += parsInterna.length;
+    
       return {
         textus,
         indexOriginalis: index,
         longaNatura: longae.has(index),
         forma,
-        syllabaLexicalis: pars
+        syllabaLexicalis: partes[index]
       };
     });
 
@@ -380,7 +382,9 @@ function hatVokalischenWert(textus) {
 
 function quantitasLexicalis(syllaba) {
   if (!hatVokalischenWert(syllaba.textus)) return null;
-  return syllaba.longaNatura ? "longa_natura_lexico" : "brevis_natura_lexico";
+  if (syllaba.longaNatura) return "longa_natura_lexico";
+  if (hatDiphthongum(syllaba.textus)) return "longa_natura_diphthongo";
+  return "brevis_natura_lexico";
 }
 
 function verbindeVokalloseSyllaben(flattened) {
