@@ -82,6 +82,15 @@ addePanel.innerHTML = `
       </select>
     </div>
   </div>
+  <div class="adde-form-card" id="addeGenitivCard" hidden>
+    <div class="adde-uerbum-field">
+      <label for="addeGenitivus">Genitivus singularis / Stammform</label>
+      <input id="addeGenitivus" type="text" placeholder="regis, corporis, maris">
+      <div class="adde-card-help">
+        Nötig vor allem für die 3. Deklination und unklare Stämme.
+      </div>
+    </div>
+  </div>
   <div class="adde-form-card" id="addeNumerusTypCard" hidden>
     <div class="adde-uerbum-field">
       <label for="addeNumerusTyp">Numerus</label>
@@ -98,10 +107,48 @@ addePanel.innerHTML = `
   </div>
   <div class="adde-form-card" id="addeLeitformen" hidden>
     <div class="adde-detail-grid">
-      <div class="adde-uerbum-field"><label for="addePraesens">Praesens</label><input id="addePraesens" type="text" placeholder="cano:"></div>
-      <div class="adde-uerbum-field"><label for="addeInfinitivus">Infinitivus</label><input id="addeInfinitivus" type="text" placeholder="canere"></div>
-      <div class="adde-uerbum-field"><label for="addePerfectum">Perfectum</label><input id="addePerfectum" type="text" placeholder="cecini:"></div>
-      <div class="adde-uerbum-field"><label for="addeSupinum">Supinum</label><input id="addeSupinum" type="text" placeholder="cantum"></div>
+      <div class="adde-uerbum-field">
+        <label for="addeConiugatio">Coniugatio</label>
+        <select id="addeConiugatio">
+          <option value="">elige...</option>
+          <option value="1">1. Konjugation</option>
+          <option value="2">2. Konjugation</option>
+          <option value="3">3. Konjugation</option>
+          <option value="3io">3. i-Konjugation</option>
+          <option value="4">4. Konjugation</option>
+          <option value="irregularis">irregularis</option>
+        </select>
+      </div>
+  
+      <div class="adde-uerbum-field">
+        <label for="addeVerbumTypus">Typus verbi</label>
+        <select id="addeVerbumTypus">
+          <option value="normale">normale</option>
+          <option value="deponens">deponens</option>
+          <option value="semideponens">semideponens</option>
+          <option value="impersonale">impersonale</option>
+        </select>
+      </div>
+  
+      <div class="adde-uerbum-field">
+        <label for="addePraesens">Praesens 1. Sg.</label>
+        <input id="addePraesens" type="text" placeholder="cano:">
+      </div>
+  
+      <div class="adde-uerbum-field">
+        <label for="addeInfinitivus">Infinitivus praesentis</label>
+        <input id="addeInfinitivus" type="text" placeholder="canere">
+      </div>
+  
+      <div class="adde-uerbum-field">
+        <label for="addePerfectum">Perfectum 1. Sg.</label>
+        <input id="addePerfectum" type="text" placeholder="cecini:">
+      </div>
+  
+      <div class="adde-uerbum-field">
+        <label for="addeSupinum">Supinum</label>
+        <input id="addeSupinum" type="text" placeholder="cantum">
+      </div>
     </div>
   </div>
   <div class="adde-uerbum-actions">
@@ -211,14 +258,30 @@ function syncAddeForm() {
   document.getElementById('addeParsCard').hidden = lemma.length === 0;
   document.getElementById('addeGenusCard').hidden = pars !== 'substantivum';
   document.getElementById('addeDeclinatioCard').hidden = pars !== 'substantivum' || !genus;
-  document.getElementById('addeNumerusTypCard').hidden = pars !== 'substantivum' || !genus || !declinatio;
+  document.getElementById('addeNumerusTypCard').hidden =
+    pars !== 'substantivum' || !genus || !declinatio;
+  
+  document.getElementById('addeGenitivCard').hidden =
+    pars !== 'substantivum' ||
+    !genus ||
+    !declinatio ||
+    !['consonantica', 'i', 'mixta', 'u', 'e', 'graeca', 'irregularis'].includes(declinatio);
+  
   document.getElementById('addeAdiectivumCard').hidden = pars !== 'adiectivum';
   document.getElementById('addeLeitformen').hidden = pars !== 'verbum';
+  
   syncDeclinationesSubstantivi();
 
   let potestServari = Boolean(lemma && pars);
   if (pars === 'substantivum') potestServari = Boolean(lemma && genus && declinatio && numerusTyp);
   document.getElementById('addeSave').disabled = !potestServari;
+  if (pars === 'verbum') {
+    const coniugatio = document.getElementById('addeConiugatio')?.value || '';
+    const praesens = document.getElementById('addePraesens')?.value.trim() || '';
+    const infinitivus = document.getElementById('addeInfinitivus')?.value.trim() || '';
+  
+    potestServari = Boolean(lemma && coniugatio && praesens && infinitivus);
+  }
 }
 function resetDependentiaSubstantivi() {
   const declinatio = document.getElementById('addeDeclinatio');
