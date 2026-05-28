@@ -268,66 +268,6 @@ function addeFormaeInfinitae(tbody, formae, vox = 'act') {
     ]);
   }
 }
-
-  function addeRow(label, cellae) {
-    const tr = document.createElement('tr');
-
-    const th = document.createElement('th');
-    th.textContent = label;
-    tr.appendChild(th);
-
-    cellae.forEach(html => {
-      const cell = td(html);
-      cell.className = 'verbum-nonfinitum';
-      cell.colSpan = 2;
-      tr.appendChild(cell);
-    });
-
-    tbody.appendChild(tr);
-  }
-
-  addeRowSineTempore(
-    'Gerundivum',
-    formaInfinitaHtml(formae, 'gerundivum')
-  );
-
-  addeRowSineTempore(
-    'Supinum I',
-    formaInfinitaHtml(formae, 'supinum_i')
-  );
-
-  addeRowSineTempore(
-    'Supinum II',
-    formaInfinitaHtml(formae, 'supinum_ii')
-  );
-
-  const trHead = document.createElement('tr');
-
-  const thLeer = document.createElement('th');
-  thLeer.textContent = '';
-  trHead.appendChild(thLeer);
-
-  ['Praesens', 'Perfectum', 'Futurum'].forEach(textus => {
-    const th = document.createElement('th');
-    th.textContent = textus;
-    th.colSpan = 2;
-    trHead.appendChild(th);
-  });
-
-  tbody.appendChild(trHead);
-
-  addeRow('Infinitivus', [
-    formaInfinitaHtml(formae, 'infinitivus', 'praes'),
-    formaInfinitaHtml(formae, 'infinitivus', 'perf'),
-    formaInfinitaHtml(formae, 'infinitivus', 'fut')
-  ]);
-
-  addeRow('Participium', [
-  formaInfinitaHtml(formae, 'participium', 'praes', 'act'),
-  '—',
-  formaInfinitaHtml(formae, 'participium', 'fut', 'act')
-]);
-}
   
 function tabellaVerbi(formae) {
   const w = document.createElement('div');
