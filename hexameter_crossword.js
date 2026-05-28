@@ -1,4 +1,4 @@
-import * as basis from "./hexameter.js?v=20260520-base-for-crossword";
+import * as basis from "./hexameter.js?v=20260528-troiae-1";
 
 const VOKALE = "aeiouy";
 const VOCALES_LONGAE = { a: "ā", e: "ē", i: "ī", o: "ō", u: "ū", y: "ȳ" };
