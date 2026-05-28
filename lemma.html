@@ -159,13 +159,15 @@ function addeVerbum(tbody, formae, label, m, t, vox = 'act') {
   
 function addeNonFin(tbody,label,html){const tr=document.createElement('tr'),th=document.createElement('th');th.textContent=label;tr.appendChild(th);const cell=td(html);cell.className='verbum-nonfinitum';cell.colSpan=6;tr.appendChild(cell);tbody.appendChild(tr);}
 
-function formaInfinitaHtml(formae, pars, tempus = null) {
+function formaInfinitaHtml(formae, pars, tempus = null, vox = null) {
   const parsNorm = normalisierePars(pars);
   const tempusNorm = tempus === null ? null : normalisiereTempus(tempus);
+  const voxNorm = vox === null ? null : normalisiere(vox);
 
   const f = formae.find(x =>
     normalisierePars(x.pars_orationis) === parsNorm &&
-    (tempusNorm === null || normalisiereTempus(x.tempus) === tempusNorm)
+    (tempusNorm === null || normalisiereTempus(x.tempus) === tempusNorm) &&
+    (voxNorm === null || normalisiere(x.vox) === voxNorm)
   );
 
   return f ? formaProLemmaHtml(f) : '—';
@@ -243,10 +245,10 @@ function addeFormaeInfinitae(tbody, formae) {
   ]);
 
   addeRow('Participium', [
-    formaInfinitaHtml(formae, 'participium', 'praes'),
-    formaInfinitaHtml(formae, 'participium', 'perf'),
-    formaInfinitaHtml(formae, 'participium', 'fut')
-  ]);
+  formaInfinitaHtml(formae, 'participium', 'praes', 'act'),
+  '—',
+  formaInfinitaHtml(formae, 'participium', 'fut', 'act')
+]);
 }
   
 function tabellaVerbi(formae) {
