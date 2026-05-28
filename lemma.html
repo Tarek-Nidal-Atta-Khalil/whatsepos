@@ -138,11 +138,63 @@ function syllabaNaturaliterLongaEst(forma,i){const syllabae=syllabaeFormae(forma
 function syllabaMetriceBrevisEst(forma,i){const syllabae=syllabaeFormae(forma),s=syllabae[i]||'';return !syllabaNaturaliterLongaEst(forma,i)&&!syllabaPositioneLongaEst(syllabae,i);}
 function estIambusCorreptibilis(forma){const syllabae=syllabaeFormae(forma);return syllabae.length===2&&syllabaMetriceBrevisEst(forma,0)&&syllabaNaturaliterLongaEst(forma,1)&&!estAblativusSingularisLongaeDeclinationis(forma);}
 function formaIambiceCorrepta(forma){const s=syllabaeFormae(forma);return s.length===2?s[0]+breviaSyllabam(s[1]):'';}
-function istElidierbar(t){const s=sineMacris(t).toLowerCase().replace(/͞/g,'');return /[aeiouy]m?$/.test(s);}
-function siglaMitElision(sigla,textus){const s=String(sigla||'').toUpperCase().replace(/[^LB]/g,'');if(!s||s.length<2||!istElidierbar(textus))return s;return `${s.slice(0,-1)}(${s.slice(-1)})`;}
-function siglaBasis(sigla){return String(sigla||'').toUpperCase().replace(/\(([LB])\)\s*$/,'').replace(/[^LB]/g,'');}
-function istHexameterCompatibilis(sigla){const s=siglaBasis(sigla);if(!s)return false;if(s.includes('BBB'))return false;if(s.includes('LBL'))return false;return true;}
-function eligeFormamHeadword(formae){const n=normalisiere(lemma);return formae.find(f=>f.pars_orationis==='substantivum'&&f.casus==='nom'&&f.numerus==='sg')||formae.find(f=>f.pars_orationis==='substantivum'&&f.casus==='nom'&&f.numerus==='pl')||formae.find(f=>f.persona==='1'&&f.numerus==='sg'&&f.tempus==='praes'&&normalisiereModus(f.modus)==='ind'&&f.vox==='act')||formae.find(f=>normalisiere(f.forma)===n)||formae[0];}
+function istElidierbar(t){
+  const s=sineMacris(t).toLowerCase().replace(/͞/g,'');
+  return /[aeiouy]m?$/.test(s);
+}
+
+function consonantesPostUltimamVocalem(syllaba){
+  const s=sineMacris(String(syllaba||'')).toLowerCase();
+  const i=indexUltimiVocalis(s);
+  if(i<0)return[];
+  return [...s.slice(i+1)].filter(c=>!estVocalis(c));
+}
+
+function ultimaSyllabaAnteVocalemBrevisFit(forma,sigla){
+  const s=String(sigla||'').toUpperCase().replace(/[^LB]/g,'');
+  const syllabae=syllabaeFormae(forma);
+  if(!s||!syllabae.length)return false;
+
+  const i=syllabae.length-1;
+  const ultima=syllabae[i];
+
+  if(s[i]!=='L')return false;
+  if(syllabaNaturaliterLongaEst(forma,i))return false;
+  if(!syllabaClausaSimplex(ultima))return false;
+
+  const consonantes=consonantesPostUltimamVocalem(ultima);
+
+  return consonantes.length===1&&!['x','z'].includes(consonantes[0]);
+}
+
+function siglaMitElisionEtLiaison(forma,sigla,textus){
+  const s=String(sigla||'').toUpperCase().replace(/[^LB]/g,'');
+  if(!s||s.length<2)return s;
+
+  if(istElidierbar(textus)){
+    return `${s.slice(0,-1)}(${s.slice(-1)})`;
+  }
+
+  if(ultimaSyllabaAnteVocalemBrevisFit(forma,s)){
+    return `${s.slice(0,-1)}B(${s.slice(-1)})`;
+  }
+
+  return s;
+}
+
+function siglaBasis(sigla){
+  return String(sigla||'').toUpperCase().replace(/\(([LB])\)\s*$/,'').replace(/[^LB]/g,'');
+}
+
+function istHexameterCompatibilis(sigla){
+  const s=siglaBasis(sigla);
+  if(!s)return false;
+  if(s.includes('BBB'))return false;
+  if(s.includes('LBL'))return false;
+  return true;
+}
+  
+  function eligeFormamHeadword(formae){const n=normalisiere(lemma);return formae.find(f=>f.pars_orationis==='substantivum'&&f.casus==='nom'&&f.numerus==='sg')||formae.find(f=>f.pars_orationis==='substantivum'&&f.casus==='nom'&&f.numerus==='pl')||formae.find(f=>f.persona==='1'&&f.numerus==='sg'&&f.tempus==='praes'&&normalisiereModus(f.modus)==='ind'&&f.vox==='act')||formae.find(f=>normalisiere(f.forma)===n)||formae[0];}
 function td(html){const e=document.createElement('td');e.innerHTML=html||'—';return e;}
 function formaSubstantiviHtml(formae,casus,numerus){const f=formae.find(x=>x.casus===casus&&x.numerus===numerus);return f?formaProLemmaHtml(f):'—';}
 function numeriSubstantivi(formae){const sg=formae.some(f=>f.numerus==='sg'),pl=formae.some(f=>f.numerus==='pl');return sg&&pl?['sg','pl']:pl?['pl']:['sg'];}
