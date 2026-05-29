@@ -376,28 +376,28 @@ async function speichereAddeFormular() {
   const pars = document.getElementById('addePars')?.value;
   if (!lemmaInput || !pars) { statusAdde('Lemma et pars orationis necessaria sunt.'); return; }
   if (pars === 'verbum') {
-  const coniugatio = document.getElementById('addeConiugatio')?.value || '';
-  const typus = document.getElementById('addeVerbumTypus')?.value || 'normale';
-  const praesens = document.getElementById('addePraesens')?.value.trim() || '';
-  const infinitivus = document.getElementById('addeInfinitivus')?.value.trim() || '';
-  const perfectum = document.getElementById('addePerfectum')?.value.trim() || '';
-  const supinum = document.getElementById('addeSupinum')?.value.trim() || '';
-
-  const lemmaMacris = exColonibusMacra(lemmaInput);
-  const lemmaNudum = sineMacris(lemmaMacris).toLowerCase();
-
-  const verbum = {
-    lemmaInput,
-    lemmaMacris,
-    lemmaNudum,
-    pars,
-    coniugatio,
-    typus,
-    praesens: exColonibusMacra(praesens),
-    infinitivus: exColonibusMacra(infinitivus),
-    perfectum: exColonibusMacra(perfectum),
-    supinum: exColonibusMacra(supinum)
-  };
+    const coniugatio = document.getElementById('addeConiugatio')?.value || '';
+    const typus = document.getElementById('addeVerbumTypus')?.value || 'normale';
+    const praesens = document.getElementById('addePraesens')?.value.trim() || '';
+    const infinitivus = document.getElementById('addeInfinitivus')?.value.trim() || '';
+    const perfectum = document.getElementById('addePerfectum')?.value.trim() || '';
+    const supinum = document.getElementById('addeSupinum')?.value.trim() || '';
+  
+    const lemmaMacris = exColonibusMacra(lemmaInput);
+    const lemmaNudum = sineMacris(lemmaMacris).toLowerCase();
+  
+    const verbum = {
+      lemmaInput,
+      lemmaMacris,
+      lemmaNudum,
+      pars,
+      coniugatio,
+      typus,
+      praesens: exColonibusMacra(praesens),
+      infinitivus: exColonibusMacra(infinitivus),
+      perfectum: exColonibusMacra(perfectum),
+      supinum: exColonibusMacra(supinum)
+    };
 
   console.log('verbum paratum:', verbum);
   statusAdde(`Verbum paratum: ${verbum.praesens}, ${verbum.infinitivus}, ${verbum.perfectum}, ${verbum.supinum}`);
