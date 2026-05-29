@@ -309,7 +309,6 @@ function aperiAddeUerbum(lemmaPraeplenum = '') {
 
   document.getElementById('addeConiugatio').value = '';
   document.getElementById('addeVerbumTypus').value = 'normale';
-  document.getElementById('addePraesens').value = '';
   document.getElementById('addeInfinitivus').value = '';
   document.getElementById('addePerfectum').value = '';
   document.getElementById('addeSupinum').value = '';
