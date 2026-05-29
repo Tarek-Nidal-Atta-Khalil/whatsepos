@@ -426,7 +426,6 @@ document.getElementById('addeDeclinatio')?.addEventListener('change', () => { co
 document.getElementById('addeNumerusTyp')?.addEventListener('change', syncAddeForm);
 document.getElementById('addeConiugatio')?.addEventListener('change', syncAddeForm);
 document.getElementById('addeVerbumTypus')?.addEventListener('change', syncAddeForm);
-document.getElementById('addePraesens')?.addEventListener('input', syncAddeForm);
 document.getElementById('addeInfinitivus')?.addEventListener('input', syncAddeForm);
 document.getElementById('addePerfectum')?.addEventListener('input', syncAddeForm);
 document.getElementById('addeSupinum')?.addEventListener('input', syncAddeForm);
