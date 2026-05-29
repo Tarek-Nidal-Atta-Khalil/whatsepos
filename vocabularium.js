@@ -275,12 +275,11 @@ function syncAddeForm() {
   }
 
   if (pars === 'verbum') {
-    const coniugatio = document.getElementById('addeConiugatio')?.value || '';
-    const praesens = document.getElementById('addePraesens')?.value.trim() || '';
-    const infinitivus = document.getElementById('addeInfinitivus')?.value.trim() || '';
-  
-    potestServari = Boolean(coniugatio && praesens && infinitivus);
-  }
+  const coniugatio = document.getElementById('addeConiugatio')?.value || '';
+  const infinitivus = document.getElementById('addeInfinitivus')?.value.trim() || '';
+
+  potestServari = Boolean(lemma && coniugatio && infinitivus);
+}
 
   document.getElementById('addeSave').disabled = !potestServari;
 }
