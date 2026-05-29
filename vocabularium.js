@@ -371,7 +371,7 @@ async function speichereAddeFormular() {
   if (pars === 'verbum') {
     const coniugatio = document.getElementById('addeConiugatio')?.value || '';
     const typus = document.getElementById('addeVerbumTypus')?.value || 'normale';
-    const praesens = document.getElementById('addePraesens')?.value.trim() || '';
+    const praesens = lemmaInput;
     const infinitivus = document.getElementById('addeInfinitivus')?.value.trim() || '';
     const perfectum = document.getElementById('addePerfectum')?.value.trim() || '';
     const supinum = document.getElementById('addeSupinum')?.value.trim() || '';
