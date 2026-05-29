@@ -258,30 +258,36 @@ function syncAddeForm() {
   document.getElementById('addeParsCard').hidden = lemma.length === 0;
   document.getElementById('addeGenusCard').hidden = pars !== 'substantivum';
   document.getElementById('addeDeclinatioCard').hidden = pars !== 'substantivum' || !genus;
+
   document.getElementById('addeNumerusTypCard').hidden =
     pars !== 'substantivum' || !genus || !declinatio;
-  
+
   document.getElementById('addeGenitivCard').hidden =
     pars !== 'substantivum' ||
     !genus ||
     !declinatio ||
     !['consonantica', 'i', 'mixta', 'u', 'e', 'graeca', 'irregularis'].includes(declinatio);
-  
+
   document.getElementById('addeAdiectivumCard').hidden = pars !== 'adiectivum';
   document.getElementById('addeLeitformen').hidden = pars !== 'verbum';
-  
+
   syncDeclinationesSubstantivi();
 
   let potestServari = Boolean(lemma && pars);
-  if (pars === 'substantivum') potestServari = Boolean(lemma && genus && declinatio && numerusTyp);
-  document.getElementById('addeSave').disabled = !potestServari;
+
+  if (pars === 'substantivum') {
+    potestServari = Boolean(lemma && genus && declinatio && numerusTyp);
+  }
+
   if (pars === 'verbum') {
     const coniugatio = document.getElementById('addeConiugatio')?.value || '';
     const praesens = document.getElementById('addePraesens')?.value.trim() || '';
     const infinitivus = document.getElementById('addeInfinitivus')?.value.trim() || '';
-  
+
     potestServari = Boolean(lemma && coniugatio && praesens && infinitivus);
   }
+
+  document.getElementById('addeSave').disabled = !potestServari;
 }
 function resetDependentiaSubstantivi() {
   const declinatio = document.getElementById('addeDeclinatio');
@@ -291,16 +297,32 @@ function resetDependentiaSubstantivi() {
 }
 function aperiAddeUerbum(lemmaPraeplenum = '') {
   leereSuggestiones();
+
   if (row) row.style.display = 'none';
   if (eventus) eventus.style.display = 'none';
   if (status) status.style.display = 'none';
+
   addePanel.hidden = false;
+
   document.getElementById('addeLemma').value = lemmaPraeplenum || '';
   document.getElementById('addePars').value = '';
   document.getElementById('addeGenus').value = '';
   document.getElementById('addeDeclinatio').value = '';
+  document.getElementById('addeGenitivus').value = '';
   document.getElementById('addeNumerusTyp').value = '';
-  syncAddeForm(); statusAdde(''); document.getElementById('addeLemma').focus();
+
+  document.getElementById('addeAdiectivumDeclinatio').value = 'a_o';
+
+  document.getElementById('addeConiugatio').value = '';
+  document.getElementById('addeVerbumTypus').value = 'normale';
+  document.getElementById('addePraesens').value = '';
+  document.getElementById('addeInfinitivus').value = '';
+  document.getElementById('addePerfectum').value = '';
+  document.getElementById('addeSupinum').value = '';
+
+  syncAddeForm();
+  statusAdde('');
+  document.getElementById('addeLemma').focus();
 }
 function schliesseAddeUerbum() { addePanel.hidden = true; if (row) row.style.display = 'flex'; if (eventus) eventus.style.display = ''; if (status) status.style.display = ''; input?.focus(); }
 function erzeugeAddeSuggestio(lemmaNeu) { const b = document.createElement('button'); b.type='button'; b.className='vocabularium-suggestio is-selected'; b.dataset.action='adde'; b.dataset.lemma=lemmaNeu; b.style.cssText='display:block;width:100%;text-align:left;padding:14px 18px;border:none;background:white;cursor:pointer;border-bottom:1px solid #eee'; b.innerHTML=`<strong>${lemmaNeu}</strong> <span style="color:#6b7280">adde ut nouum headword</span>`; b.addEventListener('mousedown', e => { e.preventDefault(); aperiAddeUerbum(lemmaNeu); }); suggestiones.appendChild(b); suggestiones.style.display='block'; suggestioSelectaIndex=0; }
@@ -382,5 +404,11 @@ document.getElementById('addePars')?.addEventListener('change', syncAddeForm);
 document.getElementById('addeGenus')?.addEventListener('change', () => { resetDependentiaSubstantivi(); syncAddeForm(); });
 document.getElementById('addeDeclinatio')?.addEventListener('change', () => { const numerusTyp = document.getElementById('addeNumerusTyp'); if (numerusTyp) numerusTyp.value = ''; syncAddeForm(); });
 document.getElementById('addeNumerusTyp')?.addEventListener('change', syncAddeForm);
+document.getElementById('addeConiugatio')?.addEventListener('change', syncAddeForm);
+document.getElementById('addeVerbumTypus')?.addEventListener('change', syncAddeForm);
+document.getElementById('addePraesens')?.addEventListener('input', syncAddeForm);
+document.getElementById('addeInfinitivus')?.addEventListener('input', syncAddeForm);
+document.getElementById('addePerfectum')?.addEventListener('input', syncAddeForm);
+document.getElementById('addeSupinum')?.addEventListener('input', syncAddeForm);
 document.getElementById('addeCancel')?.addEventListener('click', schliesseAddeUerbum);
 document.getElementById('addeSave')?.addEventListener('click', speichereAddeFormular);
