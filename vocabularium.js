@@ -283,8 +283,8 @@ function syncAddeForm() {
     const coniugatio = document.getElementById('addeConiugatio')?.value || '';
     const praesens = document.getElementById('addePraesens')?.value.trim() || '';
     const infinitivus = document.getElementById('addeInfinitivus')?.value.trim() || '';
-
-    potestServari = Boolean(lemma && coniugatio && praesens && infinitivus);
+  
+    potestServari = Boolean(coniugatio && praesens && infinitivus);
   }
 
   document.getElementById('addeSave').disabled = !potestServari;
