@@ -131,11 +131,6 @@ addePanel.innerHTML = `
       </div>
   
       <div class="adde-uerbum-field">
-        <label for="addePraesens">Praesens 1. Sg.</label>
-        <input id="addePraesens" type="text" placeholder="cano:">
-      </div>
-  
-      <div class="adde-uerbum-field">
         <label for="addeInfinitivus">Infinitivus praesentis</label>
         <input id="addeInfinitivus" type="text" placeholder="canere">
       </div>
