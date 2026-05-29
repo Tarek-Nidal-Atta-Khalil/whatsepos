@@ -111,12 +111,12 @@ addePanel.innerHTML = `
         <label for="addeConiugatio">Coniugatio</label>
         <select id="addeConiugatio">
           <option value="">elige...</option>
-          <option value="1">1. Konjugation</option>
-          <option value="2">2. Konjugation</option>
-          <option value="3">3. Konjugation</option>
-          <option value="3io">3. i-Konjugation</option>
-          <option value="4">4. Konjugation</option>
-          <option value="irregularis">irregularis</option>
+          <option value="a">a-Konjugation</option>
+          <option value="e">e-Konjugation</option>
+          <option value="i">i-Konjugation</option>
+          <option value="consonantica">konsonantische Konjugation</option>
+          <option value="mixta">gemischte Konjugation</option>
+          <option value="irregularis">unregelmäßige Konjugation</option>        
         </select>
       </div>
   
