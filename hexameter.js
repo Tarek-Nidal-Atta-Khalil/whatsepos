@@ -62,9 +62,23 @@ function indexPrimiVocalisInTextu(textus) {
   return -1;
 }
 
+export function estDiphthongusCommunis(textus, index, diphthongi = DIPHTHONGE) {
+  const s = normalisiereSyllabaeLexico(textus);
+  const duo = s.slice(index, index + 2);
+
+  if (!estVokalInTextu(s, index)) return false;
+  if (!estVokalInTextu(s, index + 1)) return false;
+  if (!diphthongi.includes(duo)) return false;
+
+  // Ein grundsätzlich möglicher Diphthong gilt nicht als Diphthong,
+  // wenn unmittelbar ein weiterer Vokal folgt.
+  if (estVokalInTextu(s, index + 2)) return false;
+
+  return true;
+}
+
 function istDiphthong(textus, index) {
-  if (!estVokalInTextu(textus, index) || !estVokalInTextu(textus, index + 1)) return false;
-  return DIPHTHONGE.includes(textus.slice(index, index + 2));
+  return estDiphthongusCommunis(textus, index, DIPHTHONGE);
 }
 
 function indexDiphthongiInTextu(textus) {
