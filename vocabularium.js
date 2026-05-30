@@ -252,8 +252,21 @@ function indicesLongarum(syllabaeMacris) {
 
 function recordumFormae({ formaMacris, lemmaNudum, pars, genus, numerus, casus }) {
   const syllabaeMacris = trenneSilben(formaMacris);
-  return { forma: sineMacris(formaMacris).toLowerCase(), lemma: lemmaNudum, pars_orationis: pars, genus, numerus, casus, syllabae: syllabaeMacris.map(s => sineMacris(s).toLowerCase()).join('.'), longae: longaeSigla(syllabaeMacris) };
+
+  return {
+    forma: sineMacris(formaMacris).toLowerCase(),
+    lemma: lemmaNudum,
+    pars_orationis: pars,
+    genus,
+    numerus,
+    casus,
+    syllabae: syllabaeMacris
+      .map(s => sineMacris(s).toLowerCase())
+      .join('.'),
+    longae: indicesLongarum(syllabaeMacris)
+  };
 }
+
 function generaSubstantivumA({ lemmaInput, genus, numerusTyp }) {
   const lemmaMacris = exColonibusMacra(lemmaInput).trim();
   const lemmaNudum = sineMacris(lemmaMacris).toLowerCase();
