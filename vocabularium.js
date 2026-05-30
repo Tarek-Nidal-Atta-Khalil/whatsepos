@@ -315,7 +315,30 @@ function syncAddeForm() {
     !['consonantica', 'i', 'mixta', 'u', 'e', 'graeca', 'irregularis'].includes(declinatio);
 
   document.getElementById('addeAdiectivumCard').hidden = pars !== 'adiectivum';
-  document.getElementById('addeLeitformen').hidden = pars !== 'verbum';
+
+    const coniugatio = document.getElementById('addeConiugatio')?.value || '';
+  const typusVerbi = document.getElementById('addeVerbumTypus')?.value || '';
+  const voxTypus = document.getElementById('addeVoxTypus')?.value || '';
+  const infinitivus = document.getElementById('addeInfinitivus')?.value.trim() || '';
+  const perfectum = document.getElementById('addePerfectum')?.value.trim() || '';
+
+  document.getElementById('addeConiugatioCard').hidden =
+    pars !== 'verbum';
+
+  document.getElementById('addeVerbumTypusCard').hidden =
+    pars !== 'verbum' || !coniugatio;
+
+  document.getElementById('addeVoxTypusCard').hidden =
+    pars !== 'verbum' || !coniugatio || !typusVerbi;
+
+  document.getElementById('addeInfinitivusCard').hidden =
+    pars !== 'verbum' || !coniugatio || !typusVerbi || !voxTypus;
+
+  document.getElementById('addePerfectumCard').hidden =
+    pars !== 'verbum' || !coniugatio || !typusVerbi || !voxTypus || !infinitivus;
+
+  document.getElementById('addeSupinumCard').hidden =
+    pars !== 'verbum' || !coniugatio || !typusVerbi || !voxTypus || !infinitivus || !perfectum;
 
   syncDeclinationesSubstantivi();
 
@@ -325,12 +348,19 @@ function syncAddeForm() {
     potestServari = Boolean(lemma && genus && declinatio && numerusTyp);
   }
 
-  if (pars === 'verbum') {
-  const coniugatio = document.getElementById('addeConiugatio')?.value || '';
-  const infinitivus = document.getElementById('addeInfinitivus')?.value.trim() || '';
-
-  potestServari = Boolean(lemma && coniugatio && infinitivus);
-}
+    if (pars === 'verbum') {
+      const supinum = document.getElementById('addeSupinum')?.value.trim() || '';
+  
+      potestServari = Boolean(
+        lemma &&
+        coniugatio &&
+        typusVerbi &&
+        voxTypus &&
+        infinitivus &&
+        perfectum &&
+        supinum
+      );
+    }
 
   document.getElementById('addeSave').disabled = !potestServari;
 }
@@ -359,7 +389,8 @@ function aperiAddeUerbum(lemmaPraeplenum = '') {
   document.getElementById('addeAdiectivumDeclinatio').value = 'a_o';
 
   document.getElementById('addeConiugatio').value = '';
-  document.getElementById('addeVerbumTypus').value = 'normale';
+  document.getElementById('addeVerbumTypus').value = '';
+  document.getElementById('addeVoxTypus').value = '';
   document.getElementById('addeInfinitivus').value = '';
   document.getElementById('addePerfectum').value = '';
   document.getElementById('addeSupinum').value = '';
@@ -421,7 +452,8 @@ async function speichereAddeFormular() {
   if (!lemmaInput || !pars) { statusAdde('Lemma et pars orationis necessaria sunt.'); return; }
   if (pars === 'verbum') {
     const coniugatio = document.getElementById('addeConiugatio')?.value || '';
-    const typus = document.getElementById('addeVerbumTypus')?.value || 'normale';
+    const typus = document.getElementById('addeVerbumTypus')?.value || '';
+    const uoces = document.getElementById('addeVoxTypus')?.value || '';
     const praesens = lemmaInput;
     const infinitivus = document.getElementById('addeInfinitivus')?.value.trim() || '';
     const perfectum = document.getElementById('addePerfectum')?.value.trim() || '';
@@ -437,6 +469,7 @@ async function speichereAddeFormular() {
       pars,
       coniugatio,
       typus,
+      uoces,
       praesens: exColonibusMacra(praesens),
       infinitivus: exColonibusMacra(infinitivus),
       perfectum: exColonibusMacra(perfectum),
@@ -477,6 +510,7 @@ document.getElementById('addeDeclinatio')?.addEventListener('change', () => { co
 document.getElementById('addeNumerusTyp')?.addEventListener('change', syncAddeForm);
 document.getElementById('addeConiugatio')?.addEventListener('change', syncAddeForm);
 document.getElementById('addeVerbumTypus')?.addEventListener('change', syncAddeForm);
+document.getElementById('addeVoxTypus')?.addEventListener('change', syncAddeForm);
 document.getElementById('addeInfinitivus')?.addEventListener('input', syncAddeForm);
 document.getElementById('addePerfectum')?.addEventListener('input', syncAddeForm);
 document.getElementById('addeSupinum')?.addEventListener('input', syncAddeForm);
