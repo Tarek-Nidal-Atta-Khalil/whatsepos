@@ -277,8 +277,8 @@ function recordumVerbi({
       tempus,
       modus,
       vox,
-      syllabae: '',
-      longae: ''
+      syllabae: null,
+      longae: null
     };
   }
 
