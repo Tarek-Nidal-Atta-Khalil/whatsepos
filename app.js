@@ -147,7 +147,7 @@ window.zeigeTab = async function(tabName) {
   }
 
   if (tabName === "hexameter") {
-    await ladeDictionariumMetricum({ erzwingen: true });
+    await ladeDictionariumMetricum();
     aktualisiereSuggestionesMetricas();
   }
 };
@@ -158,11 +158,18 @@ campus.addEventListener("keydown", async function(event) {
     await fuegeVersHinzu();
   }
 });
+let suggestionesMetricaeTimer = null;
 
 campus.addEventListener("input", async function () {
   await ladeDictionariumMetricum();
+
   aktualisiereHexameterVorschau();
-  aktualisiereSuggestionesMetricas();
+
+  clearTimeout(suggestionesMetricaeTimer);
+
+  suggestionesMetricaeTimer = setTimeout(function () {
+    aktualisiereSuggestionesMetricas();
+  }, 120);
 });
 
 function textusCumSuggestione(forma) {
@@ -246,17 +253,21 @@ function aktualisiereSuggestionesMetricas() {
     return;
   }
 
-  const formaeVisibiles = new Map();
-  
-  dictionariumMetricum.forEach(item => {
-    if (item.forma && !formaeVisibiles.has(item.forma)) {
-      formaeVisibiles.set(item.forma, item);
-    }
-  });
-  
-  const suggestiones = Array.from(formaeVisibiles.values())
-    .filter(item => item.forma && suggestioMetricePossibilis(item.forma))
-    .slice(0, 30);
+  const formaeIamVisibiles = new Set();
+  const suggestiones = [];
+
+  for (const item of dictionariumMetricum) {
+    if (!item.forma) continue;
+    if (formaeIamVisibiles.has(item.forma)) continue;
+
+    formaeIamVisibiles.add(item.forma);
+
+    if (!suggestioMetricePossibilis(item.forma)) continue;
+
+    suggestiones.push(item);
+
+    if (suggestiones.length >= 30) break;
+  }
 
   if (suggestiones.length === 0) {
     const div = document.createElement("div");
@@ -474,7 +485,7 @@ function entferneVersEditorSizer(input) {
 }
 
 async function fuegeVersHinzu() {
-  await ladeDictionariumMetricum({ erzwingen: true });
+  await ladeDictionariumMetricum();
 
   const vers = campus.value.trim();
   if (vers === "") return;
