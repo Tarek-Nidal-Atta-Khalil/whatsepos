@@ -909,7 +909,7 @@ async function speichereAddeFormular() {
       return;
     }
 
-    const { lemmaNudum, formae } = paradigma;
+    const { lemmaNudum, lexemeId, formae } = paradigma;
 
     const { error } =
       await window.whatseposSupabase
@@ -921,7 +921,9 @@ async function speichereAddeFormular() {
       return;
     }
 
-    aperiNouumLemma(lemmaNudum);
+    window.location.href =
+    `lemma.html?lexeme_id=${encodeURIComponent(lexemeId)}`;
+
     return;
   }
   
