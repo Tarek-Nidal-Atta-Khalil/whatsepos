@@ -253,6 +253,437 @@ function generaSubstantivumA({ lemmaInput, genus, numerusTyp }) {
   return { lemmaNudum, formae };
 }
 
+function recordumVerbi({
+  formaMacris,
+  lemmaNudum,
+  pars = 'verbum',
+  numerus = null,
+  persona = null,
+  tempus = null,
+  modus = null,
+  vox = null
+}) {
+  const forma = String(formaMacris || '').trim();
+
+  if (forma.includes(' ')) {
+    return {
+      forma: sineMacris(forma).toLowerCase(),
+      lemma: lemmaNudum,
+      pars_orationis: pars,
+      genus: null,
+      numerus,
+      casus: null,
+      persona,
+      tempus,
+      modus,
+      vox,
+      syllabae: '',
+      longae: ''
+    };
+  }
+
+  return {
+    ...recordumFormae({
+      formaMacris: forma,
+      lemmaNudum,
+      pars,
+      genus: null,
+      numerus,
+      casus: null
+    }),
+    persona,
+    tempus,
+    modus,
+    vox
+  };
+}
+
+function generaVerbumA({
+  lemmaInput,
+  infinitivusInput,
+  perfectumInput,
+  supinumInput,
+  uoces
+}) {
+  const lemmaMacris = exColonibusMacra(lemmaInput).trim();
+  const lemmaNudum = sineMacris(lemmaMacris).toLowerCase();
+
+  const infinitivus = exColonibusMacra(infinitivusInput).trim();
+  const perfectum = exColonibusMacra(perfectumInput).trim();
+  const supinum = exColonibusMacra(supinumInput).trim();
+
+  if (!/(āre|ārī)$/i.test(infinitivus)) {
+    throw new Error('Infinitivus a-coniugationis in -a:re aut -a:ri: desinere debet.');
+  }
+
+  if (!/ī$/i.test(perfectum)) {
+    throw new Error('Perfectum in -i: desinere debet.');
+  }
+
+  if (!/um$/i.test(supinum)) {
+    throw new Error('Supinum in -um desinere debet.');
+  }
+
+  const stemmaPraesentis = infinitivus.replace(/(āre|ārī)$/i, 'ā');
+  const radixPraesentis = stemmaPraesentis.slice(0, -1);
+  const stemmaPerfecti = perfectum.replace(/ī$/i, '');
+  const stemmaSupini = supinum.replace(/um$/i, '');
+
+  const infinitivusActiuus = radixPraesentis + 'āre';
+  const infinitivusPassiuus = radixPraesentis + 'ārī';
+
+  const formae = [];
+
+  const personae = [
+    ['1', 'sg'],
+    ['2', 'sg'],
+    ['3', 'sg'],
+    ['1', 'pl'],
+    ['2', 'pl'],
+    ['3', 'pl']
+  ];
+
+  const add = ({
+    formaMacris,
+    pars = 'verbum',
+    persona = null,
+    numerus = null,
+    tempus = null,
+    modus = null,
+    vox = null
+  }) => {
+    formae.push(recordumVerbi({
+      formaMacris,
+      lemmaNudum,
+      pars,
+      persona,
+      numerus,
+      tempus,
+      modus,
+      vox
+    }));
+  };
+
+  const addSeries = (series, tempus, modus, vox) => {
+    series.forEach((formaMacris, index) => {
+      if (!formaMacris) return;
+
+      add({
+        formaMacris,
+        persona: personae[index][0],
+        numerus: personae[index][1],
+        tempus,
+        modus,
+        vox
+      });
+    });
+  };
+
+  const habetActiuum =
+    uoces === 'utraque' ||
+    uoces === 'activum_tantum';
+
+  const habetPassiuum =
+    uoces === 'utraque' ||
+    uoces === 'passivum_tantum';
+
+  if (habetActiuum) {
+    addSeries([
+      radixPraesentis + 'ō',
+      stemmaPraesentis + 's',
+      stemmaPraesentis + 't',
+      stemmaPraesentis + 'mus',
+      stemmaPraesentis + 'tis',
+      radixPraesentis + 'ant'
+    ], 'praes', 'ind', 'act');
+
+    addSeries([
+      stemmaPraesentis + 'bam',
+      stemmaPraesentis + 'bās',
+      stemmaPraesentis + 'bat',
+      stemmaPraesentis + 'bāmus',
+      stemmaPraesentis + 'bātis',
+      stemmaPraesentis + 'bant'
+    ], 'imperf', 'ind', 'act');
+
+    addSeries([
+      stemmaPraesentis + 'bō',
+      stemmaPraesentis + 'bis',
+      stemmaPraesentis + 'bit',
+      stemmaPraesentis + 'bimus',
+      stemmaPraesentis + 'bitis',
+      stemmaPraesentis + 'bunt'
+    ], 'fut', 'ind', 'act');
+
+    addSeries([
+      stemmaPerfecti + 'ī',
+      stemmaPerfecti + 'istī',
+      stemmaPerfecti + 'it',
+      stemmaPerfecti + 'imus',
+      stemmaPerfecti + 'istis',
+      stemmaPerfecti + 'ērunt'
+    ], 'perf', 'ind', 'act');
+
+    addSeries([
+      stemmaPerfecti + 'eram',
+      stemmaPerfecti + 'erās',
+      stemmaPerfecti + 'erat',
+      stemmaPerfecti + 'erāmus',
+      stemmaPerfecti + 'erātis',
+      stemmaPerfecti + 'erant'
+    ], 'plqpf', 'ind', 'act');
+
+    addSeries([
+      stemmaPerfecti + 'erō',
+      stemmaPerfecti + 'eris',
+      stemmaPerfecti + 'erit',
+      stemmaPerfecti + 'erimus',
+      stemmaPerfecti + 'eritis',
+      stemmaPerfecti + 'erint'
+    ], 'futperf', 'ind', 'act');
+
+    addSeries([
+      radixPraesentis + 'em',
+      radixPraesentis + 'ēs',
+      radixPraesentis + 'et',
+      radixPraesentis + 'ēmus',
+      radixPraesentis + 'ētis',
+      radixPraesentis + 'ent'
+    ], 'praes', 'coni', 'act');
+
+    addSeries([
+      infinitivusActiuus + 'm',
+      infinitivusActiuus + 's',
+      infinitivusActiuus + 't',
+      infinitivusActiuus + 'mus',
+      infinitivusActiuus + 'tis',
+      infinitivusActiuus + 'nt'
+    ], 'imperf', 'coni', 'act');
+
+    addSeries([
+      stemmaPerfecti + 'erim',
+      stemmaPerfecti + 'erīs',
+      stemmaPerfecti + 'erit',
+      stemmaPerfecti + 'erīmus',
+      stemmaPerfecti + 'erītis',
+      stemmaPerfecti + 'erint'
+    ], 'perf', 'coni', 'act');
+
+    addSeries([
+      stemmaPerfecti + 'issem',
+      stemmaPerfecti + 'issēs',
+      stemmaPerfecti + 'isset',
+      stemmaPerfecti + 'issēmus',
+      stemmaPerfecti + 'issētis',
+      stemmaPerfecti + 'issent'
+    ], 'plqpf', 'coni', 'act');
+
+    addSeries([
+      null,
+      stemmaPraesentis,
+      null,
+      null,
+      stemmaPraesentis + 'te',
+      null
+    ], 'praes', 'imp', 'act');
+
+    addSeries([
+      null,
+      stemmaPraesentis + 'tō',
+      stemmaPraesentis + 'tō',
+      null,
+      stemmaPraesentis + 'tōte',
+      radixPraesentis + 'antō'
+    ], 'fut', 'imp', 'act');
+
+    add({
+      formaMacris: infinitivusActiuus,
+      pars: 'infinitivus',
+      tempus: 'praes',
+      vox: 'act'
+    });
+
+    add({
+      formaMacris: stemmaPerfecti + 'isse',
+      pars: 'infinitivus',
+      tempus: 'perf',
+      vox: 'act'
+    });
+
+    add({
+      formaMacris: stemmaSupini + 'ūrus esse',
+      pars: 'infinitivus',
+      tempus: 'fut',
+      vox: 'act'
+    });
+
+    add({
+      formaMacris: stemmaPraesentis + 'ns',
+      pars: 'participium',
+      tempus: 'praes',
+      vox: 'act'
+    });
+
+    add({
+      formaMacris: stemmaSupini + 'ūrus',
+      pars: 'participium',
+      tempus: 'fut',
+      vox: 'act'
+    });
+  }
+
+  if (habetPassiuum) {
+    addSeries([
+      radixPraesentis + 'or',
+      stemmaPraesentis + 'ris',
+      stemmaPraesentis + 'tur',
+      stemmaPraesentis + 'mur',
+      stemmaPraesentis + 'minī',
+      radixPraesentis + 'antur'
+    ], 'praes', 'ind', 'pass');
+
+    addSeries([
+      stemmaPraesentis + 'bar',
+      stemmaPraesentis + 'bāris',
+      stemmaPraesentis + 'bātur',
+      stemmaPraesentis + 'bāmur',
+      stemmaPraesentis + 'bāminī',
+      stemmaPraesentis + 'bantur'
+    ], 'imperf', 'ind', 'pass');
+
+    addSeries([
+      stemmaPraesentis + 'bor',
+      stemmaPraesentis + 'beris',
+      stemmaPraesentis + 'bitur',
+      stemmaPraesentis + 'bimur',
+      stemmaPraesentis + 'biminī',
+      stemmaPraesentis + 'buntur'
+    ], 'fut', 'ind', 'pass');
+
+    const auxiliaPerfecti = [
+      ['sum', 'es', 'est', 'sumus', 'estis', 'sunt'],
+      ['eram', 'erās', 'erat', 'erāmus', 'erātis', 'erant'],
+      ['erō', 'eris', 'erit', 'erimus', 'eritis', 'erunt']
+    ];
+
+    auxiliaPerfecti.forEach((auxilia, index) => {
+      const tempora = ['perf', 'plqpf', 'futperf'];
+
+      addSeries(
+        auxilia.map((auxilium, i) =>
+          stemmaSupini + (i < 3 ? 'us ' : 'ī ') + auxilium
+        ),
+        tempora[index],
+        'ind',
+        'pass'
+      );
+    });
+
+    addSeries([
+      radixPraesentis + 'er',
+      radixPraesentis + 'ēris',
+      radixPraesentis + 'ētur',
+      radixPraesentis + 'ēmur',
+      radixPraesentis + 'ēminī',
+      radixPraesentis + 'entur'
+    ], 'praes', 'coni', 'pass');
+
+    addSeries([
+      stemmaPraesentis + 'rer',
+      stemmaPraesentis + 'rēris',
+      stemmaPraesentis + 'rētur',
+      stemmaPraesentis + 'rēmur',
+      stemmaPraesentis + 'rēminī',
+      stemmaPraesentis + 'rentur'
+    ], 'imperf', 'coni', 'pass');
+
+    addSeries([
+      stemmaSupini + 'us sim',
+      stemmaSupini + 'us sīs',
+      stemmaSupini + 'us sit',
+      stemmaSupini + 'ī sīmus',
+      stemmaSupini + 'ī sītis',
+      stemmaSupini + 'ī sint'
+    ], 'perf', 'coni', 'pass');
+
+    addSeries([
+      stemmaSupini + 'us essem',
+      stemmaSupini + 'us essēs',
+      stemmaSupini + 'us esset',
+      stemmaSupini + 'ī essēmus',
+      stemmaSupini + 'ī essētis',
+      stemmaSupini + 'ī essent'
+    ], 'plqpf', 'coni', 'pass');
+
+    addSeries([
+      null,
+      stemmaPraesentis + 're',
+      null,
+      null,
+      stemmaPraesentis + 'minī',
+      null
+    ], 'praes', 'imp', 'pass');
+
+    addSeries([
+      null,
+      stemmaPraesentis + 'tor',
+      stemmaPraesentis + 'tor',
+      null,
+      null,
+      radixPraesentis + 'antor'
+    ], 'fut', 'imp', 'pass');
+
+    add({
+      formaMacris: infinitivusPassiuus,
+      pars: 'infinitivus',
+      tempus: 'praes',
+      vox: 'pass'
+    });
+
+    add({
+      formaMacris: stemmaSupini + 'us esse',
+      pars: 'infinitivus',
+      tempus: 'perf',
+      vox: 'pass'
+    });
+
+    add({
+      formaMacris: stemmaSupini + 'um īrī',
+      pars: 'infinitivus',
+      tempus: 'fut',
+      vox: 'pass'
+    });
+
+    add({
+      formaMacris: stemmaSupini + 'us',
+      pars: 'participium',
+      tempus: 'perf',
+      vox: 'pass'
+    });
+
+    add({
+      formaMacris: radixPraesentis + 'andus',
+      pars: 'gerundivum',
+      vox: 'pass'
+    });
+  }
+
+  add({
+    formaMacris: supinum,
+    pars: 'supinum_i'
+  });
+
+  add({
+    formaMacris: stemmaSupini + 'ū',
+    pars: 'supinum_ii'
+  });
+
+  return {
+    lemmaNudum,
+    formae
+  };
+}
+
 function syncDeclinationesSubstantivi() {
   const genus = document.getElementById('addeGenus')?.value;
   const declinatio = document.getElementById('addeDeclinatio');
@@ -428,36 +859,66 @@ async function speichereAddeFormular() {
   const lemmaInput = document.getElementById('addeLemma')?.value.trim();
   const pars = document.getElementById('addePars')?.value;
   if (!lemmaInput || !pars) { statusAdde('Lemma et pars orationis necessaria sunt.'); return; }
-  if (pars === 'verbum') {
-    const coniugatio = document.getElementById('addeConiugatio')?.value || '';
-    const typus = document.getElementById('addeVerbumTypus')?.value || '';
-    const uoces = document.getElementById('addeVoxTypus')?.value || '';
-    const praesens = lemmaInput;
-    const infinitivus = document.getElementById('addeInfinitivus')?.value.trim() || '';
-    const perfectum = document.getElementById('addePerfectum')?.value.trim() || '';
-    const supinum = document.getElementById('addeSupinum')?.value.trim() || '';
-  
-    const lemmaMacris = exColonibusMacra(lemmaInput);
-    const lemmaNudum = sineMacris(lemmaMacris).toLowerCase();
-  
-    const verbum = {
-      lemmaInput,
-      lemmaMacris,
-      lemmaNudum,
-      pars,
-      coniugatio,
-      typus,
-      uoces,
-      praesens: exColonibusMacra(praesens),
-      infinitivus: exColonibusMacra(infinitivus),
-      perfectum: exColonibusMacra(perfectum),
-      supinum: exColonibusMacra(supinum)
-    };
+    if (pars === 'verbum') {
+    const coniugatio =
+      document.getElementById('addeConiugatio')?.value || '';
 
-  console.log('verbum paratum:', verbum);
-  statusAdde(`Verbum paratum: ${verbum.praesens}, ${verbum.infinitivus}, ${verbum.perfectum}, ${verbum.supinum}`);
-  return;
-}
+    const typus =
+      document.getElementById('addeVerbumTypus')?.value || '';
+
+    const uoces =
+      document.getElementById('addeVoxTypus')?.value || '';
+
+    const infinitivus =
+      document.getElementById('addeInfinitivus')?.value.trim() || '';
+
+    const perfectum =
+      document.getElementById('addePerfectum')?.value.trim() || '';
+
+    const supinum =
+      document.getElementById('addeSupinum')?.value.trim() || '';
+
+    if (coniugatio !== 'a') {
+      statusAdde('Nunc tantum uerba a-coniugationis servari possunt.');
+      return;
+    }
+
+    if (typus !== 'normale') {
+      statusAdde('Nunc tantum uerba normalia servari possunt.');
+      return;
+    }
+
+    let paradigma;
+
+    try {
+      paradigma = generaVerbumA({
+        lemmaInput,
+        infinitivusInput: infinitivus,
+        perfectumInput: perfectum,
+        supinumInput: supinum,
+        uoces
+      });
+    } catch (error) {
+      statusAdde(error.message);
+      return;
+    }
+
+    const { lemmaNudum, formae } = paradigma;
+
+    const { error } =
+      await window.whatseposSupabase
+        .from('formae')
+        .insert(formae);
+
+    if (error) {
+      statusAdde(error.message);
+      return;
+    }
+
+    aperiNouumLemma(lemmaNudum);
+    return;
+  }
+  
   if (pars === 'substantivum') {
     const declinatio = document.getElementById('addeDeclinatio')?.value;
     if (declinatio === 'a') {
