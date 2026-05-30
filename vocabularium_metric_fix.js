@@ -1,4 +1,4 @@
-import { erstelleAnalysezeile } from './hexameter_active.js?v=20260520-active-3';
+import { erstelleAnalysezeile } from './hexameter_flex.js?v=20260530-cache-reset-1';
 
 function sineMacris(textus) {
   return String(textus || '')
