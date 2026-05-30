@@ -170,6 +170,11 @@ addePanel.innerHTML = `
       <input id="addeSupinum" type="text" placeholder="lauda:tum">
     </div>
   </div>
+
+  <div class="adde-uerbum-actions">
+    <button id="addeCancel" type="button" class="adde-uerbum-secondary">revertere</button>
+    <button id="addeSave" type="button" class="adde-uerbum-primary" disabled>servare</button>
+  </div>
   
   <div class="adde-uerbum-actions">
     <button id="addeCancel" type="button" class="adde-uerbum-secondary">revertere</button>
@@ -419,6 +424,12 @@ async function quaereSuggestiones() {
                         suggestiones.appendChild(b); });
   if (suggestiones.children.length > 0) { suggestiones.style.display='block'; setzeSuggestioSelecta(0); }
 }
+function aperiNouumLemma(lemmaNudum) {
+  window.location.href = `lemma.html?lemma=${encodeURIComponent(lemmaNudum)}`;
+}
+
+async function speichereAddeFormular() {
+
 async function speichereAddeFormular() {
   if (!window.whatseposSupabase) return;
   const lemmaInput = document.getElementById('addeLemma')?.value.trim();
@@ -460,7 +471,7 @@ async function speichereAddeFormular() {
       const { lemmaNudum, formae } = generaSubstantivumA({ lemmaInput, genus: document.getElementById('addeGenus')?.value || null, numerusTyp: document.getElementById('addeNumerusTyp')?.value || 'sg_pl' });
       const { error } = await window.whatseposSupabase.from('formae').insert(formae);
       if (error) { statusAdde(error.message); return; }
-      window.location.href = `lemma.html?lemma=${encodeURIComponent(lemmaNudum)}`;
+      aperiNouumLemma(lemmaNudum);
       return;
     }
   }
@@ -469,7 +480,7 @@ async function speichereAddeFormular() {
   const record = recordumFormae({ formaMacris: lemmaMacris, lemmaNudum, pars, genus:null, numerus:null, casus:null });
   const { error } = await window.whatseposSupabase.from('formae').insert([record]);
   if (error) { statusAdde(error.message); return; }
-  window.location.href = `lemma.html?lemma=${encodeURIComponent(lemmaNudum)}`;
+  aperiNouumLemma(lemmaNudum);
 }
 
 const zeigeTabOriginal = window.zeigeTab;
