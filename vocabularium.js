@@ -294,7 +294,11 @@ function trenneSilben(textus) {
     const zwischenStart = links.end + 1;
     const zwischenEnd = rechts.start - 1;
     const zwischen = s.slice(zwischenStart, zwischenEnd + 1);
-    limites.push(zwischen.length <= 1 ? rechts.start : zwischenStart + 1);
+    limites.push(
+      zwischen.length <= 1
+        ? zwischenStart
+        : zwischenStart + 1
+    );
   }
   return limites.map((start, i) => s.slice(start, i + 1 < limites.length ? limites[i + 1] : s.length)).filter(Boolean);
 }
