@@ -3,6 +3,7 @@ import * as basis from "./hexameter_crossword.js?v=20260520-crossword-importmap-
 const VOCALES_LONGAE = { a: "ā", e: "ē", i: "ī", o: "ō", u: "ū", y: "ȳ" };
 const VOCALES_BREVES = { a: "ă", e: "ĕ", i: "ĭ", o: "ŏ", u: "ŭ", y: "y̆" };
 const DIPHTHONGE = ["ae", "oe", "au", "eu"];
+const DOUBLE_MACRON = "͞";
 
 export const setzeFormaeMetricas = basis.setzeFormaeMetricas;
 export const normalisiereLatein = basis.normalisiereLatein;
