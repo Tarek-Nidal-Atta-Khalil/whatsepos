@@ -215,6 +215,144 @@ function aplicaIConsonansIntervocalicum(elemente) {
   return resultatum;
 }
 
+function estQuUAnalyse(textus, index) {
+  const s = String(textus || "").toLowerCase();
+
+  return s[index] === "u"
+    && index > 0
+    && s[index - 1] === "q";
+}
+
+function indexPrimiVocalisAnalyse(textus) {
+  const s = String(textus || "").toLowerCase();
+
+  for (let i = 0; i < s.length; i += 1) {
+    if (estQuUAnalyse(s, i)) continue;
+    if (estVokalSimplex(s[i])) return i;
+  }
+
+  return -1;
+}
+
+function indexUltimiVocalisAnalyse(textus) {
+  const s = String(textus || "").toLowerCase();
+
+  for (let i = s.length - 1; i >= 0; i -= 1) {
+    if (estQuUAnalyse(s, i)) continue;
+    if (estVokalSimplex(s[i])) return i;
+  }
+
+  return -1;
+}
+
+function notaAnalyseElementum(textus, quantitas) {
+  const s = String(textus || "");
+  const indexVocalis = indexSignandiVocalisProNota(s);
+
+  if (indexVocalis < 0) return s;
+
+  if (quantitas === "longa" && istDiphthong(s, indexVocalis)) {
+    return s.slice(0, indexVocalis)
+      + s[indexVocalis]
+      + DOUBLE_MACRON
+      + s[indexVocalis + 1]
+      + s.slice(indexVocalis + 2);
+  }
+
+  return s.slice(0, indexVocalis)
+    + litteraQuantitateNotata(s[indexVocalis], quantitas)
+    + s.slice(indexVocalis + 1);
+}
+
+function resyllabificaElementeAnalyse(elemente, textus) {
+  const grenzen = wordBoundaries(textus);
+  const resultatum = positioniere(elemente).map(elementum => ({ ...elementum }));
+
+  for (let i = 0; i < resultatum.length - 1; i += 1) {
+    const links = resultatum[i];
+    const rechts = resultatum[i + 1];
+
+    if (!grenzen.has(links.ende)) continue;
+    if (indexPrimiVocalisAnalyse(rechts.textus) !== 0) continue;
+
+    const ultimusVocalis = indexUltimiVocalisAnalyse(links.textus);
+
+    if (ultimusVocalis < 0 || ultimusVocalis >= links.textus.length - 1) {
+      continue;
+    }
+
+    const coda = links.textus.slice(ultimusVocalis + 1);
+    const basisLinks = links.textus.slice(0, ultimusVocalis + 1);
+
+    if (!coda) continue;
+
+    links.textus = basisLinks;
+    rechts.textus = coda + rechts.textus;
+
+    if (links.quantitas === "longa") {
+      links.quantitas = "brevis";
+      links.signum = signumQuantitatis("brevis");
+    }
+  }
+
+  const cumIConsonante = aplicaIConsonansIntervocalicum(resultatum);
+
+  return positioniere(cumIConsonante).map(elementum => ({
+    ...elementum,
+    textusSignatus: notaAnalyseElementum(
+      elementum.textus,
+      elementum.quantitas
+    ),
+    signum: signumQuantitatis(elementum.quantitas)
+  }));
+}
+
+function quantitasSimplexAnalyseElementi(elementum) {
+  return elementum.quantitas === "longa"
+    ? "longa"
+    : "brevis";
+}
+
+function problemIndicesAnalyse(elemente) {
+  const indices = new Set();
+
+  for (let i = 0; i <= elemente.length - 3; i += 1) {
+    const q0 = quantitasSimplexAnalyseElementi(elemente[i]);
+    const q1 = quantitasSimplexAnalyseElementi(elemente[i + 1]);
+    const q2 = quantitasSimplexAnalyseElementi(elemente[i + 2]);
+
+    if (q0 === "longa" && q1 === "brevis" && q2 === "longa") {
+      indices.add(i + 1);
+    }
+
+    if (q0 === "brevis" && q1 === "brevis" && q2 === "brevis") {
+      indices.add(i);
+      indices.add(i + 1);
+      indices.add(i + 2);
+    }
+  }
+
+  return indices;
+}
+
+function finalisiereAnalysezeileFlex(zeile, textus) {
+  const elemente = resyllabificaElementeAnalyse(
+    zeile.elemente || [],
+    textus
+  );
+
+  const problemata = problemIndicesAnalyse(elemente);
+
+  return {
+    ...zeile,
+    schema: elemente.map(elementum => elementum.textus).join("-"),
+    elemente: elemente.map((elementum, index) => ({
+      ...elementum,
+      problema: problemata.has(index)
+    }))
+  };
+}
+
 function terminaturInMCoda(textus) {
   return /[aeiouy]m$/.test(String(textus || ""));
 }
