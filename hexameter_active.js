@@ -11,6 +11,7 @@ export const normalisiereLatein = basis.normalisiereLatein;
 export const findeElisionen = basis.findeElisionen;
 export const bereiteVersstromVor = basis.bereiteVersstromVor;
 export const findeMutaCumLiquidaStellen = basis.findeMutaCumLiquidaStellen;
+export const estDiphthongusCommunis = basis.estDiphthongusCommunis;
 
 function estVokal(c) {
   return VOKALE.includes((c || '').toLowerCase());
@@ -33,15 +34,7 @@ function estUConsonansIntervocalicum(textus, index, contextus = {}) {
 }
 
 function diphthongusValet(textus, index) {
-  const s = String(textus || '').toLowerCase();
-  const duo = s.slice(index, index + 2);
-  if (!DIPHTHONGI.includes(duo)) return false;
-
-  if ((duo === 'au' || duo === 'eu') && estVokal(s[index + 2])) {
-    return false;
-  }
-
-  return true;
+  return estDiphthongusCommunis(textus, index, DIPHTHONGI);
 }
 
 function indexSignandiVocalis(textus, contextus = {}) {
