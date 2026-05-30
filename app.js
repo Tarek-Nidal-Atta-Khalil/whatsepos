@@ -3,7 +3,7 @@ import {
   erstelleAnalysezeile,
   pruefeVersVorlaeufig,
   setzeFormaeMetricas
-} from "./hexameter_flex.js?v=20260530-crossword-merge-1";
+} from "./hexameter_flex.js?v=20260530-cache-reset-1";
 
 const sideMenu = document.getElementById("sideMenu");
 const menuButton = document.getElementById("menuButton");
