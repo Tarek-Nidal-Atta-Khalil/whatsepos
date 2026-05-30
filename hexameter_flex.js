@@ -165,6 +165,56 @@ function positioniere(elemente) {
   });
 }
 
+function estVokalSimplex(littera) {
+  return "aeiouy".includes((littera || "").toLowerCase());
+}
+
+function diphthongusInSyllaba(textus) {
+  const s = String(textus || "").toLowerCase();
+
+  for (let i = 0; i < s.length - 1; i += 1) {
+    if (istDiphthong(s, i)) return true;
+  }
+
+  return false;
+}
+
+function aplicaIConsonansIntervocalicum(elemente) {
+  const resultatum = (elemente || []).map(elementum => ({ ...elementum }));
+
+  for (let i = 0; i < resultatum.length - 1; i += 1) {
+    const links = resultatum[i];
+    const rechts = resultatum[i + 1];
+
+    const l = String(links.textus || "");
+    const r = String(rechts.textus || "");
+
+    if (!l || !r) continue;
+    if (!estVokalSimplex(l[l.length - 1])) continue;
+
+    // Fall: tro + iae → troj + jae
+    if (r[0] === "i" && estVokalSimplex(r[1])) {
+      links.textus = l + "j";
+      rechts.textus = "j" + r.slice(1);
+    }
+
+    // Fall: Die Basisanalyse hat bereits jae erzeugt.
+    else if (r[0] === "j" && estVokalSimplex(r[1])) {
+      links.textus = l + "j";
+    }
+
+    else {
+      continue;
+    }
+
+    if (diphthongusInSyllaba(rechts.textus)) {
+      rechts.quantitas = "longa";
+    }
+  }
+
+  return resultatum;
+}
+
 function terminaturInMCoda(textus) {
   return /[aeiouy]m$/.test(String(textus || ""));
 }
