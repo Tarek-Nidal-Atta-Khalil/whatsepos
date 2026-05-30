@@ -1,7 +1,7 @@
 import {
   formaSupabaseSignata,
   estDiphthongusCommunis
-} from './hexameter_flex.js?v=20260530-active-merge-1';
+} from './hexameter_flex.js?v=20260530-crossword-merge-1';
 
 const input = document.getElementById('vocabulariumQuaere');
 const status = document.getElementById('vocabulariumStatus');
