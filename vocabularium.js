@@ -169,34 +169,8 @@ addePanel.innerHTML = `
       <label for="addeSupinum">Supinum</label>
       <input id="addeSupinum" type="text" placeholder="lauda:tum">
     </div>
-  </div>>
-  
-      <div class="adde-uerbum-field">
-        <label for="addeVerbumTypus">Typus verbi</label>
-        <select id="addeVerbumTypus">
-          <option value="normale">normale</option>
-          <option value="deponens">deponens</option>
-          <option value="semideponens">semideponens</option>
-          <option value="impersonale">impersonale</option>
-        </select>
-      </div>
-  
-      <div class="adde-uerbum-field">
-        <label for="addeInfinitivus">Infinitivus praesentis</label>
-        <input id="addeInfinitivus" type="text" placeholder="canere">
-      </div>
-  
-      <div class="adde-uerbum-field">
-        <label for="addePerfectum">Perfectum 1. Sg.</label>
-        <input id="addePerfectum" type="text" placeholder="cecini:">
-      </div>
-  
-      <div class="adde-uerbum-field">
-        <label for="addeSupinum">Supinum</label>
-        <input id="addeSupinum" type="text" placeholder="cantum">
-      </div>
-    </div>
   </div>
+  
   <div class="adde-uerbum-actions">
     <button id="addeCancel" type="button" class="adde-uerbum-secondary">revertere</button>
     <button id="addeSave" type="button" class="adde-uerbum-primary" disabled>servare</button>
