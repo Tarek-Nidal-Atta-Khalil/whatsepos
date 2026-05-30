@@ -3,7 +3,7 @@ import {
   erstelleAnalysezeile,
   pruefeVersVorlaeufig,
   setzeFormaeMetricas
-} from "./hexameter_active.js?v=20260530-diphthongi-1";
+} from "./hexameter_flex.js?v=20260530-active-merge-1";
 
 const sideMenu = document.getElementById("sideMenu");
 const menuButton = document.getElementById("menuButton");
