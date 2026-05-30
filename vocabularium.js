@@ -256,6 +256,7 @@ function generaSubstantivumA({ lemmaInput, genus, numerusTyp }) {
 function recordumVerbi({
   formaMacris,
   lemmaNudum,
+  lexemeId,
   pars = 'verbum',
   numerus = null,
   persona = null,
