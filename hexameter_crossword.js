@@ -11,6 +11,7 @@ export const normalisiereLatein = basis.normalisiereLatein;
 export const findeElisionen = basis.findeElisionen;
 export const bereiteVersstromVor = basis.bereiteVersstromVor;
 export const findeMutaCumLiquidaStellen = basis.findeMutaCumLiquidaStellen;
+export const estDiphthongusCommunis = basis.estDiphthongusCommunis;
 
 function estVokal(littera) {
   return VOKALE.includes(littera);
@@ -42,8 +43,7 @@ function beginntMitVokalischemWert(textus) {
 }
 
 function istDiphthong(textus, index) {
-  if (!estVokalInTextu(textus, index) || !estVokalInTextu(textus, index + 1)) return false;
-  return DIPHTHONGE.includes(textus.slice(index, index + 2));
+  return estDiphthongusCommunis(textus, index, DIPHTHONGE);
 }
 
 function indexDiphthongiInTextu(textus) {
