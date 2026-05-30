@@ -120,14 +120,6 @@ function positioniere(elemente) {
   });
 }
 
-function hatDiphthongumNachJ(textus) {
-  const s = String(textus || "").toLowerCase();
-  for (let i = 0; i < s.length - 1; i += 1) {
-    if (diphthongusValet(s, i)) return true;
-  }
-  return false;
-}
-
 function diphthongusInSyllaba(textus) {
   const s = String(textus || "").toLowerCase();
 
