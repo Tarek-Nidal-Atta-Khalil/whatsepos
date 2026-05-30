@@ -267,4 +267,3 @@ window.normalisiereLatein = normalisiereLatein;
 window.findeElisionen = findeElisionen;
 window.bereiteVersstromVor = bereiteVersstromVor;
 window.findeMutaCumLiquidaStellen = findeMutaCumLiquidaStellen;
-window.formaSupabaseSignata = formaSupabaseSignata;
