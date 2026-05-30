@@ -170,11 +170,6 @@ addePanel.innerHTML = `
       <input id="addeSupinum" type="text" placeholder="lauda:tum">
     </div>
   </div>
-
-  <div class="adde-uerbum-actions">
-    <button id="addeCancel" type="button" class="adde-uerbum-secondary">revertere</button>
-    <button id="addeSave" type="button" class="adde-uerbum-primary" disabled>servare</button>
-  </div>
   
   <div class="adde-uerbum-actions">
     <button id="addeCancel" type="button" class="adde-uerbum-secondary">revertere</button>
