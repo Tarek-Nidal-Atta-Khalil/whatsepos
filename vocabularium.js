@@ -105,20 +105,71 @@ addePanel.innerHTML = `
   <div class="adde-form-card" id="addeAdiectivumCard" hidden>
     <div class="adde-uerbum-field"><label for="addeAdiectivumDeclinatio">Declinatio adiectivi</label><select id="addeAdiectivumDeclinatio"><option value="a_o">a-/o-Deklination</option><option value="consonantica">konsonantische Deklination</option><option value="i">i-Deklination</option><option value="indeclinabile">indeclinabile</option></select></div>
   </div>
-  <div class="adde-form-card" id="addeLeitformen" hidden>
-    <div class="adde-detail-grid">
-      <div class="adde-uerbum-field">
-        <label for="addeConiugatio">Coniugatio</label>
-        <select id="addeConiugatio">
-          <option value="">elige...</option>
-          <option value="a">a-Konjugation</option>
-          <option value="e">e-Konjugation</option>
-          <option value="i">i-Konjugation</option>
-          <option value="consonantica">konsonantische Konjugation</option>
-          <option value="mixta">gemischte Konjugation</option>
-          <option value="irregularis">unregelmäßige Konjugation</option>        
-        </select>
+    <div class="adde-form-card" id="addeConiugatioCard" hidden>
+    <div class="adde-uerbum-field">
+      <label for="addeConiugatio">Coniugatio</label>
+      <select id="addeConiugatio">
+        <option value="">elige...</option>
+        <option value="a">a-Konjugation</option>
+        <option value="e">e-Konjugation</option>
+        <option value="i">i-Konjugation</option>
+        <option value="consonantica">konsonantische Konjugation</option>
+        <option value="mixta">gemischte Konjugation</option>
+        <option value="irregularis">unregelmäßige Konjugation</option>
+      </select>
+      <div class="adde-card-help">Primum coniugationem elige.</div>
+    </div>
+  </div>
+
+  <div class="adde-form-card" id="addeVerbumTypusCard" hidden>
+    <div class="adde-uerbum-field">
+      <label for="addeVerbumTypus">Typus verbi</label>
+      <select id="addeVerbumTypus">
+        <option value="">elige...</option>
+        <option value="normale">normale</option>
+        <option value="deponens">deponens</option>
+        <option value="semideponens">semideponens</option>
+        <option value="impersonale">impersonale</option>
+      </select>
+      <div class="adde-card-help">Deinde typum uerbi elige.</div>
+    </div>
+  </div>
+
+  <div class="adde-form-card" id="addeVoxTypusCard" hidden>
+    <div class="adde-uerbum-field">
+      <label for="addeVoxTypus">Usus vocis</label>
+      <select id="addeVoxTypus">
+        <option value="">elige...</option>
+        <option value="utraque">activum et passivum</option>
+        <option value="activum_tantum">activum tantum</option>
+        <option value="passivum_tantum">passivum tantum</option>
+      </select>
+      <div class="adde-card-help">
+        Elige utrum formae actiuae, passiuae an utraeque generandae sint.
       </div>
+    </div>
+  </div>
+
+  <div class="adde-form-card" id="addeInfinitivusCard" hidden>
+    <div class="adde-uerbum-field">
+      <label for="addeInfinitivus">Infinitivus praesentis</label>
+      <input id="addeInfinitivus" type="text" placeholder="lauda:re">
+    </div>
+  </div>
+
+  <div class="adde-form-card" id="addePerfectumCard" hidden>
+    <div class="adde-uerbum-field">
+      <label for="addePerfectum">Perfectum 1. Sg.</label>
+      <input id="addePerfectum" type="text" placeholder="lauda:ui:">
+    </div>
+  </div>
+
+  <div class="adde-form-card" id="addeSupinumCard" hidden>
+    <div class="adde-uerbum-field">
+      <label for="addeSupinum">Supinum</label>
+      <input id="addeSupinum" type="text" placeholder="lauda:tum">
+    </div>
+  </div>>
   
       <div class="adde-uerbum-field">
         <label for="addeVerbumTypus">Typus verbi</label>
