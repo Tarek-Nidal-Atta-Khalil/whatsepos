@@ -1,7 +1,7 @@
 import {
   formaSupabaseSignata,
   estDiphthongusCommunis
-} from './hexameter_active.js?v=20260530-diphthongi-1';
+} from './hexameter_flex.js?v=20260530-forma-supabase-1';
 
 const input = document.getElementById('vocabulariumQuaere');
 const status = document.getElementById('vocabulariumStatus');
