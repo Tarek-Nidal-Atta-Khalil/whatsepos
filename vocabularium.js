@@ -685,6 +685,7 @@ function generaVerbumA({
 
   return {
     lemmaNudum,
+    lexemeId,
     formae
   };
 }
