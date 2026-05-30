@@ -96,35 +96,6 @@ function nota(textus, quantitas, contextus = {}) {
     + textus.slice(i + 1);
 }
 
-function longaeIndizesExSupabase(forma) {
-  if (Array.isArray(forma?.longae)) {
-    return forma.longae
-      .map(x => Number(x))
-      .filter(x => Number.isInteger(x) && x >= 0);
-  }
-
-  return String(forma?.quantitates || forma?.longae || "")
-    .toUpperCase()
-    .replace(/[.\s-]/g, "")
-    .split("")
-    .map((siglum, index) => siglum === "L" ? index : null)
-    .filter(index => index !== null);
-}
-
-export function formaSupabaseSignata(forma) {
-  const syllabae = String(forma?.syllabae || "")
-    .split(".")
-    .filter(Boolean);
-
-  if (syllabae.length === 0) return String(forma?.forma || forma?.lemma || "");
-
-  const longae = new Set(longaeIndizesExSupabase(forma));
-  return syllabae.map(function(syllaba, index) {
-    const contextus = { praecedens: syllabae[index - 1] || "" };
-    return longae.has(index) ? nota(syllaba, "longa", contextus) : syllaba;
-  }).join("");
-}
-
 function wordBoundaries(textus) {
   const normalisiert = basis.normalisiereLatein(textus);
   const woerter = normalisiert ? normalisiert.split(" ") : [];
