@@ -108,9 +108,36 @@ function estUConsonansInitiale(s,i){
 
 function estUConsonansIntervocalicum(s,i,ctx={}){
   const t=sineMacris(String(s||'')).toLowerCase();
-  if(t[i]!=='u'||i!==0||!estVocalis(t[i+1]))return false;
-  const p=sineMacris(String(ctx.praecedens||'')).toLowerCase();
-  return Boolean(p&&estVocalis(p[p.length-1]));
+
+  if(t[i]!=='u')return false;
+
+  const praecedens=i>0
+    ? t[i-1]
+    : sineMacris(String(ctx.praecedens||'')).toLowerCase().slice(-1);
+
+  const sequens=i<t.length-1
+    ? t[i+1]
+    : sineMacris(String(ctx.sequens||'')).toLowerCase().charAt(0);
+
+  return Boolean(
+    praecedens &&
+    sequens &&
+    estVocalis(praecedens) &&
+    estVocalis(sequens)
+  );
+}
+
+function estDiphthongusProNota(t,i,ctx={}){
+  const s=sineMacris(String(t||'')).toLowerCase();
+
+  if(
+    s[i+1]==='u' &&
+    estUConsonansIntervocalicum(s,i+1,ctx)
+  ){
+    return false;
+  }
+
+  return estDiphthongus(s,i);
 }
 
 function indexSignandiVocalis(t,ctx={}){
@@ -125,8 +152,8 @@ function indexSignandiVocalis(t,ctx={}){
   return-1;
 }
   
-  function notaLongaText(syllaba,ctx={}){const i=indexSignandiVocalis(syllaba,ctx);if(i<0)return syllaba;if(estDiphthongus(syllaba,i))return syllaba.slice(0,i)+syllaba[i]+'͞'+syllaba[i+1]+syllaba.slice(i+2);return syllaba.slice(0,i)+(longaeNotae[syllaba[i]]||syllaba[i])+syllaba.slice(i+1);}
-function notaLongaHtml(syllaba,ctx={}){const i=indexSignandiVocalis(syllaba,ctx);if(i<0)return escapeHtml(syllaba);if(estDiphthongus(syllaba,i))return escapeHtml(syllaba.slice(0,i))+`<span class="diphthongus">${escapeHtml(syllaba[i]+syllaba[i+1])}</span>`+escapeHtml(syllaba.slice(i+2));return escapeHtml(syllaba.slice(0,i)+(longaeNotae[syllaba[i]]||syllaba[i])+syllaba.slice(i+1));}
+  function notaLongaText(syllaba,ctx={}){const i=indexSignandiVocalis(syllaba,ctx);if(i<0)return syllaba;if(estDiphthongusProNota(syllaba,i,ctx))return syllaba.slice(0,i)+syllaba[i]+'͞'+syllaba[i+1]+syllaba.slice(i+2);return syllaba.slice(0,i)+(longaeNotae[syllaba[i]]||syllaba[i])+syllaba.slice(i+1);}
+function notaLongaHtml(syllaba,ctx={}){const i=indexSignandiVocalis(syllaba,ctx);if(i<0)return escapeHtml(syllaba);if(estDiphthongusProNota(syllaba,i,ctx))return escapeHtml(syllaba.slice(0,i))+`<span class="diphthongus">${escapeHtml(syllaba[i]+syllaba[i+1])}</span>`+escapeHtml(syllaba.slice(i+2));return escapeHtml(syllaba.slice(0,i)+(longaeNotae[syllaba[i]]||syllaba[i])+syllaba.slice(i+1));}
 function formaCorrecta(forma){const f={...forma};if(normalisiere(f.lemma||'').startsWith('lauini')||normalisiere(f.forma||'').startsWith('lauini')){const indices=new Set(longaeIndices(f));indices.add(0);indices.add(1);f.longae=[...indices].sort((a,b)=>a-b);}return f;}
 function syllabaeFormae(forma){return String(forma?.syllabae||'').split('.').filter(Boolean);}
 function syllabaeDisplayFormae(forma){
@@ -156,8 +183,28 @@ function syllabaeDisplayFormae(forma){
 function longaeSiglaMetricae(forma){forma=formaCorrecta(forma);const syllabae=syllabaeFormae(forma),dataLongae=new Set(longaeIndices(forma));return syllabae.map((s,i)=>(dataLongae.has(i)||syllabaPositioneLongaEst(syllabae,i)||syllabaDiphthongoLongaEst(s)||syllabaMacronLongaEst(s))?'L':'B').join('');}
 function longaeSiglaSignandae(forma){forma=formaCorrecta(forma);const syllabae=syllabaeFormae(forma),dataLongae=new Set(longaeIndices(forma));return syllabae.map((s,i)=>(dataLongae.has(i)||syllabaDiphthongoLongaEst(s)||syllabaMacronLongaEst(s))?'L':'B').join('');}
 function initialisMaiuscula(forma){return /^[A-ZĀĒĪŌŪȲ]/.test(String(forma?.lemma||lemmaDisplayActuale||lemma||''));}
-function formaSignata(forma){forma=formaCorrecta(forma);const syllabae=syllabaeFormae(forma);const textus=syllabae.length?syllabae.map((s,i)=>longaeSiglaSignandae(forma)[i]==='L'?notaLongaText(s,{praecedens:syllabae[i-1]||''}):s).join(''):String(forma?.forma||forma?.lemma||'');return initialisMaiuscula(forma)&&textus?textus.charAt(0).toUpperCase()+textus.slice(1):textus;}
-function formaSignataHtml(forma){forma=formaCorrecta(forma);const syllabae=syllabaeFormae(forma);let html=syllabae.length?syllabae.map((s,i)=>longaeSiglaSignandae(forma)[i]==='L'?notaLongaHtml(s,{praecedens:syllabae[i-1]||''}):escapeHtml(s)).join(''):escapeHtml(forma?.forma||forma?.lemma||'');if(initialisMaiuscula(forma)&&html)html=html.charAt(0).toUpperCase()+html.slice(1);return html;}
+
+function formaSignata(forma){
+  forma=formaCorrecta(forma);
+  const syllabae=syllabaeFormae(forma);
+  const textus=syllabae.length?syllabae.map((s,i)=>longaeSiglaSignandae(forma)[i]==='L'?notaLongaText(s,{
+  praecedens:syllabae[i-1]||'',
+  sequens:syllabae[i+1]||''
+}):s).join(''):String(forma?.forma||forma?.lemma||'');
+  return initialisMaiuscula(forma)&&textus?textus.charAt(0).toUpperCase()+textus.slice(1):textus;
+}
+  
+function formaSignataHtml(forma){
+  forma=formaCorrecta(forma);
+  const syllabae=syllabaeFormae(forma);
+  let html=syllabae.length?syllabae.map((s,i)=>longaeSiglaSignandae(forma)[i]==='L'?notaLongaHtml(s,{
+  praecedens:syllabae[i-1]||'',
+  sequens:syllabae[i+1]||''
+}):escapeHtml(s)).join(''):escapeHtml(forma?.forma||forma?.lemma||'');
+  if(initialisMaiuscula(forma)&&html)html=html.charAt(0).toUpperCase()+html.slice(1);
+  return html;
+}
+  
 function formaProLemmaHtml(forma){return formaSignataHtml(forma)||'—';}
 function breviaSyllabam(s){return String(s||'').replace(/[aeiouyAEIOUY]/,l=>breves[l]||l);}
 function estAblativusSingularisLongaeDeclinationis(f){if(normalisiere(f?.casus)!=='abl'||normalisiere(f?.numerus)!=='sg')return false;return /[aoieu]$/.test(normalisiere(f?.forma||''));}
