@@ -635,6 +635,13 @@ function erstelleAnalysezeileBasisFlex(textus) {
   };
 }
 
+export function erstelleAnalysezeile(textus) {
+  return finalisiereAnalysezeileFlex(
+    erstelleAnalysezeileBasisFlex(textus),
+    textus
+  );
+}
+
 export function analysiereHexameterRoh(textus) {
   const normalisiert = basis.normalisiereLatein(textus);
   const woerter = normalisiert ? normalisiert.split(" ") : [];
