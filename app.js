@@ -122,11 +122,17 @@ versWerkzeuge.appendChild(versLoeschenKnopf);
 document.body.appendChild(versWerkzeuge);
 
 window.zeigeTab = async function(tabName) {
-  ["login", "register", "hexameter", "meineTexte", "veroeffentlichungen", "profil"].forEach(id => {
+  ["login", "register", "hexameter", "meineTexte", "vocabularium", "veroeffentlichungen", "profil"].forEach(id => {
     document.getElementById(id).style.display = "none";
   });
+
   document.getElementById(tabName).style.display = "block";
   document.getElementById("sideMenu").classList.remove("open");
+
+  if (tabName !== "hexameter") {
+    ausgewaehlteVerse.clear();
+    aktualisiereVersWerkzeuge();
+  }
 
   if (tabName === "meineTexte") {
     ladeGedichtsliste();
