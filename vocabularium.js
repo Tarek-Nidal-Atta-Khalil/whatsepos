@@ -424,8 +424,6 @@ function aperiNouumLemma(lemmaNudum) {
 }
 
 async function speichereAddeFormular() {
-
-async function speichereAddeFormular() {
   if (!window.whatseposSupabase) return;
   const lemmaInput = document.getElementById('addeLemma')?.value.trim();
   const pars = document.getElementById('addePars')?.value;
