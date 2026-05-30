@@ -1,4 +1,4 @@
-import * as basis from "./hexameter.js?v=20260530-crossword-merge-1";
+import * as basis from "./hexameter.js?v=20260530-cache-reset-1";
 
 const VOCALES_LONGAE = { a: "ā", e: "ē", i: "ī", o: "ō", u: "ū", y: "ȳ" };
 const VOCALES_BREVES = { a: "ă", e: "ĕ", i: "ĭ", o: "ŏ", u: "ŭ", y: "y̆" };
