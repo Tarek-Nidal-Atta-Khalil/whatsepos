@@ -1,4 +1,5 @@
-// Hexameter-Hilfsfunktionen.
+const basis = (() => {
+  // Hexameter-Hilfsfunktionen.
 const VOKALE = "aeiouy";
 const DIPHTHONGE = ["ae", "au", "oe", "ei", "eu"];
 const MUTAE_CUM_LIQUIDA = ["bl","br","cl","cr","dl","dr","gl","gr","pl","pr","tl","tr","chl","chr","phl","phr","thl","thr"];
@@ -8,7 +9,7 @@ const VOCALES_BREVES = { a: "ă", e: "ĕ", i: "ĭ", o: "ŏ", u: "ŭ", y: "y̆" }
 let formaeMetricae = [];
 let formaePerFormam = new Map();
 
-export function setzeFormaeMetricas(formae) {
+function setzeFormaeMetricas(formae) {
   formaeMetricae = Array.isArray(formae) ? formae : [];
   formaePerFormam = new Map();
 
@@ -28,7 +29,7 @@ function clavisFormae(textus) {
   return normalisiereLatein(textus).replace(/\s+/g, "");
 }
 
-export function normalisiereLatein(textus) {
+function normalisiereLatein(textus) {
   return String(textus || "")
     .toLowerCase()
     .replace(/[āáàâäǎă]/g, "a")
@@ -62,7 +63,7 @@ function indexPrimiVocalisInTextu(textus) {
   return -1;
 }
 
-export function estDiphthongusCommunis(textus, index, diphthongi = DIPHTHONGE) {
+function estDiphthongusCommunis(textus, index, diphthongi = DIPHTHONGE) {
   const s = normalisiereSyllabaeLexico(textus);
   const duo = s.slice(index, index + 2);
 
@@ -110,7 +111,7 @@ function beginntMitVokalOderH(wort) {
   return /^[aeiouyh]/.test(wort);
 }
 
-export function findeElisionen(textus) {
+function findeElisionen(textus) {
   const normalisiert = normalisiereLatein(textus);
   const woerter = normalisiert ? normalisiert.split(" ") : [];
   const elisionen = [];
@@ -151,7 +152,7 @@ function bereiteWortVor(wort) {
   return geminaIntervokalischesI(consonantificaIntervocalicumU(mitKonsonantischemU));
 }
 
-export function bereiteVersstromVor(textus) {
+function bereiteVersstromVor(textus) {
   const normalisiert = normalisiereLatein(textus);
   const woerter = normalisiert ? normalisiert.split(" ") : [];
   const elisionen = findeElisionen(textus);
@@ -208,7 +209,7 @@ function findeSilbenkerne(strom) {
   return kerne;
 }
 
-export function findeMutaCumLiquidaStellen(textus) {
+function findeMutaCumLiquidaStellen(textus) {
   const vorbereitet = bereiteVersstromVor(textus);
   const strom = vorbereitet.versstrom;
   const kerne = findeSilbenkerne(strom);
@@ -601,7 +602,7 @@ function formaeSelectaeExKombination(kombination) {
   return map;
 }
 
-export function trenneSilbenVariantenVers(textus) {
+function trenneSilbenVariantenVers(textus) {
   const normalisiert = normalisiereLatein(textus);
   const woerter = normalisiert ? normalisiert.split(" ") : [];
   const elisionen = findeElisionen(textus);
@@ -631,12 +632,12 @@ export function trenneSilbenVariantenVers(textus) {
   return resultata;
 }
 
-export function trenneSilbenVers(textus) {
+function trenneSilbenVers(textus) {
   const varianten = trenneSilbenVariantenVers(textus);
   return varianten[0]?.silben ?? [];
 }
 
-export function analysiereSilbenVorlaeufig(textus) {
+function analysiereSilbenVorlaeufig(textus) {
   const vorbereitet = bereiteVersstromVor(textus);
   const varianten = trenneSilbenVariantenVers(textus);
   return {
@@ -753,7 +754,7 @@ function resolvePedesRekursiv(silbae, pesIndex, initium, pedes) {
   return null;
 }
 
-export function analysiereHexameterPedes(textus) {
+function analysiereHexameterPedes(textus) {
   const analyse = analysiereSilbenVorlaeufig(textus);
   const conatus = [];
   const variantes = [...(analyse.varianten || [])].sort((a, b) => optimaComparatio(a, b));
@@ -851,7 +852,7 @@ function optimaVariante(varianten) {
   return [...varianten].sort(optimaComparatio)[0];
 }
 
-export function pruefeVersVorlaeufig(textus) {
+function pruefeVersVorlaeufig(textus) {
   const analyse = analysiereSilbenVorlaeufig(textus);
   const pedesAnalyse = analysiereHexameterPedes(textus);
 
@@ -861,7 +862,7 @@ export function pruefeVersVorlaeufig(textus) {
   return { abschickbar: true, grund: "", analyse, pedesAnalyse };
 }
 
-export function erstelleAnalysezeile(textus) {
+function erstelleAnalysezeile(textus) {
   const pruefung = pruefeVersVorlaeufig(textus);
   const pedesAnalyse = pruefung.pedesAnalyse;
   const optima = optimaVariante(pruefung.analyse.varianten);
@@ -892,7 +893,7 @@ export function erstelleAnalysezeile(textus) {
   };
 }
 
-export function analysiereHexameterRoh(textus) {
+function analysiereHexameterRoh(textus) {
   const normalisiert = normalisiereLatein(textus);
   const woerter = normalisiert ? normalisiert.split(" ") : [];
   const elisionen = findeElisionen(textus);
@@ -955,3 +956,22 @@ window.debugProfilVarianten = function(textus) {
     };
   });
 };
+
+                 return {
+    setzeFormaeMetricas,
+    normalisiereLatein,
+    estDiphthongusCommunis,
+    findeElisionen,
+    bereiteVersstromVor,
+    findeMutaCumLiquidaStellen,
+    trenneSilbenVariantenVers,
+    trenneSilbenVers,
+    analysiereSilbenVorlaeufig,
+    analysiereHexameterPedes,
+    pruefeVersVorlaeufig,
+    erstelleAnalysezeile,
+    analysiereHexameterRoh,
+    erzeugeProfileAusSupabase,
+    silbenAusFormaeOderRegula
+  };
+})();
