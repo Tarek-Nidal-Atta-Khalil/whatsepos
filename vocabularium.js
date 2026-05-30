@@ -270,6 +270,7 @@ function recordumVerbi({
     return {
       forma: sineMacris(forma).toLowerCase(),
       lemma: lemmaNudum,
+      lexeme_id: lexemeId,
       pars_orationis: pars,
       genus: null,
       numerus,
@@ -283,7 +284,7 @@ function recordumVerbi({
     };
   }
 
-  return {
+    return {
     ...recordumFormae({
       formaMacris: forma,
       lemmaNudum,
@@ -292,6 +293,7 @@ function recordumVerbi({
       numerus,
       casus: null
     }),
+    lexeme_id: lexemeId,
     persona,
     tempus,
     modus,
@@ -308,6 +310,7 @@ function generaVerbumA({
 }) {
   const lemmaMacris = exColonibusMacra(lemmaInput).trim();
   const lemmaNudum = sineMacris(lemmaMacris).toLowerCase();
+  const lexemeId = crypto.randomUUID();
 
   const infinitivus = exColonibusMacra(infinitivusInput).trim();
   const perfectum = exColonibusMacra(perfectumInput).trim();
@@ -353,9 +356,10 @@ function generaVerbumA({
     modus = null,
     vox = null
   }) => {
-    formae.push(recordumVerbi({
+      formae.push(recordumVerbi({
       formaMacris,
       lemmaNudum,
+      lexemeId,
       pars,
       persona,
       numerus,
