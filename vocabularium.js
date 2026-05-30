@@ -236,7 +236,20 @@ function trenneSilben(textus) {
   }
   return limites.map((start, i) => s.slice(start, i + 1 < limites.length ? limites[i + 1] : s.length)).filter(Boolean);
 }
-function longaeSigla(syllabaeMacris) { return syllabaeMacris.map(s => ([...s].some(estLongaChar) || ['ae','au','oe','eu'].some(d => sineMacris(s).toLowerCase().includes(d))) ? 'L' : 'B').join(''); }
+
+function estSyllabaLongaNatura(syllaba) {
+  return [...String(syllaba || '')].some(estLongaChar)
+    || nucleiVocalici(syllaba).some(nucleus => nucleus.end > nucleus.start);
+}
+
+function indicesLongarum(syllabaeMacris) {
+  return syllabaeMacris
+    .map((syllaba, index) =>
+      estSyllabaLongaNatura(syllaba) ? index : null
+    )
+    .filter(index => index !== null);
+}
+
 function recordumFormae({ formaMacris, lemmaNudum, pars, genus, numerus, casus }) {
   const syllabaeMacris = trenneSilben(formaMacris);
   return { forma: sineMacris(formaMacris).toLowerCase(), lemma: lemmaNudum, pars_orationis: pars, genus, numerus, casus, syllabae: syllabaeMacris.map(s => sineMacris(s).toLowerCase()).join('.'), longae: longaeSigla(syllabaeMacris) };
