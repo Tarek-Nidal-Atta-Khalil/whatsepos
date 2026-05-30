@@ -1,4 +1,7 @@
-import { formaSupabaseSignata } from './hexameter_active.js?v=20260525-macra-1';
+import {
+  formaSupabaseSignata,
+  estDiphthongusCommunis
+} from './hexameter_active.js?v=20260530-diphthongi-1';
 
 const input = document.getElementById('vocabulariumQuaere');
 const status = document.getElementById('vocabulariumStatus');
@@ -205,13 +208,7 @@ function exColonibusMacra(textus) { return String(textus || '').replace(/([aeiou
 function estVocalis(c) { return VOCALES.includes(c || ''); }
 function estLongaChar(c) { return /[āēīōūȳĀĒĪŌŪȲ]/.test(c || ''); }
 function estDiphthongus(textus, i) {
-  const s = sineMacris(String(textus || '')).toLowerCase();
-  const duo = s.slice(i, i + 2);
-
-  if (!DIPHTHONGI.includes(duo)) return false;
-  if (estVocalis(s[i + 2])) return false;
-
-  return true;
+  return estDiphthongusCommunis(textus, i, DIPHTHONGI);
 }
 function nucleiVocalici(textus) {
   const s = String(textus || '');
