@@ -13,7 +13,7 @@
 <h1 id="siteTitle">Uocabularium</h1><a href="index.html?tab=vocabularium" class="lemma-revertere">← Retro</a>
 <div class="container lemma-container"><div class="lemma-topbar"><input id="lemmaQuaere" type="search" placeholder="Aliud verbum quaere"></div><article class="lemma-card"><header><h1 id="lemmaTitulus">—</h1><p id="lemmaPars">—</p></header><section class="lemma-section"><h2>Flexio</h2><div id="lemmaFlexio">Tabula nondum onerata est.</div></section><section class="lemma-section"><h2>Formae metricae</h2><div id="lemmaFormae">—</div></section></article></div>
 <script type="module">
-import { estDiphthongusCommunis } from './hexameter.js?v=20260530-diphthongi-1';
+import { estDiphthongusCommunis } from './hexameter.js?v=20260531-u-intervocalicum-1';
 import{createClient}from"https://esm.sh/@supabase/supabase-js@2";
 async function client(){const s=await fetch('./app.js').then(r=>r.text());const m=s.match(/createClient\(\s*"([^"]+)"\s*,\s*"([^"]+)"/);if(!m)throw new Error('config');return createClient(m[1],m[2]);}
 const supabase=await client();
