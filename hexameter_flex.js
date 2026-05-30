@@ -607,7 +607,7 @@ function problemIndicesMetrice(silbae, pedesAnzeige) {
   return addeProblemataAb(silbae, start);
 }
 
-export function erstelleAnalysezeile(textus) {
+function erstelleAnalysezeileBasisFlex(textus) {
   const pruefung = pruefeVersVorlaeufig(textus);
   const pedesAnalyse = pruefung.pedesAnalyse;
   const silben = pedesAnalyse.successit ? pedesAnalyse.silben : ((pruefung.analyse.varianten || [])[0]?.silben ?? []);
