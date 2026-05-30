@@ -210,17 +210,79 @@ function estLongaChar(c) { return /[āēīōūȳĀĒĪŌŪȲ]/.test(c || ''); }
 function estDiphthongus(textus, i) {
   return estDiphthongusCommunis(textus, i, DIPHTHONGI);
 }
+
+function consonantificaAdSyllabas(textus) {
+  const litterae = [...String(textus || '')];
+
+  return litterae
+    .map((littera, index) => {
+      const simplex = sineMacris(littera).toLowerCase();
+      const praecedens = litterae[index - 1] || '';
+      const sequens = litterae[index + 1] || '';
+
+      const praecedensEstVocalis = estVocalis(praecedens);
+      const sequensEstVocalis = estVocalis(sequens);
+
+      // u am Wortanfang oder zwischen zwei Vokalen ist konsonantisch:
+      // u → v nur für die interne Analyse.
+      if (
+        simplex === 'u'
+        && sequensEstVocalis
+        && (index === 0 || praecedensEstVocalis)
+      ) {
+        return 'v';
+      }
+
+      // i am Wortanfang oder zwischen zwei Vokalen ist konsonantisch:
+      // i → j nur für die interne Analyse.
+      if (
+        simplex === 'i'
+        && sequensEstVocalis
+        && (index === 0 || praecedensEstVocalis)
+      ) {
+        return 'j';
+      }
+
+      return littera;
+    })
+    .join('');
+}
+
 function nucleiVocalici(textus) {
   const s = String(textus || '');
+
+  // Die Länge bleibt identisch, damit die Indizes weiterhin
+  // auf die sichtbare Schreibweise mit u und i passen.
+  const analysis = consonantificaAdSyllabas(s);
+
   const nuclei = [];
-  for (let i = 0; i < s.length; i += 1) {
-    if (!estVocalis(s[i])) continue;
-    if (sineMacris(s[i]).toLowerCase() === 'u' && i > 0 && sineMacris(s[i - 1]).toLowerCase() === 'q') continue;
-    if (i < s.length - 1 && estVocalis(s[i + 1]) && estDiphthongus(s, i)) { nuclei.push({ start:i, end:i + 1 }); i += 1; }
-    else nuclei.push({ start:i, end:i });
+
+  for (let i = 0; i < analysis.length; i += 1) {
+    if (!estVocalis(analysis[i])) continue;
+
+    if (
+      sineMacris(analysis[i]).toLowerCase() === 'u'
+      && i > 0
+      && sineMacris(analysis[i - 1]).toLowerCase() === 'q'
+    ) {
+      continue;
+    }
+
+    if (
+      i < analysis.length - 1
+      && estVocalis(analysis[i + 1])
+      && estDiphthongus(analysis, i)
+    ) {
+      nuclei.push({ start: i, end: i + 1 });
+      i += 1;
+    } else {
+      nuclei.push({ start: i, end: i });
+    }
   }
+
   return nuclei;
 }
+
 function trenneSilben(textus) {
   const s = String(textus || '');
   const nuclei = nucleiVocalici(s);
