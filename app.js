@@ -1,5 +1,9 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { erstelleAnalysezeile, pruefeVersVorlaeufig, setzeFormaeMetricas } from "./hexameter.js?v=20260520-longae-pipeline-2";
+import {
+  erstelleAnalysezeile,
+  pruefeVersVorlaeufig,
+  setzeFormaeMetricas
+} from "./hexameter_active.js?v=20260530-diphthongi-1";
 
 const sideMenu = document.getElementById("sideMenu");
 const menuButton = document.getElementById("menuButton");
