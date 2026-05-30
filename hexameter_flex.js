@@ -1,4 +1,4 @@
-import * as basis from "./hexameter_crossword.js?v=20260520-crossword-importmap-1";
+import * as basis from "./hexameter.js?v=20260530-crossword-merge-1";
 
 const VOCALES_LONGAE = { a: "ā", e: "ē", i: "ī", o: "ō", u: "ū", y: "ȳ" };
 const VOCALES_BREVES = { a: "ă", e: "ĕ", i: "ĭ", o: "ŏ", u: "ŭ", y: "y̆" };
@@ -353,6 +353,202 @@ function finalisiereAnalysezeileFlex(zeile, textus) {
   };
 }
 
+const DIPHTHONGE_CROSSWORD = ["ae", "au", "oe", "ei", "eu", "ui"];
+
+const MUTAE_CUM_LIQUIDA_CROSSWORD = [
+  "bl", "br", "cl", "cr", "dl", "dr",
+  "gl", "gr", "pl", "pr", "tl", "tr",
+  "chl", "chr", "phl", "phr", "thl", "thr"
+];
+
+function istDiphthongCrossword(textus, index) {
+  return estDiphthongusCommunis(
+    textus,
+    index,
+    DIPHTHONGE_CROSSWORD
+  );
+}
+
+function hatDiphthongumCrossword(textus) {
+  for (let i = 0; i < String(textus || "").length - 1; i += 1) {
+    if (istDiphthongCrossword(textus, i)) return true;
+  }
+
+  return false;
+}
+
+function hatVokalischenWertCrossword(textus) {
+  return indexPrimiVocalisInTextu(textus) >= 0;
+}
+
+function istMutaCumLiquidaCrossword(gruppe) {
+  return MUTAE_CUM_LIQUIDA_CROSSWORD.includes(gruppe);
+}
+
+function estFallbackSyllabaCrossword(syllaba) {
+  return !syllaba?.forma;
+}
+
+function quantitasBasisCrossword(syllaba) {
+  if (syllaba.quantitas === "longa_natura_lexico") {
+    return "longa_natura_lexico";
+  }
+
+  if (
+    syllaba.quantitas === "brevis_natura_lexico"
+    && !estFallbackSyllabaCrossword(syllaba)
+  ) {
+    return "brevis_natura_lexico";
+  }
+
+  if (hatDiphthongumCrossword(syllaba.textus)) {
+    return "longa_natura_diphthongo";
+  }
+
+  if (/[aeiouy]m$/.test(syllaba.textus)) {
+    return "longa_natura_m_coda";
+  }
+
+  if (!hatVokalischenWertCrossword(syllaba.textus)) {
+    return syllaba.quantitas || "ambigua_provisoria";
+  }
+
+  if (estFallbackSyllabaCrossword(syllaba)) {
+    return "ambigua_provisoria";
+  }
+
+  return estVokalInTextu(
+    syllaba.textus,
+    syllaba.textus.length - 1
+  )
+    ? "brevis_provisoria"
+    : "longa_positione_provisoria";
+}
+
+function schliesseWortgrenzenCrossword(silben) {
+  const resultatum = (silben || []).map(syllaba => ({ ...syllaba }));
+
+  for (let i = 0; i < resultatum.length - 1; i += 1) {
+    const links = resultatum[i];
+    const rechts = resultatum[i + 1];
+
+    if (links.wortIndex === rechts.wortIndex) continue;
+    if (!beginntMitVokalischemWert(rechts.textus)) continue;
+
+    const ultimusVocalis =
+      indexUltimiVocalisInTextu(links.textus);
+
+    if (
+      ultimusVocalis < 0
+      || ultimusVocalis >= links.textus.length - 1
+    ) {
+      continue;
+    }
+
+    const coda = links.textus.slice(ultimusVocalis + 1);
+    const basisLinks = links.textus.slice(0, ultimusVocalis + 1);
+
+    if (
+      !coda
+      || !hatVokalischenWertCrossword(basisLinks)
+    ) {
+      continue;
+    }
+
+    links.textus = basisLinks;
+    rechts.textus = coda + rechts.textus;
+
+    links.quantitas = quantitasBasisCrossword(links);
+    rechts.quantitas = quantitasBasisCrossword(rechts);
+  }
+
+  return aktualisierePositiones(resultatum);
+}
+
+function normalisiereFallbackQuantitatesCrossword(silben) {
+  return (silben || []).map(function(syllaba) {
+    if (!estFallbackSyllabaCrossword(syllaba)) return syllaba;
+
+    if (
+      syllaba.quantitas === "longa_positione_provisoria"
+      || syllaba.quantitas === "longa_natura_diphthongo"
+      || syllaba.quantitas === "longa_natura_m_coda"
+    ) {
+      return syllaba;
+    }
+
+    if (hatVokalischenWertCrossword(syllaba.textus)) {
+      return {
+        ...syllaba,
+        quantitas: "ambigua_provisoria"
+      };
+    }
+
+    return syllaba;
+  });
+}
+
+function wendePositionslaengenCrosswordAn(silben) {
+  return (silben || []).map(function(syllaba, index) {
+    if (
+      syllaba.quantitas
+      && syllaba.quantitas !== "brevis_natura_lexico"
+      && syllaba.quantitas !== "brevis_provisoria"
+      && syllaba.quantitas !== "ambigua_provisoria"
+    ) {
+      return syllaba;
+    }
+
+    const naechste = silben[index + 1];
+
+    if (!naechste) return syllaba;
+
+    const indexVocalisLinks =
+      indexPrimiVocalisInTextu(syllaba.textus);
+
+    const indexVocalisRechts =
+      indexPrimiVocalisInTextu(naechste.textus);
+
+    if (indexVocalisLinks < 0 || indexVocalisRechts < 0) {
+      return syllaba;
+    }
+
+    const zwischen =
+      syllaba.textus.slice(indexVocalisLinks + 1)
+      + naechste.textus.slice(0, indexVocalisRechts);
+
+    const konsonanten = zwischen.replace(/[aeiouy]/g, "");
+
+    if (
+      konsonanten.length >= 2
+      && !istMutaCumLiquidaCrossword(konsonanten)
+    ) {
+      return {
+        ...syllaba,
+        quantitas: "longa_positione_provisoria"
+      };
+    }
+
+    return syllaba;
+  });
+}
+
+function postprocessVarianteCrossword(variante) {
+  const resyllabificatae =
+    normalisiereFallbackQuantitatesCrossword(
+      schliesseWortgrenzenCrossword(variante.silben || [])
+    );
+
+  const silben =
+    wendePositionslaengenCrosswordAn(resyllabificatae);
+
+  return {
+    ...variante,
+    schema: silben.map(syllaba => syllaba.textus).join("-"),
+    silben
+  };
+}
+
 function terminaturInMCoda(textus) {
   return /[aeiouy]m$/.test(String(textus || ""));
 }
@@ -420,7 +616,12 @@ function determinaVarianten(varianten) {
 }
 
 export function trenneSilbenVariantenVers(textus) {
-  return determinaVarianten(basis.trenneSilbenVariantenVers(textus));
+  const variantesCrossword =
+    basis
+      .trenneSilbenVariantenVers(textus)
+      .map(postprocessVarianteCrossword);
+
+  return determinaVarianten(variantesCrossword);
 }
 
 export function trenneSilbenVers(textus) {
@@ -429,9 +630,17 @@ export function trenneSilbenVers(textus) {
 }
 
 export function analysiereSilbenVorlaeufig(textus) {
-  const roh = basis.analysiereSilbenVorlaeufig(textus);
-  const varianten = determinaVarianten(roh.varianten);
-  return { ...roh, varianten, silben: varianten[0]?.silben ?? [] };
+  const vorbereitet = basis.bereiteVersstromVor(textus);
+  const varianten = trenneSilbenVariantenVers(textus);
+
+  return {
+    original: textus,
+    versstrom: vorbereitet.versstrom,
+    elisionen: vorbereitet.elisionen,
+    mutaCumLiquida: basis.findeMutaCumLiquidaStellen(textus),
+    silben: varianten[0]?.silben ?? [],
+    varianten
+  };
 }
 
 function quantitasSimplex(syllaba) {
