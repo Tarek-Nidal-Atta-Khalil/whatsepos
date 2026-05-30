@@ -48,6 +48,92 @@ function indexDiphthongiInTextu(textus) {
   return -1;
 }
 
+function estUConsonansIntervocalicumProNota(textus, index, contextus = {}) {
+  const s = String(textus || "").toLowerCase();
+
+  if (s[index] !== "u") return false;
+  if (index !== 0) return false;
+  if (!estVokalInTextu(s, index + 1)) return false;
+
+  const praecedens = String(contextus?.praecedens || "").toLowerCase();
+
+  if (!praecedens) return false;
+
+  return estVokalInTextu(praecedens, praecedens.length - 1);
+}
+
+function indexSignandiVocalisProNota(textus, contextus = {}) {
+  const s = String(textus || "").toLowerCase();
+  const ia = s.indexOf("ia");
+
+  if (ia >= 0) return ia + 1;
+
+  for (let i = 0; i < s.length; i += 1) {
+    if (!estVokalInTextu(s, i)) continue;
+    if (estUConsonansIntervocalicumProNota(s, i, contextus)) continue;
+
+    return i;
+  }
+
+  return -1;
+}
+
+function notaProSupabase(textus, quantitas, contextus = {}) {
+  const s = String(textus || "");
+  const i = indexSignandiVocalisProNota(s, contextus);
+
+  if (i < 0) return s;
+
+  if (quantitas === "longa" && istDiphthong(s, i)) {
+    return s.slice(0, i)
+      + s[i]
+      + DOUBLE_MACRON
+      + s[i + 1]
+      + s.slice(i + 2);
+  }
+
+  return s.slice(0, i)
+    + litteraQuantitateNotata(s[i], quantitas)
+    + s.slice(i + 1);
+}
+
+function longaeIndizesExSupabase(forma) {
+  if (Array.isArray(forma?.longae)) {
+    return forma.longae
+      .map(x => Number(x))
+      .filter(x => Number.isInteger(x) && x >= 0);
+  }
+
+  return String(forma?.quantitates || forma?.longae || "")
+    .toUpperCase()
+    .replace(/[.\s-]/g, "")
+    .split("")
+    .map((siglum, index) => siglum === "L" ? index : null)
+    .filter(index => index !== null);
+}
+
+export function formaSupabaseSignata(forma) {
+  const syllabae = String(forma?.syllabae || "")
+    .split(".")
+    .filter(Boolean);
+
+  if (syllabae.length === 0) {
+    return String(forma?.forma || forma?.lemma || "");
+  }
+
+  const longae = new Set(longaeIndizesExSupabase(forma));
+
+  return syllabae.map(function(syllaba, index) {
+    const contextus = {
+      praecedens: syllabae[index - 1] || ""
+    };
+
+    return longae.has(index)
+      ? notaProSupabase(syllaba, "longa", contextus)
+      : syllaba;
+  }).join("");
+}
+
 function terminaturInMCoda(textus) {
   return /[aeiouy]m$/.test(String(textus || ""));
 }
@@ -359,5 +445,6 @@ window.analysiereHexameterRoh = analysiereHexameterRoh;
 window.setzeFormaeMetricas = setzeFormaeMetricas;
 window.normalisiereLatein = normalisiereLatein;
 window.findeElisionen = findeElisionen;
+window.formaSupabaseSignata = formaSupabaseSignata;
 window.bereiteVersstromVor = bereiteVersstromVor;
 window.findeMutaCumLiquidaStellen = findeMutaCumLiquidaStellen;
