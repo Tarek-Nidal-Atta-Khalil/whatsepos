@@ -1028,14 +1028,30 @@ function estUConsonansIntervocalicumProNota(textus, index, contextus = {}) {
   const s = String(textus || "").toLowerCase();
 
   if (s[index] !== "u") return false;
-  if (index !== 0) return false;
-  if (!estVokalInTextu(s, index + 1)) return false;
 
-  const praecedens = String(contextus?.praecedens || "").toLowerCase();
+  const praecedens = index > 0
+    ? s[index - 1]
+    : String(contextus?.praecedens || "").toLowerCase().slice(-1);
 
-  if (!praecedens) return false;
+  const sequens = index < s.length - 1
+    ? s[index + 1]
+    : String(contextus?.sequens || "").toLowerCase().charAt(0);
 
-  return estVokalInTextu(praecedens, praecedens.length - 1);
+  return estVokalInTextu(praecedens, 0)
+    && estVokalInTextu(sequens, 0);
+}
+
+function estDiphthongusProNota(textus, index, contextus = {}) {
+  const s = String(textus || "").toLowerCase();
+
+  if (
+    s[index + 1] === "u" &&
+    estUConsonansIntervocalicumProNota(s, index + 1, contextus)
+  ) {
+    return false;
+  }
+
+  return istDiphthong(s, index);
 }
 
 function indexSignandiVocalisProNota(textus, contextus = {}) {
@@ -1060,7 +1076,7 @@ function notaProSupabase(textus, quantitas, contextus = {}) {
 
   if (i < 0) return s;
 
-  if (quantitas === "longa" && istDiphthong(s, i)) {
+  if (quantitas === "longa" && estDiphthongusProNota(s, i, contextus)) {
     return s.slice(0, i)
       + s[i]
       + DOUBLE_MACRON
@@ -1101,7 +1117,8 @@ export function formaSupabaseSignata(forma) {
 
   return syllabae.map(function(syllaba, index) {
     const contextus = {
-      praecedens: syllabae[index - 1] || ""
+      praecedens: syllabae[index - 1] || "",
+      sequens: syllabae[index + 1] || ""
     };
 
     return longae.has(index)
