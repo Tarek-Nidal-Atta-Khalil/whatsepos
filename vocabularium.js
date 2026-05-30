@@ -207,8 +207,10 @@ function estLongaChar(c) { return /[āēīōūȳĀĒĪŌŪȲ]/.test(c || ''); }
 function estDiphthongus(textus, i) {
   const s = sineMacris(String(textus || '')).toLowerCase();
   const duo = s.slice(i, i + 2);
+
   if (!DIPHTHONGI.includes(duo)) return false;
-  if ((duo === 'au' || duo === 'eu') && estVocalis(s[i + 2])) return false;
+  if (estVocalis(s[i + 2])) return false;
+
   return true;
 }
 function nucleiVocalici(textus) {
