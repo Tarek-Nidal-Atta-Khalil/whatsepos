@@ -131,7 +131,38 @@ export function formaSupabaseSignata(forma) {
     return longae.has(index)
       ? notaProSupabase(syllaba, "longa", contextus)
       : syllaba;
-  }).join("");
+    }).join("");
+}
+
+function wordBoundaries(textus) {
+  const normalisiert = normalisiereLatein(textus);
+  const woerter = normalisiert ? normalisiert.split(" ") : [];
+  const boundaries = new Set();
+  let cursor = 0;
+
+  for (let i = 0; i < woerter.length; i += 1) {
+    cursor += woerter[i].length;
+    boundaries.add(cursor - 1);
+  }
+
+  return boundaries;
+}
+
+function positioniere(elemente) {
+  let cursor = 0;
+
+  return (elemente || []).map(elementum => {
+    const start = cursor;
+    const ende = start + String(elementum.textus || "").length - 1;
+
+    cursor = ende + 1;
+
+    return {
+      ...elementum,
+      start,
+      ende
+    };
+  });
 }
 
 function terminaturInMCoda(textus) {
