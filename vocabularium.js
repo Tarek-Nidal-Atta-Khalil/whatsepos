@@ -508,7 +508,7 @@ function generaVerbumA({
     addSeries([
       radixPraesentis + 'ō',
       stemmaPraesentis + 's',
-      stemmaPraesentis + 't',
+      radixPraesentis + 'at',
       stemmaPraesentis + 'mus',
       stemmaPraesentis + 'tis',
       radixPraesentis + 'ant'
