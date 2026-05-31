@@ -533,7 +533,7 @@ function generaVerbumA({
     ], 'fut', 'ind', 'act');
 
     addSeries([
-      stemmaPerfecti + 'ī',
+      perfectum,
       stemmaPerfecti + 'istī',
       stemmaPerfecti + 'it',
       stemmaPerfecti + 'imus',
