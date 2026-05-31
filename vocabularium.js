@@ -874,10 +874,29 @@ function reddeLemmaListam() {
 
   const q = clavisQuaestionis(input?.value || '');
 
-  const visibilia = lemmataOmnia.filter(item =>
-    clavisQuaestionis(item?.lemma || '').includes(q)
-  );
+  const formaeQuaeribiles = item => [
+  item?.lemma || '',
+  ...formaeLemmae(item)
+    .map(forma => forma?.forma || '')
+];
 
+const congruentiaExacta = lemmataOmnia.filter(item =>
+  formaeQuaeribiles(item)
+    .some(forma =>
+      clavisQuaestionis(forma) === q
+    )
+);
+
+const visibilia =
+  q && congruentiaExacta.length
+    ? congruentiaExacta
+    : lemmataOmnia.filter(item =>
+        formaeQuaeribiles(item)
+          .some(forma =>
+            clavisQuaestionis(forma).includes(q)
+          )
+      );
+  
   lemmaLista.innerHTML = '';
 
   if (lemmaNumerus) {
