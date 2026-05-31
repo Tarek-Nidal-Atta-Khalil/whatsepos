@@ -273,7 +273,25 @@ function istHexameterCompatibilis(sigla){
 function td(html){const e=document.createElement('td');e.innerHTML=html||'—';return e;}
 function formaSubstantiviHtml(formae,casus,numerus){const f=formae.find(x=>x.casus===casus&&x.numerus===numerus);return f?formaProLemmaHtml(f):'—';}
 function numeriSubstantivi(formae){const sg=formae.some(f=>f.numerus==='sg'),pl=formae.some(f=>f.numerus==='pl');return sg&&pl?['sg','pl']:pl?['pl']:['sg'];}
-function tabellaSubstantivi(formae){const wrapper=document.createElement('div');wrapper.className='flexio-wrapper';const table=document.createElement('table');table.className='flexio-tabelle';const numeri=numeriSubstantivi(formae),thead=document.createElement('thead'),trh=document.createElement('tr');['',...numeri.map(n=>n==='sg'?'Singularis':'Pluralis')].forEach(t=>{const th=document.createElement('th');th.textContent=t;trh.appendChild(th)});thead.appendChild(trh);table.appendChild(thead);const tbody=document.createElement('tbody');casusOrdines.forEach(casus=>{const tr=document.createElement('tr'),th=document.createElement('th');th.textContent=casusNomina[casus];tr.appendChild(th);numeri.forEach(n=>tr.appendChild(td(formaSubstantiviHtml(formae,casus,n))));tbody.appendChild(tr)});table.appendChild(tbody);wrapper.appendChild(table);return wrapper;}
+function tabellaSubstantivi(formae){
+  const wrapper=document.createElement('div');wrapper.className='flexio-wrapper';
+  const table=document.createElement('table');table.className='flexio-tabelle genus-tabula';
+  const numeri=numeriSubstantivi(formae),thead=document.createElement('thead'),trh=document.createElement('tr');
+    ['',...numeri.map(n=>n==='sg'?'Singularis':'Pluralis')].forEach(t=>{
+    const th=document.createElement('th');
+      th.textContent=t;trh.appendChild(th)});
+      thead.appendChild(trh);table.appendChild(thead);
+  const tbody=document.createElement('tbody');
+    casusOrdines.forEach(casus=>{
+  const tr=document.createElement('tr'),th=document.createElement('th');
+      th.textContent=casusNomina[casus];
+      tr.appendChild(th);
+      numeri.forEach(n=>tr.appendChild(td(formaSubstantiviHtml(formae,casus,n))));
+      tbody.appendChild(tr)});
+      table.appendChild(tbody);
+      wrapper.appendChild(table);
+  return wrapper;
+}
 function formaNachMetaHtml(formae,casus,numerus,genus){const f=formae.find(x=>x.casus===casus&&x.numerus===numerus&&x.genus===genus);return f?formaProLemmaHtml(f):'—';}
 function tabellaGenusNumerus(formae,numerus){const h=document.createElement('h3');h.className='flexio-numerus';h.textContent=numerus==='sg'?'Singularis':'Pluralis';const wrapper=document.createElement('div');wrapper.className='flexio-wrapper';const table=document.createElement('table');table.className='flexio-tabelle';const head=document.createElement('tr');['','masculinum','femininum','neutrum'].forEach(t=>{const th=document.createElement('th');th.textContent=t;head.appendChild(th)});const thead=document.createElement('thead');thead.appendChild(head);table.appendChild(thead);const tbody=document.createElement('tbody');casusOrdines.forEach(c=>{const tr=document.createElement('tr'),th=document.createElement('th');th.textContent=casusNomina[c];tr.appendChild(th);['m','f','n'].forEach(g=>tr.appendChild(td(formaNachMetaHtml(formae,c,numerus,g))));tbody.appendChild(tr)});table.appendChild(tbody);wrapper.appendChild(table);return[h,wrapper];}
 function modusEst(x,m){const mm=normalisiereModus(x.modus);return m==='ind'?!mm||mm==='ind':mm===m;}
