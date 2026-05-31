@@ -303,7 +303,45 @@ function istHexameterCompatibilis(sigla){
   return true;
 }
   
-function eligeFormamHeadword(formae){const n=normalisiere(lemma);return formae.find(f=>f.pars_orationis==='substantivum'&&f.casus==='nom'&&f.numerus==='sg')||formae.find(f=>f.pars_orationis==='substantivum'&&f.casus==='nom'&&f.numerus==='pl')||formae.find(f=>f.persona==='1'&&f.numerus==='sg'&&f.tempus==='praes'&&normalisiereModus(f.modus)==='ind'&&f.vox==='act')||formae.find(f=>normalisiere(f.forma)===n)||formae[0];}
+function eligeFormamHeadword(formae) {
+  const n = normalisiere(lemma);
+
+  return (
+    formae.find(f =>
+      normalisierePars(f.pars_orationis) === 'pronomen' &&
+      f.casus === 'nom' &&
+      f.numerus === 'sg' &&
+      (!f.genus || f.genus === 'm') &&
+      normalisiere(f.forma) === n
+    ) ||
+
+    formae.find(f =>
+      f.pars_orationis === 'substantivum' &&
+      f.casus === 'nom' &&
+      f.numerus === 'sg'
+    ) ||
+
+    formae.find(f =>
+      f.pars_orationis === 'substantivum' &&
+      f.casus === 'nom' &&
+      f.numerus === 'pl'
+    ) ||
+
+    formae.find(f =>
+      f.persona === '1' &&
+      f.numerus === 'sg' &&
+      f.tempus === 'praes' &&
+      normalisiereModus(f.modus) === 'ind' &&
+      f.vox === 'act'
+    ) ||
+
+    formae.find(f =>
+      normalisiere(f.forma) === n
+    ) ||
+
+    formae[0]
+  );
+}
 function td(html){
   const e=document.createElement('td');
   e.innerHTML=html||'—';
