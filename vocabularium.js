@@ -1314,7 +1314,36 @@ async function speichereAddeFormular() {
 
 const zeigeTabOriginal = window.zeigeTab;
 const scriptoriumTitulus = document.querySelector('.container > h1');
-window.zeigeTab = async function(tabName) { if (typeof zeigeTabOriginal === 'function') await zeigeTabOriginal(tabName); if (tabName === 'vocabularium') { if (row && addePanel.hidden) row.style.display = 'flex'; if (scriptoriumTitulus) scriptoriumTitulus.textContent = 'Uocabularium'; } else { if (row) row.style.display = 'none'; addePanel.hidden = true; if (scriptoriumTitulus) scriptoriumTitulus.textContent = 'Scriptorium'; } };
+window.zeigeTab = async function(tabName) {
+  if (typeof zeigeTabOriginal === 'function') {
+    await zeigeTabOriginal(tabName);
+  }
+
+  if (tabName === 'vocabularium') {
+    if (row && addePanel.hidden) row.style.display = 'flex';
+
+    if (lemmaListaRahmen && addePanel.hidden) {
+      lemmaListaRahmen.style.display = '';
+    }
+
+    await ladeLemmataOmnia();
+    reddeLemmaListam();
+
+    if (scriptoriumTitulus) {
+      scriptoriumTitulus.textContent = 'Uocabularium';
+    }
+  } else {
+    if (row) row.style.display = 'none';
+    if (lemmaListaRahmen) lemmaListaRahmen.style.display = 'none';
+
+    addePanel.hidden = true;
+
+    if (scriptoriumTitulus) {
+      scriptoriumTitulus.textContent = 'Scriptorium';
+    }
+  }
+};
+
 if (input) {
   let timer = null;
   input.addEventListener('input', () => {
