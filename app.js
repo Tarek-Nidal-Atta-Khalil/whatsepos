@@ -766,9 +766,16 @@ async function pruefeSitzung() {
   if (data.session?.user) {
     aktuellerUser = data.session.user;
     aktualisiereAuthMenu();
-    await ladeGedichtsliste();
+        await ladeGedichtsliste();
     await aktualisiereMenuButton();
-    zeigeTab("meineTexte");
+
+    const tabExUrl = new URLSearchParams(location.search).get("tab");
+
+    zeigeTab(
+      tabExUrl === "vocabularium"
+        ? "vocabularium"
+        : "meineTexte"
+    );
   } else {
     aktuellerUser = null;
     aktualisiereAuthMenu();
