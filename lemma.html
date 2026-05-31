@@ -109,7 +109,12 @@ function normalisierePars(p){
   return s;
 }
   
-function estVocalis(c){return vocales.includes(c||'');}
+function estVocalis(c){
+  return typeof c === 'string' &&
+    c.length === 1 &&
+    vocales.includes(c);
+}
+  
 function estDiphthongus(t, i) {
   return estDiphthongusCommunis(t, i, diphthongi);
 }
