@@ -1188,7 +1188,6 @@ function resetDependentiaSubstantivi() {
   if (numerusTyp) numerusTyp.value = '';
 }
 function aperiAddeUerbum(lemmaPraeplenum = '') {
-  leereSuggestiones();
 
   if (row) row.style.display = 'none';
   if (eventus) eventus.style.display = 'none';
@@ -1398,37 +1397,16 @@ window.zeigeTab = async function(tabName) {
 };
 
 if (input) {
-  let timer = null;
   input.addEventListener('input', () => {
-  reddeLemmaListam();
-
-  clearTimeout(timer);
-  timer = setTimeout(quaereSuggestiones, 150);
-});
-input.addEventListener('keydown', e => {
-  const buttons = suggestioButtons();
-  if (e.key === 'ArrowDown' && buttons.length) {
-    e.preventDefault();
-    setzeSuggestioSelecta(suggestioSelectaIndex < 0 ? 0 : suggestioSelectaIndex + 1);
-    return;
-  } 
-  if (e.key === 'ArrowUp' && buttons.length) {
-    e.preventDefault(); setzeSuggestioSelecta(suggestioSelectaIndex < 0 ? buttons.length - 1 : suggestioSelectaIndex - 1);
-    return; 
-  } 
-  if (e.key === 'Enter') {
-    e.preventDefault();
-    if (buttons.length) {
-      if (suggestioSelectaIndex < 0) setzeSuggestioSelecta(0); oeffneSuggestioSelecta();
-    } else if (input.value.trim()) aperiAddeUerbum(input.value.trim()); 
-  } 
-}); 
-  input.addEventListener('blur', () => setTimeout(() => {
-    if (addePanel.hidden) leereSuggestiones();
-  }, 120)); 
+    reddeLemmaListam();
+  });
 }
 
-document.getElementById('novumVerbumKnopf')?.addEventListener('click', () => aperiAddeUerbum(nullusEventusLemma || input?.value.trim() || ''));
+document.getElementById('novumVerbumKnopf')?.addEventListener(
+  'click',
+  () => aperiAddeUerbum(input?.value.trim() || '')
+);
+
 document.getElementById('addeLemma')?.addEventListener('input', syncAddeForm);
 document.getElementById('addePars')?.addEventListener('change', syncAddeForm);
 document.getElementById('addeGenus')?.addEventListener('change', () => { resetDependentiaSubstantivi(); syncAddeForm(); });
