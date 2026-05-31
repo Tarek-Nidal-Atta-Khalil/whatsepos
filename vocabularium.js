@@ -727,6 +727,8 @@ function notaeVerbi(item) {
 }
 
 function notaeAdpositionis(item) {
+  const formae = formaeLemmae(item);
+
   const casusNomina = {
     gen: 'Gen.',
     dat: 'Dat.',
@@ -734,35 +736,63 @@ function notaeAdpositionis(item) {
     abl: 'Abl.'
   };
 
-  const ordo = [
+  const ordoCasuum = [
     'gen',
     'dat',
     'acc',
     'abl'
   ];
 
-  const casus =
-    [
-      ...new Set(
-        formaeLemmae(item)
-          .map(forma =>
-            normalisiere(forma?.casus || '')
-          )
-          .filter(Boolean)
-      )
-    ]
-      .sort(
-        (a, b) =>
-          ordo.indexOf(a) -
-          ordo.indexOf(b)
-      )
-      .map(casusSingularis =>
-        casusNomina[casusSingularis] ||
-        casusSingularis
-      );
+  const casus = [
+    ...new Set(
+      formae
+        .map(forma =>
+          normalisiere(forma?.casus || '')
+        )
+        .filter(Boolean)
+    )
+  ]
+    .sort(
+      (a, b) =>
+        ordoCasuum.indexOf(a) -
+        ordoCasuum.indexOf(b)
+    )
+    .map(casusSingularis =>
+      casusNomina[casusSingularis] ||
+      casusSingularis
+    );
+
+  const lemma =
+    clavisQuaestionis(item?.lemma || '');
+
+  const formaeVariae = [
+    ...new Map(
+      formae
+        .map(forma => {
+          const formaSignata =
+            formaCumMacris(forma);
+
+          return [
+            clavisQuaestionis(formaSignata),
+            formaSignata
+          ];
+        })
+        .filter(([clavis, formaSignata]) =>
+          clavis &&
+          formaSignata &&
+          clavis !== lemma
+        )
+    ).values()
+  ];
 
   return {
-    textus: casus.join(', '),
+    textus: [
+      formaeVariae.join(', '),
+      casus.join(', ')
+    ]
+      .filter(Boolean)
+      .join(' · '),
+
     genus: ''
   };
 }
