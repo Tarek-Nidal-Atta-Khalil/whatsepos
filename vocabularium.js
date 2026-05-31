@@ -89,6 +89,17 @@ style.textContent = `
   background:#eef2ff
 }
 
+.vocabularium-lemma-principale{
+  display:flex;
+  align-items:baseline;
+  flex-wrap:wrap;
+  min-width:0
+}
+
+.vocabularium-lemma-info{
+  font-weight:400
+}
+
 .vocabularium-lemma-pars{
   color:#6b7280;
   font-size:.88rem;
@@ -345,6 +356,145 @@ function comparaLemmata(a, b) {
   );
 }
 
+function estParsOrationis(recordum, pars) {
+  return clavisQuaestionis(recordum?.pars_orationis || '') ===
+    clavisQuaestionis(pars);
+}
+
+function idemCampus(recordum, campus, valor) {
+  return clavisQuaestionis(recordum?.[campus] || '') ===
+    clavisQuaestionis(valor);
+}
+
+function formaeLemmae(item) {
+  return Array.isArray(item?.formae)
+    ? item.formae
+    : [item];
+}
+
+function primaForma(formae, condicio) {
+  return formae.find(condicio)?.forma || '';
+}
+
+function notaeSubstantivi(item) {
+  const formae = formaeLemmae(item);
+
+  const genitivus = primaForma(formae, forma =>
+    estParsOrationis(forma, 'substantivum') &&
+    idemCampus(forma, 'casus', 'gen') &&
+    idemCampus(forma, 'numerus', 'sg')
+  );
+
+  const genus =
+    formae.find(forma =>
+      estParsOrationis(forma, 'substantivum') &&
+      forma.genus
+    )?.genus || '';
+
+  return [
+    genitivus,
+    genus ? `${genus}.` : ''
+  ]
+    .filter(Boolean)
+    .join(' ');
+}
+
+function notaeAdiectivi(item) {
+  const formae = formaeLemmae(item);
+
+  const nominatiui = ['m', 'f', 'n']
+    .map(genus =>
+      primaForma(formae, forma =>
+        estParsOrationis(forma, 'adiectivum') &&
+        idemCampus(forma, 'casus', 'nom') &&
+        idemCampus(forma, 'numerus', 'sg') &&
+        idemCampus(forma, 'genus', genus)
+      )
+    )
+    .filter(Boolean);
+
+  const indexLemmae = nominatiui.findIndex(forma =>
+    clavisQuaestionis(forma) === clavisQuaestionis(item?.lemma || '')
+  );
+
+  if (indexLemmae >= 0) {
+    nominatiui.splice(indexLemmae, 1);
+  }
+
+  return nominatiui.join(', ');
+}
+
+function notaeVerbi(item) {
+  const formae = formaeLemmae(item);
+
+  const infinitivus =
+    primaForma(formae, forma =>
+      estParsOrationis(forma, 'infinitivus') &&
+      idemCampus(forma, 'tempus', 'praes') &&
+      idemCampus(forma, 'vox', 'act')
+    ) ||
+    primaForma(formae, forma =>
+      estParsOrationis(forma, 'infinitivus') &&
+      idemCampus(forma, 'tempus', 'praes') &&
+      idemCampus(forma, 'vox', 'pass')
+    );
+
+  const perfectum = primaForma(formae, forma =>
+    estParsOrationis(forma, 'verbum') &&
+    idemCampus(forma, 'tempus', 'perf') &&
+    idemCampus(forma, 'modus', 'ind') &&
+    idemCampus(forma, 'vox', 'act') &&
+    idemCampus(forma, 'persona', '1') &&
+    idemCampus(forma, 'numerus', 'sg')
+  );
+
+  const supinum = primaForma(formae, forma =>
+    estParsOrationis(forma, 'supinum_i')
+  );
+
+  return [
+    infinitivus,
+    perfectum,
+    supinum
+  ]
+    .filter(Boolean)
+    .join(', ');
+}
+
+function notaeLemmae(item) {
+  if (estParsOrationis(item, 'substantivum')) {
+    return notaeSubstantivi(item);
+  }
+
+  if (estParsOrationis(item, 'adiectivum')) {
+    return notaeAdiectivi(item);
+  }
+
+  if (estParsOrationis(item, 'verbum')) {
+    return notaeVerbi(item);
+  }
+
+  return '';
+}
+
+function eligeRecordumPrincipale(formae) {
+  return (
+    formae.find(forma =>
+      clavisQuaestionis(forma?.forma || '') ===
+        clavisQuaestionis(forma?.lemma || '') &&
+      (
+        estParsOrationis(forma, 'verbum') ||
+        estParsOrationis(forma, 'substantivum') ||
+        estParsOrationis(forma, 'adiectivum')
+      )
+    ) ||
+    formae.find(forma => estParsOrationis(forma, 'verbum')) ||
+    formae.find(forma => estParsOrationis(forma, 'substantivum')) ||
+    formae.find(forma => estParsOrationis(forma, 'adiectivum')) ||
+    formae[0]
+  );
+}
+
 function reddeLemmaListam() {
   if (!lemmaLista) return;
 
@@ -380,14 +530,28 @@ function reddeLemmaListam() {
     button.dataset.lexemeId = item.lexeme_id || '';
     button.setAttribute('role', 'option');
 
+        const principale = document.createElement('span');
+    principale.className = 'vocabularium-lemma-principale';
+
     const strong = document.createElement('strong');
     strong.textContent = item.lemma || '—';
+
+    const infoTextus = notaeLemmae(item);
+
+    const info = document.createElement('span');
+    info.className = 'vocabularium-lemma-info';
+    info.textContent = infoTextus
+      ? `, ${infoTextus}`
+      : '';
 
     const span = document.createElement('span');
     span.className = 'vocabularium-lemma-pars';
     span.textContent = item.pars_orationis || '';
 
-    button.appendChild(strong);
+    principale.appendChild(strong);
+    principale.appendChild(info);
+
+    button.appendChild(principale);
     button.appendChild(span);
 
     button.addEventListener('click', () => {
@@ -440,7 +604,7 @@ async function ladeLemmataOmnia() {
       const { data, error } =
         await supabase
           .from('formae')
-          .select('lemma, lexeme_id, pars_orationis')
+          .select('lemma, lexeme_id, pars_orationis, forma, genus, numerus, casus, persona, tempus, modus, vox')
           .not('lemma', 'is', null)
           .order('lemma', { ascending: true })
           .range(initium, initium + amplitudo - 1);
@@ -461,18 +625,30 @@ async function ladeLemmataOmnia() {
       initium += amplitudo;
     }
 
-    const visa = new Set();
+        const greges = new Map();
 
-    lemmataOmnia = resultata
-      .filter(item => {
-        if (!item?.lemma) return false;
+    resultata.forEach(item => {
+      if (!item?.lemma) return;
 
-        const clavis = clavisLemmae(item);
+      const clavis = clavisLemmae(item);
 
-        if (visa.has(clavis)) return false;
+      if (!greges.has(clavis)) {
+        greges.set(clavis, []);
+      }
 
-        visa.add(clavis);
-        return true;
+      greges.get(clavis).push(item);
+    });
+
+    lemmataOmnia = [...greges.values()]
+      .map(formae => {
+        const principale =
+          eligeRecordumPrincipale(formae) ||
+          formae[0];
+
+        return {
+          ...principale,
+          formae
+        };
       })
       .sort(comparaLemmata);
 
