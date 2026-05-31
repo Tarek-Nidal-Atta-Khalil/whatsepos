@@ -305,7 +305,20 @@ function istHexameterCompatibilis(sigla){
   
   function eligeFormamHeadword(formae){const n=normalisiere(lemma);return formae.find(f=>f.pars_orationis==='substantivum'&&f.casus==='nom'&&f.numerus==='sg')||formae.find(f=>f.pars_orationis==='substantivum'&&f.casus==='nom'&&f.numerus==='pl')||formae.find(f=>f.persona==='1'&&f.numerus==='sg'&&f.tempus==='praes'&&normalisiereModus(f.modus)==='ind'&&f.vox==='act')||formae.find(f=>normalisiere(f.forma)===n)||formae[0];}
 function td(html){const e=document.createElement('td');e.innerHTML=html||'—';return e;}
-function formaSubstantiviHtml(formae,casus,numerus){const f=formae.find(x=>x.casus===casus&&x.numerus===numerus);return f?formaProLemmaHtml(f):'—';}
+function formaSubstantiviHtml(formae, casus, numerus) {
+  const congruentia = formae.filter(
+    x => x.casus === casus && x.numerus === numerus
+  );
+
+  if (!congruentia.length) return '—';
+
+  return congruentia
+    .map(forma => formaProLemmaHtml(forma))
+    .filter((forma, index, omnes) =>
+      forma && omnes.indexOf(forma) === index
+    )
+    .join('<br>');
+}
 function numeriSubstantivi(formae){const sg=formae.some(f=>f.numerus==='sg'),pl=formae.some(f=>f.numerus==='pl');return sg&&pl?['sg','pl']:pl?['pl']:['sg'];}
 function tabellaSubstantivi(formae){
   const wrapper=document.createElement('div');wrapper.className='flexio-wrapper';
