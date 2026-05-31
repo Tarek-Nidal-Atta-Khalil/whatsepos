@@ -380,6 +380,24 @@ addePanel.innerHTML = `
   </div>
 </div>
 
+<div class="adde-form-card" id="addeAdpositioFormaeVariaeCard" hidden>
+  <div class="adde-uerbum-field">
+    <label for="addeAdpositioFormaeVariae">
+      Formae variae
+    </label>
+
+    <input
+      id="addeAdpositioFormaeVariae"
+      type="text"
+      placeholder="a:, abs"
+    >
+
+    <div class="adde-card-help">
+      Formas varias commatibus separa. Campus omitti potest.
+    </div>
+  </div>
+</div>
+
     <div class="adde-form-card" id="addeConiugatioCard" hidden>
     <div class="adde-uerbum-field">
       <label for="addeConiugatio">Coniugatio</label>
