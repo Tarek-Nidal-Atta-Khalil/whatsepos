@@ -944,6 +944,17 @@ function notaeLemmae(item) {
 function eligeRecordumPrincipale(formae) {
   return (
     formae.find(forma =>
+      estParsOrationis(forma, 'pronomen') &&
+      idemCampus(forma, 'casus', 'nom') &&
+      idemCampus(forma, 'numerus', 'sg') &&
+      (
+        !forma?.genus ||
+        idemCampus(forma, 'genus', 'm')
+      ) &&
+      clavisQuaestionis(forma?.forma || '') ===
+        clavisQuaestionis(forma?.lemma || '')
+    ) ||
+    formae.find(forma =>
       clavisQuaestionis(forma?.forma || '') ===
         clavisQuaestionis(forma?.lemma || '') &&
       (
