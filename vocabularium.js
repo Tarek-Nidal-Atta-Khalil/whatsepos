@@ -254,7 +254,7 @@ addePanel.innerHTML = `
   <div class="adde-form-card" id="addeGenitivCard" hidden>
     <div class="adde-uerbum-field">
       <label for="addeGenitivus">Genitivus singularis / Stammform</label>
-      <input id="addeGenitivus" type="text" placeholder="regis, corporis, maris">
+      <input id="addeGenitivus" type="text" placeholder="litoris, corporis, nominis">
       <div class="adde-card-help">
         Nötig vor allem für die 3. Deklination und unklare Stämme.
       </div>
@@ -2654,33 +2654,68 @@ async function speichereAddeFormular() {
     return;
   }
   
-    if (pars === 'substantivum') {
+      if (pars === 'substantivum') {
     const declinatio =
-      document.getElementById('addeDeclinatio')?.value;
+      document.getElementById('addeDeclinatio')?.value || '';
 
-    if (declinatio === 'a') {
-      const { lemmaNudum, formae } =
-        generaSubstantivumA({
-          lemmaInput,
-          genus:
-            document.getElementById('addeGenus')?.value || null,
-          numerusTyp:
-            document.getElementById('addeNumerusTyp')?.value || 'sg_pl'
-        });
+    const genus =
+      document.getElementById('addeGenus')?.value || '';
 
-      const { error } =
-        await window.whatseposSupabase
-          .from('formae')
-          .insert(formae);
+    const numerusTyp =
+      document.getElementById('addeNumerusTyp')?.value || 'sg_pl';
 
-      if (error) {
-        statusAdde(error.message);
+    const genitivusInput =
+      document.getElementById('addeGenitivus')?.value.trim() || '';
+
+    let paradigma;
+
+    try {
+      if (declinatio === 'a') {
+        paradigma =
+          generaSubstantivumA({
+            lemmaInput,
+            genus,
+            numerusTyp
+          });
+      } else if (
+        declinatio === 'consonantica' &&
+        genus === 'n'
+      ) {
+        paradigma =
+          generaSubstantivumConsonanticumNeutrum({
+            lemmaInput,
+            genitivusInput,
+            numerusTyp
+          });
+      } else {
+        statusAdde(
+          'Nunc tantum substantiva a-declinationis et substantiva neutra consonantica tertiae declinationis servari possunt.'
+        );
+
         return;
       }
-
-      aperiNouumLemma(lemmaNudum);
+    } catch (error) {
+      statusAdde(error.message);
       return;
     }
+
+    const {
+      lemmaNudum,
+      formae
+    } = paradigma;
+
+    const { error } =
+      await window.whatseposSupabase
+        .from('formae')
+        .insert(formae);
+
+    if (error) {
+      statusAdde(error.message);
+      return;
+    }
+
+    aperiNouumLemma(lemmaNudum);
+    return;
   }
 
     if (pars === 'adiectivum') {
@@ -2791,6 +2826,7 @@ document.getElementById('addePars')?.addEventListener('change', syncAddeForm);
 document.getElementById('addeGenus')?.addEventListener('change', () => { resetDependentiaSubstantivi(); syncAddeForm(); });
 document.getElementById('addeDeclinatio')?.addEventListener('change', () => { const numerusTyp = document.getElementById('addeNumerusTyp'); if (numerusTyp) numerusTyp.value = ''; syncAddeForm(); });
 document.getElementById('addeNumerusTyp')?.addEventListener('change', syncAddeForm);
+document.getElementById('addeGenitivus')?.addEventListener('input', syncAddeForm);
 document.getElementById('addeAdiectivumFemininum')?.addEventListener('input', syncAddeForm);
 document.getElementById('addeAdiectivumNeutrum')?.addEventListener('input', syncAddeForm);
 document.getElementById('addeAdiectivumDeclinatio')?.addEventListener('change', syncAddeForm);
