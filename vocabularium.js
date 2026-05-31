@@ -358,22 +358,43 @@ function recordumVerbi({
   const forma = String(formaMacris || '').trim();
 
   if (forma.includes(' ')) {
-    return {
-      forma: sineMacris(forma).toLowerCase(),
-      lemma: lemmaNudum,
-      lexeme_id: lexemeId,
-      pars_orationis: pars,
-      genus: null,
-      numerus,
-      casus: null,
-      persona,
-      tempus,
-      modus,
-      vox,
-      syllabae: null,
-      longae: null
-    };
-  }
+  const verba = forma
+    .split(/\s+/)
+    .filter(Boolean);
+
+  const syllabaeMacris = [];
+
+  verba.forEach((verbum, index) => {
+    const syllabaeVerbi = trenneSilben(verbum);
+
+    if (
+      index < verba.length - 1 &&
+      syllabaeVerbi.length > 0
+    ) {
+      syllabaeVerbi[syllabaeVerbi.length - 1] += ' ';
+    }
+
+    syllabaeMacris.push(...syllabaeVerbi);
+  });
+
+  return {
+    forma: sineMacris(forma).toLowerCase(),
+    lemma: lemmaNudum,
+    lexeme_id: lexemeId,
+    pars_orationis: pars,
+    genus: null,
+    numerus,
+    casus: null,
+    persona,
+    tempus,
+    modus,
+    vox,
+    syllabae: syllabaeMacris
+      .map(s => sineMacris(s).toLowerCase())
+      .join('.'),
+    longae: indicesLongarum(syllabaeMacris)
+  };
+}
 
     return {
     ...recordumFormae({
