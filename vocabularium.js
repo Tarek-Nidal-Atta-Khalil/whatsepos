@@ -12,6 +12,71 @@ const style = document.createElement('style');
 style.textContent = `
 .vocabularium-search-row{display:flex;align-items:flex-start;justify-content:center;gap:16px;width:min(100%,980px);margin:0 auto}.vocabularium-search-column{flex:1;min-width:0;display:flex;flex-direction:column}.vocabularium-search-column #vocabulariumQuaere{width:100%;margin:0}.vocabularium-admin{display:flex;align-items:center;justify-content:center;margin:0;flex-shrink:0}.vocabularium-suggestio.is-selected{background:#eef2ff!important}.vox-button{height:62px;padding:0 24px;border:none;border-radius:18px;background:#1faa4b;color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1rem;letter-spacing:.01em;box-shadow:0 10px 24px rgba(0,0,0,.16);transition:all .18s ease;white-space:nowrap}.vox-button:hover{transform:translateY(-1px);box-shadow:0 14px 30px rgba(0,0,0,.22)}
 .adde-uerbum-panel{width:min(100%,760px);margin:0 auto 48px;padding:0;background:#f8fafc;text-align:left;border-radius:28px}.adde-uerbum-panel[hidden]{display:none}.adde-form-head{background:white;border-top:10px solid #673ab7;border-radius:14px;padding:28px 32px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.08)}.adde-form-head h2{margin:0 0 8px;font-size:34px}.adde-form-head p{margin:0;color:#6b7280}.adde-form-card{background:white;border-radius:14px;padding:24px 32px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.08)}.adde-form-card[hidden]{display:none}.adde-uerbum-field label{display:block;margin-bottom:10px;font-weight:700;color:#202124}.adde-uerbum-field input,.adde-uerbum-field select{width:100%;max-width:none;margin:0;border:none;border-bottom:2px solid #dadce0;border-radius:0;background:white;padding:10px 0;font-size:22px}.adde-uerbum-field input:focus,.adde-uerbum-field select:focus{outline:none;border-bottom-color:#673ab7;box-shadow:none}.adde-card-help{margin-top:8px;color:#6b7280;font-size:.95rem}.adde-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.adde-uerbum-actions{display:flex;gap:12px;justify-content:flex-end;margin-top:20px}.adde-uerbum-actions button{border-radius:16px}.adde-uerbum-primary{border:none;background:#673ab7;color:white}.adde-uerbum-secondary{border:1px solid #dadce0;background:white;color:#3c4043}.adde-uerbum-status{min-height:1.4em;margin-top:14px;color:#374151}.adde-uerbum-primary:disabled{opacity:.45;cursor:not-allowed}
+
+.vocabularium-lemma-lista-rahmen{
+  width:min(100%,980px);
+  margin:18px auto 0;
+  overflow:hidden;
+  border:1px solid #e5e7eb;
+  border-radius:18px;
+  background:white;
+  text-align:left
+}
+
+.vocabularium-lemma-lista-kopf{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:12px 18px;
+  border-bottom:1px solid #e5e7eb;
+  background:#f8fafc;
+  color:#6b7280;
+  font-size:.95rem;
+  font-weight:700
+}
+
+.vocabularium-lemma-lista{
+  max-height:min(58vh,560px);
+  overflow-y:auto;
+  overscroll-behavior:contain
+}
+
+.vocabularium-lemma-item{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  width:100%;
+  padding:13px 18px;
+  border:none;
+  border-bottom:1px solid #eef2f7;
+  background:white;
+  text-align:left;
+  cursor:pointer;
+  font-size:19px
+}
+
+.vocabularium-lemma-item:last-child{
+  border-bottom:none
+}
+
+.vocabularium-lemma-item:hover,
+.vocabularium-lemma-item:focus{
+  outline:none;
+  background:#eef2ff
+}
+
+.vocabularium-lemma-pars{
+  color:#6b7280;
+  font-size:.88rem;
+  white-space:nowrap
+}
+
+.vocabularium-lemma-vacua{
+  padding:18px;
+  color:#6b7280
+}
+
 @media(max-width:900px){.vocabularium-search-row{flex-direction:column}.vocabularium-admin{width:100%}.vox-button{width:100%}.adde-detail-grid{grid-template-columns:1fr}}
 `;
 document.head.appendChild(style);
@@ -25,6 +90,31 @@ suggestiones.style.margin = '8px 0 0';
 const adminBox = document.createElement('div');
 adminBox.className = 'vocabularium-admin';
 adminBox.innerHTML = `<button id="novumVerbumKnopf" type="button" class="vox-button">adde uerbum</button>`;
+
+const lemmaListaRahmen = document.createElement('section');
+lemmaListaRahmen.className = 'vocabularium-lemma-lista-rahmen';
+
+lemmaListaRahmen.innerHTML = `
+  <div class="vocabularium-lemma-lista-kopf">
+    <span>Lemmata</span>
+    <span id="vocabulariumLemmaNumerus"></span>
+  </div>
+  <div
+    id="vocabulariumLemmaLista"
+    class="vocabularium-lemma-lista"
+    role="listbox"
+    aria-label="Lemmata"
+  ></div>
+`;
+
+const lemmaLista =
+  lemmaListaRahmen.querySelector('#vocabulariumLemmaLista');
+
+const lemmaNumerus =
+  lemmaListaRahmen.querySelector('#vocabulariumLemmaNumerus');
+
+let lemmataOmnia = [];
+let lemmataPromissum = null;
 
 const addePanel = document.createElement('section');
 addePanel.id = 'addeUerbumPanel';
@@ -188,13 +278,19 @@ let nullusEventusLemma = '';
 if (input && vocabulariumTab) {
   row = document.createElement('div');
   row.className = 'vocabularium-search-row';
+
   const column = document.createElement('div');
   column.className = 'vocabularium-search-column';
+
   input.parentNode.insertBefore(row, input);
+
   row.appendChild(column);
   column.appendChild(input);
   column.appendChild(suggestiones);
   row.appendChild(adminBox);
+
+  row.insertAdjacentElement('afterend', lemmaListaRahmen);
+
   vocabulariumTab.appendChild(addePanel);
 }
 
@@ -202,9 +298,152 @@ const MACRA = { a:'ā', e:'ē', i:'ī', o:'ō', u:'ū', y:'ȳ', A:'Ā', E:'Ē', 
 const VOCALES = 'aeiouyāēīōūȳAEIOUYĀĒĪŌŪȲ';
 const DIPHTHONGI = ['ae','au','oe','eu'];
 
-function normalisiere(textus) { return String(textus || '').trim().toLowerCase().replace(/j/g, 'i').replace(/v/g, 'u'); }
-function sineMacris(textus) { return String(textus || '').replace(/[āăáàâä]/g,'a').replace(/[ēĕéèêë]/g,'e').replace(/[īĭíìîï]/g,'i').replace(/[ōŏóòôö]/g,'o').replace(/[ūŭúùûü]/g,'u').replace(/[ȳýỳŷÿ]/g,'y').replace(/[ĀĂÁÀÂÄ]/g,'A').replace(/[ĒĔÉÈÊË]/g,'E').replace(/[ĪĬÍÌÎÏ]/g,'I').replace(/[ŌŎÓÒÔÖ]/g,'O').replace(/[ŪŬÚÙÛÜ]/g,'U').replace(/[ȲÝỲŶŸ]/g,'Y'); }
-function exColonibusMacra(textus) { return String(textus || '').replace(/([aeiouyAEIOUY]):/g, (_, v) => MACRA[v] || v); }
+function normalisiere(textus) {
+  return String(textus || '').trim().toLowerCase().replace(/j/g, 'i').replace(/v/g, 'u'); 
+}
+
+function sineMacris(textus) {
+  return String(textus || '').replace(/[āăáàâä]/g,'a').replace(/[ēĕéèêë]/g,'e').replace(/[īĭíìîï]/g,'i').replace(/[ōŏóòôö]/g,'o').replace(/[ūŭúùûü]/g,'u').replace(/[ȳýỳŷÿ]/g,'y').replace(/[ĀĂÁÀÂÄ]/g,'A').replace(/[ĒĔÉÈÊË]/g,'E').replace(/[ĪĬÍÌÎÏ]/g,'I').replace(/[ŌŎÓÒÔÖ]/g,'O').replace(/[ŪŬÚÙÛÜ]/g,'U').replace(/[ȲÝỲŶŸ]/g,'Y');
+}
+
+function exColonibusMacra(textus) {
+  return String(textus || '').replace(/([aeiouyAEIOUY]):/g, (_, v) => MACRA[v] || v);
+}
+
+function clavisQuaestionis(textus) {
+  return normalisiere(sineMacris(textus));
+}
+
+function clavisLemmae(item) {
+  const lemma = clavisQuaestionis(item?.lemma || '');
+  const lexemeId = String(item?.lexeme_id || '');
+
+  return lexemeId
+    ? `lexeme:${lexemeId}`
+    : `lemma:${lemma}|pars:${normalisiere(item?.pars_orationis || '')}`;
+}
+
+function comparaLemmata(a, b) {
+  return String(a?.lemma || '').localeCompare(
+    String(b?.lemma || ''),
+    'la',
+    { sensitivity: 'base' }
+  );
+}
+
+function reddeLemmaListam() {
+  if (!lemmaLista) return;
+
+  const q = clavisQuaestionis(input?.value || '');
+
+  const visibilia = lemmataOmnia.filter(item =>
+    clavisQuaestionis(item?.lemma || '').includes(q)
+  );
+
+  lemmaLista.innerHTML = '';
+
+  if (lemmaNumerus) {
+    lemmaNumerus.textContent =
+      visibilia.length === lemmataOmnia.length
+        ? String(visibilia.length)
+        : `${visibilia.length} / ${lemmataOmnia.length}`;
+  }
+
+  if (!visibilia.length) {
+    const div = document.createElement('div');
+    div.className = 'vocabularium-lemma-vacua';
+    div.textContent = 'Nulla lemmata inventa sunt.';
+    lemmaLista.appendChild(div);
+    return;
+  }
+
+  visibilia.forEach(item => {
+    const button = document.createElement('button');
+
+    button.type = 'button';
+    button.className = 'vocabularium-lemma-item';
+    button.dataset.lemma = item.lemma || '';
+    button.dataset.lexemeId = item.lexeme_id || '';
+    button.setAttribute('role', 'option');
+
+    const strong = document.createElement('strong');
+    strong.textContent = item.lemma || '—';
+
+    const span = document.createElement('span');
+    span.className = 'vocabularium-lemma-pars';
+    span.textContent = item.pars_orationis || '';
+
+    button.appendChild(strong);
+    button.appendChild(span);
+
+    button.addEventListener('click', () => {
+      aperiLemma(item.lemma, item.lexeme_id || '');
+    });
+
+    lemmaLista.appendChild(button);
+  });
+}
+
+async function ladeLemmataOmnia() {
+  if (!window.whatseposSupabase || !lemmaLista) return;
+  if (lemmataPromissum) return lemmataPromissum;
+
+  lemmataPromissum = (async function () {
+    const resultata = [];
+    const amplitudo = 1000;
+
+    let initium = 0;
+
+    while (true) {
+      const { data, error } =
+        await window.whatseposSupabase
+          .from('formae')
+          .select('lemma, lexeme_id, pars_orationis')
+          .not('lemma', 'is', null)
+          .order('lemma', { ascending: true })
+          .range(initium, initium + amplitudo - 1);
+
+      if (error) {
+        lemmaLista.innerHTML =
+          `<div class="vocabularium-lemma-vacua">Lemmata nondum legi possunt.</div>`;
+
+        return;
+      }
+
+      const pagina = data || [];
+
+      resultata.push(...pagina);
+
+      if (pagina.length < amplitudo) break;
+
+      initium += amplitudo;
+    }
+
+    const visa = new Set();
+
+    lemmataOmnia = resultata
+      .filter(item => {
+        if (!item?.lemma) return false;
+
+        const clavis = clavisLemmae(item);
+
+        if (visa.has(clavis)) return false;
+
+        visa.add(clavis);
+        return true;
+      })
+      .sort(comparaLemmata);
+
+    reddeLemmaListam();
+  })();
+
+  try {
+    await lemmataPromissum;
+  } finally {
+    lemmataPromissum = null;
+  }
+}
+
 function estVocalis(c) { return VOCALES.includes(c || ''); }
 function estLongaChar(c) { return /[āēīōūȳĀĒĪŌŪȲ]/.test(c || ''); }
 function estDiphthongus(textus, i) {
