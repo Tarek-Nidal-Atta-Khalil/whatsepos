@@ -717,7 +717,14 @@ window.einloggen = async function() {
   document.getElementById("login_status").textContent = "Eingeloggt.";
 
   await ladeGedichtsliste();
-  zeigeTab("meineTexte");
+
+  const tabExUrl = new URLSearchParams(location.search).get("tab");
+
+  zeigeTab(
+    tabExUrl === "vocabularium"
+      ? "vocabularium"
+      : "meineTexte"
+  );
 };
 
 window.ausloggen = async function() {
