@@ -652,8 +652,9 @@ function formaCumMacris(recordum) {
         : syllaba
     )
     .join('');
+}
 
-  function formaCumPraefixoEnclitico(recordum) {
+function formaCumPraefixoEnclitico(recordum) {
   const forma =
     formaCumMacris(recordum) ||
     recordum?.lemma ||
@@ -664,8 +665,6 @@ function formaCumMacris(recordum) {
   }
 
   return '-' + sineHyphenoInitiali(forma);
-}
-  
 }
 
 function primaForma(formae, condicio) {
@@ -1033,10 +1032,12 @@ function reddeLemmaListam() {
     const principale = document.createElement('span');
     principale.className = 'vocabularium-lemma-principale';
 
+    const strong = document.createElement('strong');
+
     strong.textContent =
-    formaCumPraefixoEnclitico(item) ||
-    item.lemma ||
-    '—';
+      formaCumPraefixoEnclitico(item) ||
+      item.lemma ||
+      '—';
 
     const notae = notaeLemmae(item);
 
