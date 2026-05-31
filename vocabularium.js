@@ -1928,6 +1928,10 @@ function syncAddeForm() {
     pars !== 'adpositio' ||
     !adpositioTypus;
 
+  document.getElementById('addeAdpositioFormaeVariaeCard').hidden =
+    pars !== 'adpositio' ||
+    !adpositioTypus;
+
   const coniugatio = document.getElementById('addeConiugatio')?.value || '';
   const typusVerbi = document.getElementById('addeVerbumTypus')?.value || '';
   const voxTypus = document.getElementById('addeVoxTypus')?.value || '';
@@ -1996,12 +2000,14 @@ function syncAddeForm() {
 
   document.getElementById('addeSave').disabled = !potestServari;
 }
+
 function resetDependentiaSubstantivi() {
   const declinatio = document.getElementById('addeDeclinatio');
   const numerusTyp = document.getElementById('addeNumerusTyp');
   if (declinatio) declinatio.value = '';
   if (numerusTyp) numerusTyp.value = '';
 }
+
 function aperiAddeUerbum(lemmaPraeplenum = '') {
 
   if (row) row.style.display = 'none';
@@ -2023,6 +2029,7 @@ function aperiAddeUerbum(lemmaPraeplenum = '') {
   document.getElementById('addeAdiectivumDeclinatio').value = '';
 
   document.getElementById('addeAdpositioTypus').value = '';
+  document.getElementById('addeAdpositioFormaeVariae').value = '';
   
   document
     .querySelectorAll('input[name="addeAdpositioCasus"]')
@@ -2107,7 +2114,8 @@ function aperiNouumLemma(lemmaNudum) {
 function generaAdpositionem({
   lemmaInput,
   typus,
-  casus
+  casus,
+  formaeVariaeInput = ''
 }) {
   const lemmaMacris =
     exColonibusMacra(lemmaInput).trim();
@@ -2118,18 +2126,42 @@ function generaAdpositionem({
   const lexemeId =
     crypto.randomUUID();
 
-  const formae =
-    casus.map(casusSingularis => ({
-      ...recordumFormae({
-        formaMacris: lemmaMacris,
-        lemmaNudum,
-        pars: typus,
-        genus: null,
-        numerus: null,
-        casus: casusSingularis
-      }),
-      lexeme_id: lexemeId
-    }));
+  const formaeMacris = [
+    lemmaMacris,
+    ...formaeVariaeInput
+      .split(',')
+      .map(forma =>
+        exColonibusMacra(forma).trim()
+      )
+      .filter(Boolean)
+  ];
+
+  const formaeUnicae = [
+    ...new Map(
+      formaeMacris.map(forma => [
+        clavisQuaestionis(forma),
+        forma
+      ])
+    ).values()
+  ];
+
+  const formae = [];
+
+  formaeUnicae.forEach(formaMacris => {
+    casus.forEach(casusSingularis => {
+      formae.push({
+        ...recordumFormae({
+          formaMacris,
+          lemmaNudum,
+          pars: typus,
+          genus: null,
+          numerus: null,
+          casus: casusSingularis
+        }),
+        lexeme_id: lexemeId
+      });
+    });
+  });
 
   return {
     lemmaNudum,
@@ -2151,6 +2183,12 @@ async function speichereAddeFormular() {
   const casus =
     casusAdpositionisSelecti();
 
+  const formaeVariaeInput =
+    document
+      .getElementById('addeAdpositioFormaeVariae')
+      ?.value
+      .trim() || '';
+
   if (!typus) {
     statusAdde('Typus adpositionis eligendus est.');
     return;
@@ -2168,7 +2206,8 @@ async function speichereAddeFormular() {
   } = generaAdpositionem({
     lemmaInput,
     typus,
-    casus
+    casus,
+    formaeVariaeInput
   });
 
   const { error } =
