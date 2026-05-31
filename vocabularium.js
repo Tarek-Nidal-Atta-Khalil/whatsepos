@@ -875,27 +875,31 @@ function reddeLemmaListam() {
   const q = clavisQuaestionis(input?.value || '');
 
   const formaeQuaeribiles = item => [
-  item?.lemma || '',
-  ...formaeLemmae(item)
-    .map(forma => forma?.forma || '')
-];
-
-const congruentiaExacta = lemmataOmnia.filter(item =>
-  formaeQuaeribiles(item)
-    .some(forma =>
-      clavisQuaestionis(forma) === q
+    item?.lemma || '',
+    ...formaeLemmae(item)
+      .map(forma => forma?.forma || '')
+  ];
+  
+  const congruentiaExacta = lemmataOmnia.filter(item =>
+    formaeQuaeribiles(item)
+      .some(forma =>
+        clavisQuaestionis(forma) === q
+      )
+  );
+  
+  const congruentiaPartialia = lemmataOmnia.filter(item =>
+    formaeQuaeribiles(item)
+      .some(forma =>
+        clavisQuaestionis(forma).includes(q)
+      )
+  );
+  
+  const visibilia = [
+    ...congruentiaExacta,
+    ...congruentiaPartialia.filter(item =>
+      !congruentiaExacta.includes(item)
     )
-);
-
-const visibilia =
-  q && congruentiaExacta.length
-    ? congruentiaExacta
-    : lemmataOmnia.filter(item =>
-        formaeQuaeribiles(item)
-          .some(forma =>
-            clavisQuaestionis(forma).includes(q)
-          )
-      );
+  ];
   
   lemmaLista.innerHTML = '';
 
