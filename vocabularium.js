@@ -98,6 +98,10 @@ style.textContent = `
   font-weight:400
 }
 
+.vocabularium-lemma-genus{
+  font-style:italic
+}
+
 .vocabularium-lemma-pars{
   color:#6b7280;
   font-size:.88rem;
@@ -411,24 +415,50 @@ function primaForma(formae, condicio) {
 function notaeSubstantivi(item) {
   const formae = formaeLemmae(item);
 
-  const genitivus = primaForma(formae, forma =>
-    estParsOrationis(forma, 'substantivum') &&
+  const formaeSubstantivi = formae.filter(forma =>
+    estParsOrationis(forma, 'substantivum')
+  );
+
+  const habetSingularem = formaeSubstantivi.some(forma =>
+    idemCampus(forma, 'numerus', 'sg')
+  );
+
+  const habetPluralem = formaeSubstantivi.some(forma =>
+    idemCampus(forma, 'numerus', 'pl')
+  );
+
+  const estPluraleTantum =
+    !habetSingularem &&
+    habetPluralem;
+
+  const genitivusSingularis = primaForma(formaeSubstantivi, forma =>
     idemCampus(forma, 'casus', 'gen') &&
     idemCampus(forma, 'numerus', 'sg')
   );
 
+  const genitivusPluralis = primaForma(formaeSubstantivi, forma =>
+    idemCampus(forma, 'casus', 'gen') &&
+    idemCampus(forma, 'numerus', 'pl')
+  );
+
+  const genitivus =
+    genitivusSingularis ||
+    genitivusPluralis;
+
   const genus =
-    formae.find(forma =>
-      estParsOrationis(forma, 'substantivum') &&
+    formaeSubstantivi.find(forma =>
       forma.genus
     )?.genus || '';
 
-  return [
-    genitivus,
-    genus ? `${genus}.` : ''
-  ]
-    .filter(Boolean)
-    .join(' ');
+  const notaGeneris =
+    genus
+      ? genus + (estPluraleTantum ? 'pl' : '')
+      : '';
+
+  return {
+    textus: genitivus,
+    genus: notaGeneris
+  };
 }
 
 function notaeAdiectivi(item) {
@@ -499,14 +529,23 @@ function notaeLemmae(item) {
   }
 
   if (estParsOrationis(item, 'adiectivum')) {
-    return notaeAdiectivi(item);
+    return {
+      textus: notaeAdiectivi(item),
+      genus: ''
+    };
   }
 
   if (estParsOrationis(item, 'verbum')) {
-    return notaeVerbi(item);
+    return {
+      textus: notaeVerbi(item),
+      genus: ''
+    };
   }
 
-  return '';
+  return {
+    textus: '',
+    genus: ''
+  };
 }
 
 function eligeRecordumPrincipale(formae) {
@@ -568,11 +607,30 @@ function reddeLemmaListam() {
     const strong = document.createElement('strong');
     strong.textContent = item.lemma || '—';
 
-    const infoTextus = notaeLemmae(item);
+        const notae = notaeLemmae(item);
 
     const info = document.createElement('span');
     info.className = 'vocabularium-lemma-info';
-        info.textContent = infoTextus || '';
+
+    if (notae.textus) {
+      info.appendChild(
+        document.createTextNode(notae.textus)
+      );
+    }
+
+    if (notae.genus) {
+      if (notae.textus) {
+        info.appendChild(
+          document.createTextNode(' ')
+        );
+      }
+
+      const genus = document.createElement('em');
+      genus.className = 'vocabularium-lemma-genus';
+      genus.textContent = notae.genus;
+
+      info.appendChild(genus);
+    }
     
     const span = document.createElement('span');
     span.className = 'vocabularium-lemma-pars';
