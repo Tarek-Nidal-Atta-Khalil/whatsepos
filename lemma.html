@@ -167,6 +167,7 @@ function syllabaeDisplayFormae(forma){
 
     if (
       i > 0 &&
+      pars.startsWith('i') &&
       estVocalis(pars[1]) &&
       syllabae[i - 1] &&
       estVocalis(syllabae[i - 1][syllabae[i - 1].length - 1])
