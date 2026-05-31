@@ -851,7 +851,11 @@ async function ladeLemmataOmnia() {
   }
 }
 
-function estVocalis(c) { return VOCALES.includes(c || ''); }
+function estVocalis(c) {
+  const littera = String(c || '');
+  return littera.length === 1 && VOCALES.includes(littera);
+}
+
 function estLongaChar(c) { return /[āēīōūȳĀĒĪŌŪȲ]/.test(c || ''); }
 function estDiphthongus(textus, i) {
   return estDiphthongusCommunis(textus, i, DIPHTHONGI);
