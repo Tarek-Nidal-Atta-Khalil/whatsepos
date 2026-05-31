@@ -439,8 +439,75 @@ function formaeLemmae(item) {
     : [item];
 }
 
+function indicesLongarumRecordi(recordum) {
+  if (Array.isArray(recordum?.longae)) {
+    return recordum.longae
+      .map(Number)
+      .filter(index => Number.isInteger(index));
+  }
+
+  return String(recordum?.longae || '')
+    .toUpperCase()
+    .replace(/[.\s-]/g, '')
+    .split('')
+    .map((siglum, index) => siglum === 'L' ? index : null)
+    .filter(index => index !== null);
+}
+
+function syllabaCumMacron(syllaba) {
+  const nuclei = nucleiVocalici(syllaba);
+  const nucleus = nuclei[0];
+
+  if (!nucleus) return syllaba;
+
+  /*
+   * Ein Diphthong ist bereits von Natur aus lang.
+   * Wir wollen also beispielsweise ae nicht als āe darstellen.
+   */
+  if (nucleus.end > nucleus.start) return syllaba;
+
+  const index = nucleus.start;
+  const vocalis = syllaba[index];
+
+  return (
+    syllaba.slice(0, index) +
+    (MACRA[vocalis] || vocalis) +
+    syllaba.slice(index + 1)
+  );
+}
+
+function formaCumMacris(recordum) {
+  const syllabae = String(recordum?.syllabae || '')
+    .split('.')
+    .filter(Boolean);
+
+  /*
+   * Ältere Datensätze können Makra noch unmittelbar in forma enthalten.
+   * Ohne syllabae verwenden wir daher die gespeicherte Form unverändert.
+   */
+  if (!syllabae.length) {
+    return recordum?.forma || '';
+  }
+
+  const longae = new Set(
+    indicesLongarumRecordi(recordum)
+  );
+
+  return syllabae
+    .map((syllaba, index) =>
+      longae.has(index)
+        ? syllabaCumMacron(syllaba)
+        : syllaba
+    )
+    .join('');
+}
+
 function primaForma(formae, condicio) {
-  return formae.find(condicio)?.forma || '';
+  const recordum = formae.find(condicio);
+
+  return recordum
+    ? formaCumMacris(recordum)
+    : '';
 }
 
 function notaeSubstantivi(item) {
@@ -636,7 +703,10 @@ function reddeLemmaListam() {
     principale.className = 'vocabularium-lemma-principale';
 
     const strong = document.createElement('strong');
-    strong.textContent = item.lemma || '—';
+    strong.textContent =
+      formaCumMacris(item) ||
+      item.lemma ||
+      '—';
 
         const notae = notaeLemmae(item);
 
@@ -723,7 +793,7 @@ async function ladeLemmataOmnia() {
       const { data, error } =
         await supabase
           .from('formae')
-          .select('lemma, lexeme_id, pars_orationis, forma, genus, numerus, casus, persona, tempus, modus, vox')
+          .select('lemma, lexeme_id, pars_orationis, forma, genus, numerus, casus, persona, tempus, modus, vox, syllabae, longae')
           .not('lemma', 'is', null)
           .order('lemma', { ascending: true })
           .range(initium, initium + amplitudo - 1);
