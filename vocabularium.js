@@ -447,6 +447,8 @@ function generaVerbumA({
 
   const infinitivusActiuus = radixPraesentis + 'āre';
   const infinitivusPassiuus = radixPraesentis + 'ārī';
+  const infinitivusActiuusLongoE =
+    infinitivusActiuus.replace(/e$/i, 'ē');
 
   const formae = [];
 
@@ -570,13 +572,13 @@ function generaVerbumA({
 
     addSeries([
       infinitivusActiuus + 'm',
-      infinitivusActiuus + 's',
+      infinitivusActiuusLongoE + 's',
       infinitivusActiuus + 't',
-      infinitivusActiuus + 'mus',
-      infinitivusActiuus + 'tis',
+      infinitivusActiuusLongoE + 'mus',
+      infinitivusActiuusLongoE + 'tis',
       infinitivusActiuus + 'nt'
     ], 'imperf', 'coni', 'act');
-
+    
     addSeries([
       stemmaPerfecti + 'erim',
       stemmaPerfecti + 'erīs',
