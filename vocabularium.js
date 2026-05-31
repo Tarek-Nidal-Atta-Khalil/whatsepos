@@ -730,10 +730,10 @@ function notaeAdpositionis(item) {
   const formae = formaeLemmae(item);
 
   const casusNomina = {
-    gen: 'Gen.',
-    dat: 'Dat.',
-    acc: 'Acc.',
-    abl: 'Abl.'
+    gen: 'gen',
+    dat: 'dat',
+    abl: 'abl',
+    acc: 'acc'
   };
 
   const ordoCasuum = [
@@ -761,6 +761,11 @@ function notaeAdpositionis(item) {
       casusNomina[casusSingularis] ||
       casusSingularis
     );
+  
+  const notaCasuum =
+    casus.length
+      ? `[+${casus.join('/')}]`
+      : '';
 
   const lemma =
     clavisQuaestionis(item?.lemma || '');
@@ -788,11 +793,11 @@ function notaeAdpositionis(item) {
   return {
     textus: [
       formaeVariae.join(', '),
-      casus.join(', ')
+      notaCasuum
     ]
       .filter(Boolean)
-      .join(' · '),
-
+      .join(' '),
+  
     genus: ''
   };
 }
