@@ -65,10 +65,10 @@ style.textContent = `
 }
 
 .vocabularium-lemma-item{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:16px;
+  display:grid;
+  grid-template-columns:minmax(150px,220px) minmax(0,1fr) auto;
+  align-items:baseline;
+  column-gap:22px;
   width:100%;
   padding:13px 18px;
   border:none;
@@ -90,13 +90,11 @@ style.textContent = `
 }
 
 .vocabularium-lemma-principale{
-  display:flex;
-  align-items:baseline;
-  flex-wrap:wrap;
   min-width:0
 }
 
 .vocabularium-lemma-info{
+  min-width:0;
   font-weight:400
 }
 
@@ -111,7 +109,29 @@ style.textContent = `
   color:#6b7280
 }
 
-@media(max-width:900px){.vocabularium-search-row{flex-direction:column}.vocabularium-admin{width:100%}.vox-button{width:100%}.adde-detail-grid{grid-template-columns:1fr}}
+@media(max-width:900px){
+  .vocabularium-search-row{flex-direction:column}
+  .vocabularium-admin{width:100%}
+  .vox-button{width:100%}
+  .adde-detail-grid{grid-template-columns:1fr}
+
+  .vocabularium-lemma-item{
+    grid-template-columns:minmax(110px,150px) minmax(0,1fr) auto;
+    column-gap:14px
+  }
+}
+
+@media(max-width:620px){
+  .vocabularium-lemma-item{
+    grid-template-columns:minmax(100px,135px) minmax(0,1fr);
+    row-gap:4px
+  }
+
+  .vocabularium-lemma-pars{
+    grid-column:2;
+    font-size:.78rem
+  }
+}
 `;
 document.head.appendChild(style);
 
@@ -552,18 +572,16 @@ function reddeLemmaListam() {
 
     const info = document.createElement('span');
     info.className = 'vocabularium-lemma-info';
-    info.textContent = infoTextus
-      ? `, ${infoTextus}`
-      : '';
-
+        info.textContent = infoTextus || '';
+    
     const span = document.createElement('span');
     span.className = 'vocabularium-lemma-pars';
     span.textContent = item.pars_orationis || '';
 
     principale.appendChild(strong);
-    principale.appendChild(info);
 
     button.appendChild(principale);
+    button.appendChild(info);
     button.appendChild(span);
 
     button.addEventListener('click', () => {
