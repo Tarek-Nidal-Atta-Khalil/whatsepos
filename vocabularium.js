@@ -559,13 +559,13 @@ function notaeSubstantivi(item) {
   };
 }
 
-function notaeAdiectivi(item) {
+function notaeGenerum(item, pars) {
   const formae = formaeLemmae(item);
 
   const nominatiui = ['m', 'f', 'n']
     .map(genus =>
       primaForma(formae, forma =>
-        estParsOrationis(forma, 'adiectivum') &&
+        estParsOrationis(forma, pars) &&
         idemCampus(forma, 'casus', 'nom') &&
         idemCampus(forma, 'numerus', 'sg') &&
         idemCampus(forma, 'genus', genus)
@@ -628,7 +628,14 @@ function notaeLemmae(item) {
 
   if (estParsOrationis(item, 'adiectivum')) {
     return {
-      textus: notaeAdiectivi(item),
+      textus: notaeGenerum(item, 'adiectivum'),
+      genus: ''
+    };
+  }
+  
+  if (estParsOrationis(item, 'pronomen')) {
+    return {
+      textus: notaeGenerum(item, 'pronomen'),
       genus: ''
     };
   }
@@ -654,12 +661,14 @@ function eligeRecordumPrincipale(formae) {
       (
         estParsOrationis(forma, 'verbum') ||
         estParsOrationis(forma, 'substantivum') ||
-        estParsOrationis(forma, 'adiectivum')
+        estParsOrationis(forma, 'adiectivum') ||
+        estParsOrationis(forma, 'pronomen')
       )
     ) ||
     formae.find(forma => estParsOrationis(forma, 'verbum')) ||
     formae.find(forma => estParsOrationis(forma, 'substantivum')) ||
     formae.find(forma => estParsOrationis(forma, 'adiectivum')) ||
+    formae.find(forma => estParsOrationis(forma, 'pronomen')) ||
     formae[0]
   );
 }
