@@ -294,6 +294,70 @@ addePanel.innerHTML = `
   </div>
 </div>
 
+<div class="adde-form-card" id="addeAdpositioTypusCard" hidden>
+  <div class="adde-uerbum-field">
+    <label for="addeAdpositioTypus">Typus adpositionis</label>
+
+    <select id="addeAdpositioTypus">
+      <option value="">elige...</option>
+      <option value="praepositio">praepositio</option>
+      <option value="postpositio">postpositio</option>
+    </select>
+
+    <div class="adde-card-help">
+      Elige utrum adpositio ante an post nomen ponatur.
+    </div>
+  </div>
+</div>
+
+<div class="adde-form-card" id="addeAdpositioCasusCard" hidden>
+  <div class="adde-uerbum-field">
+    <label>Quem casum regit?</label>
+
+    <div class="adde-adpositio-casus">
+      <label>
+        <input
+          type="checkbox"
+          name="addeAdpositioCasus"
+          value="gen"
+        >
+        genetivus
+      </label>
+
+      <label>
+        <input
+          type="checkbox"
+          name="addeAdpositioCasus"
+          value="dat"
+        >
+        dativus
+      </label>
+
+      <label>
+        <input
+          type="checkbox"
+          name="addeAdpositioCasus"
+          value="acc"
+        >
+        accusativus
+      </label>
+
+      <label>
+        <input
+          type="checkbox"
+          name="addeAdpositioCasus"
+          value="abl"
+        >
+        ablativus
+      </label>
+    </div>
+
+    <div class="adde-card-help">
+      Plures casus simul eligi possunt.
+    </div>
+  </div>
+</div>
+
     <div class="adde-form-card" id="addeConiugatioCard" hidden>
     <div class="adde-uerbum-field">
       <label for="addeConiugatio">Coniugatio</label>
