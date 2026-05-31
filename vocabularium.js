@@ -2176,14 +2176,52 @@ function generaVerbumA({
 }
 
 function syncDeclinationesSubstantivi() {
-  const genus = document.getElementById('addeGenus')?.value;
-  const declinatio = document.getElementById('addeDeclinatio');
-  const optioA = declinatio?.querySelector('option[value="a"]');
-  if (!declinatio || !optioA) return;
-  const aIncompatibilis = genus === 'n';
-  optioA.disabled = aIncompatibilis;
-  optioA.hidden = aIncompatibilis;
-  if (aIncompatibilis && declinatio.value === 'a') declinatio.value = '';
+  const genus =
+    document.getElementById('addeGenus')?.value;
+
+  const declinatio =
+    document.getElementById('addeDeclinatio');
+
+  const optioA =
+    declinatio?.querySelector('option[value="a"]');
+
+  const optioO =
+    declinatio?.querySelector('option[value="o"]');
+
+  if (!declinatio || !optioA || !optioO) return;
+
+  const aIncompatibilis =
+    genus === 'n';
+
+  optioA.disabled =
+    aIncompatibilis;
+
+  optioA.hidden =
+    aIncompatibilis;
+
+  if (
+    aIncompatibilis &&
+    declinatio.value === 'a'
+  ) {
+    declinatio.value = '';
+  }
+
+  const oIncompatibilis =
+    Boolean(genus) &&
+    genus !== 'n';
+
+  optioO.disabled =
+    oIncompatibilis;
+
+  optioO.hidden =
+    oIncompatibilis;
+
+  if (
+    oIncompatibilis &&
+    declinatio.value === 'o'
+  ) {
+    declinatio.value = '';
+  }
 }
 
 function aperiLemma(lemma, lexemeId = '') {
