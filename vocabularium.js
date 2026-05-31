@@ -384,9 +384,37 @@ function reddeLemmaListam() {
   });
 }
 
+async function exspectaSupabaseLemmaListae() {
+  if (window.whatseposSupabase) {
+    return window.whatseposSupabase;
+  }
+
+  return new Promise(resolve => {
+    let tentamina = 0;
+
+    const timer = setInterval(() => {
+      tentamina += 1;
+
+      if (window.whatseposSupabase || tentamina >= 60) {
+        clearInterval(timer);
+        resolve(window.whatseposSupabase || null);
+      }
+    }, 50);
+  });
+}
+
 async function ladeLemmataOmnia() {
-  if (!window.whatseposSupabase || !lemmaLista) return;
+  if (!lemmaLista) return;
   if (lemmataPromissum) return lemmataPromissum;
+
+  const supabase = await exspectaSupabaseLemmaListae();
+
+  if (!supabase) {
+    lemmaLista.innerHTML =
+      `<div class="vocabularium-lemma-vacua">Lemmata nondum legi possunt.</div>`;
+
+    return;
+  }
 
   lemmataPromissum = (async function () {
     const resultata = [];
@@ -396,7 +424,7 @@ async function ladeLemmataOmnia() {
 
     while (true) {
       const { data, error } =
-        await window.whatseposSupabase
+        await supabase
           .from('formae')
           .select('lemma, lexeme_id, pars_orationis')
           .not('lemma', 'is', null)
@@ -1389,3 +1417,6 @@ document.getElementById('addePerfectum')?.addEventListener('input', syncAddeForm
 document.getElementById('addeSupinum')?.addEventListener('input', syncAddeForm);
 document.getElementById('addeCancel')?.addEventListener('click', schliesseAddeUerbum);
 document.getElementById('addeSave')?.addEventListener('click', speichereAddeFormular);
+ladeLemmataOmnia().then(() => {
+  reddeLemmaListam();
+});
