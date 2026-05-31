@@ -193,6 +193,7 @@ addePanel.innerHTML = `
         <option value="adiectivum">adiectivum</option>
         <option value="verbum">verbum</option>
         <option value="adverbium">adverbium</option>
+        <option value="adpositio">adpositio</option>
       </select>
       <div class="adde-card-help">Deinde genus uerbi elige; tum tantum reliqua campa aperientur.</div>
     </div>
