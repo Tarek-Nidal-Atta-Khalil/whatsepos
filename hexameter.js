@@ -63,8 +63,20 @@ function indexPrimiVocalisInTextu(textus) {
   return -1;
 }
 
+function normalisiereAdDiphthongos(textus) {
+  return String(textus || "")
+    .toLowerCase()
+    .replace(/[āáàâäǎă]/g, "a")
+    .replace(/[ēéèêëĕ]/g, "e")
+    .replace(/[īíìîïĭ]/g, "i")
+    .replace(/[ōóòôöŏ]/g, "o")
+    .replace(/[ūúùûüŭ]/g, "u")
+    .replace(/[ȳýỳŷÿ]/g, "y")
+    .replace(/[^a-z]/g, "");
+}
+
 function estDiphthongusCommunis(textus, index, diphthongi = DIPHTHONGE) {
-  const s = normalisiereSyllabaeLexico(textus);
+  const s = normalisiereAdDiphthongos(textus);
   const duo = s.slice(index, index + 2);
 
   if (!estVokalInTextu(s, index)) return false;
