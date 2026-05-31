@@ -247,21 +247,52 @@ addePanel.innerHTML = `
       </select>
     </div>
   </div>
-  <div class="adde-form-card" id="addeAdiectivumCard" hidden>
+  <div class="adde-form-card" id="addeAdiectivumFemininumCard" hidden>
   <div class="adde-uerbum-field">
-    <label for="addeAdiectivumDeclinatio">Declinatio adiectivi</label>
+    <label for="addeAdiectivumFemininum">
+      Nominativus singularis feminini
+    </label>
+    <input
+      id="addeAdiectivumFemininum"
+      type="text"
+      placeholder="alta, pulchra, libera, celeris"
+    >
+  </div>
+</div>
+
+<div class="adde-form-card" id="addeAdiectivumNeutrumCard" hidden>
+  <div class="adde-uerbum-field">
+    <label for="addeAdiectivumNeutrum">
+      Nominativus singularis neutri
+    </label>
+    <input
+      id="addeAdiectivumNeutrum"
+      type="text"
+      placeholder="altum, pulchrum, liberum, celere"
+    >
+  </div>
+</div>
+
+<div class="adde-form-card" id="addeAdiectivumCard" hidden>
+  <div class="adde-uerbum-field">
+    <label for="addeAdiectivumDeclinatio">
+      Declinatio adiectivi
+    </label>
+
     <select id="addeAdiectivumDeclinatio">
       <option value="">elige...</option>
       <option value="a_o">a-/o-Deklination</option>
-      <option value="consonantica">konsonantische Deklination</option>
       <option value="i">i-Deklination</option>
+      <option value="consonantica">konsonantische Deklination</option>
       <option value="indeclinabile">indeclinabile</option>
     </select>
+
     <div class="adde-card-help">
-      Nunc tantum adiectiua a-/o-declinationis in -us generari possunt.
+      Nunc adiectiua a-/o-declinationis et adiectiua i-declinationis trium terminationum generari possunt.
     </div>
   </div>
 </div>
+
     <div class="adde-form-card" id="addeConiugatioCard" hidden>
     <div class="adde-uerbum-field">
       <label for="addeConiugatio">Coniugatio</label>
@@ -878,23 +909,163 @@ function recordumFormae({ formaMacris, lemmaNudum, pars, genus, numerus, casus }
   };
 }
 
-function generaAdiectivumAO({ lemmaInput }) {
-  const lemmaMacris = exColonibusMacra(lemmaInput).trim();
+function generaAdiectivumAO({
+  lemmaInput,
+  femininumInput,
+  neutrumInput
+}) {
+  const masculinum =
+    exColonibusMacra(lemmaInput).trim();
 
-  if (!/us$/i.test(lemmaMacris)) {
+  const femininum =
+    exColonibusMacra(femininumInput).trim();
+
+  const neutrum =
+    exColonibusMacra(neutrumInput).trim();
+
+  if (!/a$/i.test(femininum)) {
     throw new Error(
-      'Adiectiuum a-/o-declinationis nunc in -us desinere debet, exempli gratia altus.'
+      'Femininum adiectivi a-/o-declinationis in -a desinere debet.'
     );
   }
 
-  const lemmaNudum = sineMacris(lemmaMacris).toLowerCase();
-  const stemma = lemmaMacris.replace(/us$/i, '');
+  const stemma =
+    femininum.replace(/a$/i, '');
+
+  if (
+    clavisQuaestionis(neutrum) !==
+    clavisQuaestionis(stemma + 'um')
+  ) {
+    throw new Error(
+      'Neutrum adiectivi a-/o-declinationis eodem stemmate et -um formari debet.'
+    );
+  }
+
+  const lemmaNudum =
+    sineMacris(masculinum).toLowerCase();
+
   const formae = [];
 
-  const add = (genus, numerus, casus, exitus) => {
+  const add = (genus, numerus, casus, formaMacris) => {
     formae.push(
       recordumFormae({
-        formaMacris: stemma + exitus,
+        formaMacris,
+        lemmaNudum,
+        pars: 'adiectivum',
+        genus,
+        numerus,
+        casus
+      })
+    );
+  };
+
+  const vocativusMasculinus = (() => {
+    if (/ius$/i.test(masculinum)) {
+      return stemma.slice(0, -1) + 'ī';
+    }
+
+    if (/us$/i.test(masculinum)) {
+      return stemma + 'e';
+    }
+
+    return masculinum;
+  })();
+
+  // Masculinum singularis
+  add('m', 'sg', 'nom', masculinum);
+  add('m', 'sg', 'gen', stemma + 'ī');
+  add('m', 'sg', 'dat', stemma + 'ō');
+  add('m', 'sg', 'acc', stemma + 'um');
+  add('m', 'sg', 'abl', stemma + 'ō');
+  add('m', 'sg', 'voc', vocativusMasculinus);
+
+  // Femininum singularis
+  add('f', 'sg', 'nom', femininum);
+  add('f', 'sg', 'gen', stemma + 'ae');
+  add('f', 'sg', 'dat', stemma + 'ae');
+  add('f', 'sg', 'acc', stemma + 'am');
+  add('f', 'sg', 'abl', stemma + 'ā');
+  add('f', 'sg', 'voc', femininum);
+
+  // Neutrum singularis
+  add('n', 'sg', 'nom', neutrum);
+  add('n', 'sg', 'gen', stemma + 'ī');
+  add('n', 'sg', 'dat', stemma + 'ō');
+  add('n', 'sg', 'acc', neutrum);
+  add('n', 'sg', 'abl', stemma + 'ō');
+  add('n', 'sg', 'voc', neutrum);
+
+  // Masculinum pluralis
+  add('m', 'pl', 'nom', stemma + 'ī');
+  add('m', 'pl', 'gen', stemma + 'ōrum');
+  add('m', 'pl', 'dat', stemma + 'īs');
+  add('m', 'pl', 'acc', stemma + 'ōs');
+  add('m', 'pl', 'abl', stemma + 'īs');
+  add('m', 'pl', 'voc', stemma + 'ī');
+
+  // Femininum pluralis
+  add('f', 'pl', 'nom', stemma + 'ae');
+  add('f', 'pl', 'gen', stemma + 'ārum');
+  add('f', 'pl', 'dat', stemma + 'īs');
+  add('f', 'pl', 'acc', stemma + 'ās');
+  add('f', 'pl', 'abl', stemma + 'īs');
+  add('f', 'pl', 'voc', stemma + 'ae');
+
+  // Neutrum pluralis
+  add('n', 'pl', 'nom', stemma + 'a');
+  add('n', 'pl', 'gen', stemma + 'ōrum');
+  add('n', 'pl', 'dat', stemma + 'īs');
+  add('n', 'pl', 'acc', stemma + 'a');
+  add('n', 'pl', 'abl', stemma + 'īs');
+  add('n', 'pl', 'voc', stemma + 'a');
+
+  return {
+    lemmaNudum,
+    formae
+  };
+}
+
+function generaAdiectivumI({
+  lemmaInput,
+  femininumInput,
+  neutrumInput
+}) {
+  const masculinum =
+    exColonibusMacra(lemmaInput).trim();
+
+  const femininum =
+    exColonibusMacra(femininumInput).trim();
+
+  const neutrum =
+    exColonibusMacra(neutrumInput).trim();
+
+  if (!/is$/i.test(femininum)) {
+    throw new Error(
+      'Femininum adiectivi i-declinationis trium terminationum in -is desinere debet.'
+    );
+  }
+
+  const stemma =
+    femininum.replace(/is$/i, '');
+
+  if (
+    clavisQuaestionis(neutrum) !==
+    clavisQuaestionis(stemma + 'e')
+  ) {
+    throw new Error(
+      'Neutrum adiectivi i-declinationis trium terminationum eodem stemmate et -e formari debet.'
+    );
+  }
+
+  const lemmaNudum =
+    sineMacris(masculinum).toLowerCase();
+
+  const formae = [];
+
+  const add = (genus, numerus, casus, formaMacris) => {
+    formae.push(
+      recordumFormae({
+        formaMacris,
         lemmaNudum,
         pars: 'adiectivum',
         genus,
@@ -905,52 +1076,52 @@ function generaAdiectivumAO({ lemmaInput }) {
   };
 
   // Masculinum singularis
-  add('m', 'sg', 'nom', 'us');
-  add('m', 'sg', 'gen', 'ī');
-  add('m', 'sg', 'dat', 'ō');
-  add('m', 'sg', 'acc', 'um');
-  add('m', 'sg', 'abl', 'ō');
-  add('m', 'sg', 'voc', 'e');
+  add('m', 'sg', 'nom', masculinum);
+  add('m', 'sg', 'gen', stemma + 'is');
+  add('m', 'sg', 'dat', stemma + 'ī');
+  add('m', 'sg', 'acc', stemma + 'em');
+  add('m', 'sg', 'abl', stemma + 'ī');
+  add('m', 'sg', 'voc', masculinum);
 
   // Femininum singularis
-  add('f', 'sg', 'nom', 'a');
-  add('f', 'sg', 'gen', 'ae');
-  add('f', 'sg', 'dat', 'ae');
-  add('f', 'sg', 'acc', 'am');
-  add('f', 'sg', 'abl', 'ā');
-  add('f', 'sg', 'voc', 'a');
+  add('f', 'sg', 'nom', femininum);
+  add('f', 'sg', 'gen', stemma + 'is');
+  add('f', 'sg', 'dat', stemma + 'ī');
+  add('f', 'sg', 'acc', stemma + 'em');
+  add('f', 'sg', 'abl', stemma + 'ī');
+  add('f', 'sg', 'voc', femininum);
 
   // Neutrum singularis
-  add('n', 'sg', 'nom', 'um');
-  add('n', 'sg', 'gen', 'ī');
-  add('n', 'sg', 'dat', 'ō');
-  add('n', 'sg', 'acc', 'um');
-  add('n', 'sg', 'abl', 'ō');
-  add('n', 'sg', 'voc', 'um');
+  add('n', 'sg', 'nom', neutrum);
+  add('n', 'sg', 'gen', stemma + 'is');
+  add('n', 'sg', 'dat', stemma + 'ī');
+  add('n', 'sg', 'acc', neutrum);
+  add('n', 'sg', 'abl', stemma + 'ī');
+  add('n', 'sg', 'voc', neutrum);
 
   // Masculinum pluralis
-  add('m', 'pl', 'nom', 'ī');
-  add('m', 'pl', 'gen', 'ōrum');
-  add('m', 'pl', 'dat', 'īs');
-  add('m', 'pl', 'acc', 'ōs');
-  add('m', 'pl', 'abl', 'īs');
-  add('m', 'pl', 'voc', 'ī');
+  add('m', 'pl', 'nom', stemma + 'ēs');
+  add('m', 'pl', 'gen', stemma + 'ium');
+  add('m', 'pl', 'dat', stemma + 'ibus');
+  add('m', 'pl', 'acc', stemma + 'ēs');
+  add('m', 'pl', 'abl', stemma + 'ibus');
+  add('m', 'pl', 'voc', stemma + 'ēs');
 
   // Femininum pluralis
-  add('f', 'pl', 'nom', 'ae');
-  add('f', 'pl', 'gen', 'ārum');
-  add('f', 'pl', 'dat', 'īs');
-  add('f', 'pl', 'acc', 'ās');
-  add('f', 'pl', 'abl', 'īs');
-  add('f', 'pl', 'voc', 'ae');
+  add('f', 'pl', 'nom', stemma + 'ēs');
+  add('f', 'pl', 'gen', stemma + 'ium');
+  add('f', 'pl', 'dat', stemma + 'ibus');
+  add('f', 'pl', 'acc', stemma + 'ēs');
+  add('f', 'pl', 'abl', stemma + 'ibus');
+  add('f', 'pl', 'voc', stemma + 'ēs');
 
   // Neutrum pluralis
-  add('n', 'pl', 'nom', 'a');
-  add('n', 'pl', 'gen', 'ōrum');
-  add('n', 'pl', 'dat', 'īs');
-  add('n', 'pl', 'acc', 'a');
-  add('n', 'pl', 'abl', 'īs');
-  add('n', 'pl', 'voc', 'a');
+  add('n', 'pl', 'nom', stemma + 'ia');
+  add('n', 'pl', 'gen', stemma + 'ium');
+  add('n', 'pl', 'dat', stemma + 'ibus');
+  add('n', 'pl', 'acc', stemma + 'ia');
+  add('n', 'pl', 'abl', stemma + 'ibus');
+  add('n', 'pl', 'voc', stemma + 'ia');
 
   return {
     lemmaNudum,
@@ -1475,7 +1646,23 @@ function syncAddeForm() {
     !declinatio ||
     !['consonantica', 'i', 'mixta', 'u', 'e', 'graeca', 'irregularis'].includes(declinatio);
 
-  document.getElementById('addeAdiectivumCard').hidden = pars !== 'adiectivum';
+    const femininumAdiectivi =
+    document.getElementById('addeAdiectivumFemininum')?.value.trim() || '';
+
+  const neutrumAdiectivi =
+    document.getElementById('addeAdiectivumNeutrum')?.value.trim() || '';
+
+  document.getElementById('addeAdiectivumFemininumCard').hidden =
+    pars !== 'adiectivum';
+
+  document.getElementById('addeAdiectivumNeutrumCard').hidden =
+    pars !== 'adiectivum' ||
+    !femininumAdiectivi;
+
+  document.getElementById('addeAdiectivumCard').hidden =
+    pars !== 'adiectivum' ||
+    !femininumAdiectivi ||
+    !neutrumAdiectivi;
 
     const coniugatio = document.getElementById('addeConiugatio')?.value || '';
   const typusVerbi = document.getElementById('addeVerbumTypus')?.value || '';
@@ -1509,12 +1696,14 @@ function syncAddeForm() {
     potestServari = Boolean(lemma && genus && declinatio && numerusTyp);
   }
 
-  if (pars === 'adiectivum') {
+    if (pars === 'adiectivum') {
     const adiectivumDeclinatio =
       document.getElementById('addeAdiectivumDeclinatio')?.value || '';
 
     potestServari = Boolean(
       lemma &&
+      femininumAdiectivi &&
+      neutrumAdiectivi &&
       adiectivumDeclinatio
     );
   }
@@ -1557,6 +1746,8 @@ function aperiAddeUerbum(lemmaPraeplenum = '') {
   document.getElementById('addeGenitivus').value = '';
   document.getElementById('addeNumerusTyp').value = '';
 
+  document.getElementById('addeAdiectivumFemininum').value = '';
+  document.getElementById('addeAdiectivumNeutrum').value = '';
   document.getElementById('addeAdiectivumDeclinatio').value = '';
 
   document.getElementById('addeConiugatio').value = '';
@@ -1729,23 +1920,37 @@ async function speichereAddeFormular() {
     }
   }
 
-  if (pars === 'adiectivum') {
+    if (pars === 'adiectivum') {
     const declinatio =
       document.getElementById('addeAdiectivumDeclinatio')?.value || '';
 
-    if (declinatio !== 'a_o') {
-      statusAdde(
-        'Nunc tantum adiectiua a-/o-declinationis servari possunt.'
-      );
-      return;
-    }
+    const femininumInput =
+      document.getElementById('addeAdiectivumFemininum')?.value.trim() || '';
+
+    const neutrumInput =
+      document.getElementById('addeAdiectivumNeutrum')?.value.trim() || '';
 
     let paradigma;
 
     try {
-      paradigma = generaAdiectivumAO({
-        lemmaInput
-      });
+      if (declinatio === 'a_o') {
+        paradigma = generaAdiectivumAO({
+          lemmaInput,
+          femininumInput,
+          neutrumInput
+        });
+      } else if (declinatio === 'i') {
+        paradigma = generaAdiectivumI({
+          lemmaInput,
+          femininumInput,
+          neutrumInput
+        });
+      } else {
+        statusAdde(
+          'Nunc tantum adiectiua a-/o-declinationis et i-declinationis trium terminationum servari possunt.'
+        );
+        return;
+      }
     } catch (error) {
       statusAdde(error.message);
       return;
@@ -1823,6 +2028,8 @@ document.getElementById('addePars')?.addEventListener('change', syncAddeForm);
 document.getElementById('addeGenus')?.addEventListener('change', () => { resetDependentiaSubstantivi(); syncAddeForm(); });
 document.getElementById('addeDeclinatio')?.addEventListener('change', () => { const numerusTyp = document.getElementById('addeNumerusTyp'); if (numerusTyp) numerusTyp.value = ''; syncAddeForm(); });
 document.getElementById('addeNumerusTyp')?.addEventListener('change', syncAddeForm);
+document.getElementById('addeAdiectivumFemininum')?.addEventListener('input', syncAddeForm);
+document.getElementById('addeAdiectivumNeutrum')?.addEventListener('input', syncAddeForm);
 document.getElementById('addeAdiectivumDeclinatio')?.addEventListener('change', syncAddeForm);
 document.getElementById('addeConiugatio')?.addEventListener('change', syncAddeForm);
 document.getElementById('addeVerbumTypus')?.addEventListener('change', syncAddeForm);
