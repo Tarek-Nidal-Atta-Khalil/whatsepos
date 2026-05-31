@@ -303,8 +303,35 @@ function istHexameterCompatibilis(sigla){
   return true;
 }
   
-  function eligeFormamHeadword(formae){const n=normalisiere(lemma);return formae.find(f=>f.pars_orationis==='substantivum'&&f.casus==='nom'&&f.numerus==='sg')||formae.find(f=>f.pars_orationis==='substantivum'&&f.casus==='nom'&&f.numerus==='pl')||formae.find(f=>f.persona==='1'&&f.numerus==='sg'&&f.tempus==='praes'&&normalisiereModus(f.modus)==='ind'&&f.vox==='act')||formae.find(f=>normalisiere(f.forma)===n)||formae[0];}
-function td(html){const e=document.createElement('td');e.innerHTML=html||'—';return e;}
+function eligeFormamHeadword(formae){const n=normalisiere(lemma);return formae.find(f=>f.pars_orationis==='substantivum'&&f.casus==='nom'&&f.numerus==='sg')||formae.find(f=>f.pars_orationis==='substantivum'&&f.casus==='nom'&&f.numerus==='pl')||formae.find(f=>f.persona==='1'&&f.numerus==='sg'&&f.tempus==='praes'&&normalisiereModus(f.modus)==='ind'&&f.vox==='act')||formae.find(f=>normalisiere(f.forma)===n)||formae[0];}
+function td(html){
+  const e=document.createElement('td');
+  e.innerHTML=html||'—';
+  return e;
+}
+
+function comparaVariantesFlexionis(a, b) {
+  /*
+   * Varianten mit weniger ausdrücklich markierten Längen
+   * stehen zuerst:
+   *
+   * illius
+   * illīus
+   */
+  const longaeA = longaeIndices(a).length;
+  const longaeB = longaeIndices(b).length;
+
+  if (longaeA !== longaeB) {
+    return longaeA - longaeB;
+  }
+
+  return formaProLemmaHtml(a).localeCompare(
+    formaProLemmaHtml(b),
+    'la',
+    { sensitivity: 'variant' }
+  );
+}
+  
 function formaSubstantiviHtml(formae, casus, numerus) {
   const congruentia = formae.filter(
     x => x.casus === casus && x.numerus === numerus
