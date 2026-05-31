@@ -340,6 +340,7 @@ function formaSubstantiviHtml(formae, casus, numerus) {
   if (!congruentia.length) return '—';
 
   return congruentia
+    .sort(comparaVariantesFlexionis)
     .map(forma => formaProLemmaHtml(forma))
     .filter((forma, index, omnes) =>
       forma && omnes.indexOf(forma) === index
@@ -377,6 +378,7 @@ function formaNachMetaHtml(formae, casus, numerus, genus) {
   if (!congruentia.length) return '—';
 
   return congruentia
+    .sort(comparaVariantesFlexionis)
     .map(forma => formaProLemmaHtml(forma))
     .filter((forma, index, omnes) =>
       forma && omnes.indexOf(forma) === index
