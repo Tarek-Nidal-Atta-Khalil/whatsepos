@@ -339,7 +339,23 @@ function tabellaSubstantivi(formae){
       wrapper.appendChild(table);
   return wrapper;
 }
-function formaNachMetaHtml(formae,casus,numerus,genus){const f=formae.find(x=>x.casus===casus&&x.numerus===numerus&&x.genus===genus);return f?formaProLemmaHtml(f):'—';}
+function formaNachMetaHtml(formae, casus, numerus, genus) {
+  const congruentia = formae.filter(
+    x =>
+      x.casus === casus &&
+      x.numerus === numerus &&
+      x.genus === genus
+  );
+
+  if (!congruentia.length) return '—';
+
+  return congruentia
+    .map(forma => formaProLemmaHtml(forma))
+    .filter((forma, index, omnes) =>
+      forma && omnes.indexOf(forma) === index
+    )
+    .join('<br>');
+}
 function tabellaGenusNumerus(formae,numerus){
   const h=document.createElement('h3');
   h.className='flexio-numerus';
