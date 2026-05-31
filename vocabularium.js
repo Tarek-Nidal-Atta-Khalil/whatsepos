@@ -1140,6 +1140,7 @@ function aperiAddeUerbum(lemmaPraeplenum = '') {
   if (row) row.style.display = 'none';
   if (eventus) eventus.style.display = 'none';
   if (status) status.style.display = 'none';
+  if (lemmaListaRahmen) lemmaListaRahmen.style.display = 'none';
 
   addePanel.hidden = false;
 
@@ -1163,7 +1164,20 @@ function aperiAddeUerbum(lemmaPraeplenum = '') {
   statusAdde('');
   document.getElementById('addeLemma').focus();
 }
-function schliesseAddeUerbum() { addePanel.hidden = true; if (row) row.style.display = 'flex'; if (eventus) eventus.style.display = ''; if (status) status.style.display = ''; input?.focus(); }
+
+function schliesseAddeUerbum() {
+  addePanel.hidden = true;
+
+  if (row) row.style.display = 'flex';
+  if (eventus) eventus.style.display = '';
+  if (status) status.style.display = '';
+  if (lemmaListaRahmen) lemmaListaRahmen.style.display = '';
+
+  reddeLemmaListam();
+
+  input?.focus();
+}
+
 function erzeugeAddeSuggestio(lemmaNeu) { const b = document.createElement('button'); b.type='button'; b.className='vocabularium-suggestio is-selected'; b.dataset.action='adde'; b.dataset.lemma=lemmaNeu; b.style.cssText='display:block;width:100%;text-align:left;padding:14px 18px;border:none;background:white;cursor:pointer;border-bottom:1px solid #eee'; b.innerHTML=`<strong>${lemmaNeu}</strong> <span style="color:#6b7280">adde ut nouum headword</span>`; b.addEventListener('mousedown', e => { e.preventDefault(); aperiAddeUerbum(lemmaNeu); }); suggestiones.appendChild(b); suggestiones.style.display='block'; suggestioSelectaIndex=0; }
 function oeffneSuggestioSelecta() {
   const b = suggestioButtons()[suggestioSelectaIndex];
