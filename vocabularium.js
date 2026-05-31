@@ -1315,7 +1315,37 @@ async function speichereAddeFormular() {
 const zeigeTabOriginal = window.zeigeTab;
 const scriptoriumTitulus = document.querySelector('.container > h1');
 window.zeigeTab = async function(tabName) { if (typeof zeigeTabOriginal === 'function') await zeigeTabOriginal(tabName); if (tabName === 'vocabularium') { if (row && addePanel.hidden) row.style.display = 'flex'; if (scriptoriumTitulus) scriptoriumTitulus.textContent = 'Uocabularium'; } else { if (row) row.style.display = 'none'; addePanel.hidden = true; if (scriptoriumTitulus) scriptoriumTitulus.textContent = 'Scriptorium'; } };
-if (input) { let timer = null; input.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(quaereSuggestiones, 150); }); input.addEventListener('keydown', e => { const buttons = suggestioButtons(); if (e.key === 'ArrowDown' && buttons.length) { e.preventDefault(); setzeSuggestioSelecta(suggestioSelectaIndex < 0 ? 0 : suggestioSelectaIndex + 1); return; } if (e.key === 'ArrowUp' && buttons.length) { e.preventDefault(); setzeSuggestioSelecta(suggestioSelectaIndex < 0 ? buttons.length - 1 : suggestioSelectaIndex - 1); return; } if (e.key === 'Enter') { e.preventDefault(); if (buttons.length) { if (suggestioSelectaIndex < 0) setzeSuggestioSelecta(0); oeffneSuggestioSelecta(); } else if (input.value.trim()) aperiAddeUerbum(input.value.trim()); } }); input.addEventListener('blur', () => setTimeout(() => { if (addePanel.hidden) leereSuggestiones(); }, 120)); }
+if (input) {
+  let timer = null;
+  input.addEventListener('input', () => {
+  reddeLemmaListam();
+
+  clearTimeout(timer);
+  timer = setTimeout(quaereSuggestiones, 150);
+});
+input.addEventListener('keydown', e => {
+  const buttons = suggestioButtons();
+  if (e.key === 'ArrowDown' && buttons.length) {
+    e.preventDefault();
+    setzeSuggestioSelecta(suggestioSelectaIndex < 0 ? 0 : suggestioSelectaIndex + 1);
+    return;
+  } 
+  if (e.key === 'ArrowUp' && buttons.length) {
+    e.preventDefault(); setzeSuggestioSelecta(suggestioSelectaIndex < 0 ? buttons.length - 1 : suggestioSelectaIndex - 1);
+    return; 
+  } 
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    if (buttons.length) {
+      if (suggestioSelectaIndex < 0) setzeSuggestioSelecta(0); oeffneSuggestioSelecta();
+    } else if (input.value.trim()) aperiAddeUerbum(input.value.trim()); 
+  } 
+}); 
+  input.addEventListener('blur', () => setTimeout(() => {
+    if (addePanel.hidden) leereSuggestiones();
+  }, 120)); 
+}
+
 document.getElementById('novumVerbumKnopf')?.addEventListener('click', () => aperiAddeUerbum(nullusEventusLemma || input?.value.trim() || ''));
 document.getElementById('addeLemma')?.addEventListener('input', syncAddeForm);
 document.getElementById('addePars')?.addEventListener('change', syncAddeForm);
