@@ -532,12 +532,55 @@ function zeigeFlexio(formae){
   }
 
   if (partes.has('substantivum') || partes.has('subst')) {
-    z.appendChild(tabellaSubstantivi(formae));
-    return;
-  }
+  z.appendChild(tabellaSubstantivi(formae));
+  return;
+}
 
-  tabellaGenusNumerus(formae, 'sg').forEach(e => z.appendChild(e));
-  tabellaGenusNumerus(formae, 'pl').forEach(e => z.appendChild(e));
+if (
+  partes.has('praepositio') ||
+  partes.has('postpositio')
+) {
+  const casusNomina = {
+    gen: 'Genitivus',
+    dat: 'Dativus',
+    acc: 'Accusativus',
+    abl: 'Ablativus'
+  };
+
+  const ordo = [
+    'gen',
+    'dat',
+    'acc',
+    'abl'
+  ];
+
+  const casus = [
+    ...new Set(
+      formae
+        .map(forma => normalisiere(forma.casus || ''))
+        .filter(Boolean)
+    )
+  ]
+    .sort(
+      (a, b) =>
+        ordo.indexOf(a) -
+        ordo.indexOf(b)
+    )
+    .map(casusSingularis =>
+      casusNomina[casusSingularis] ||
+      casusSingularis
+    );
+
+  z.textContent =
+    casus.length
+      ? `Regit: ${casus.join(', ')}`
+      : 'Indeclinabile';
+
+  return;
+}
+
+tabellaGenusNumerus(formae, 'sg').forEach(e => z.appendChild(e));
+tabellaGenusNumerus(formae, 'pl').forEach(e => z.appendChild(e));
 }
   
 function zeigeFormaeMetricae(formae) {
