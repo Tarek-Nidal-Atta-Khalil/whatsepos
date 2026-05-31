@@ -970,14 +970,14 @@ function recordumFormae({ formaMacris, lemmaNudum, pars, genus, numerus, casus }
   const syllabaeMacris = trenneSilben(formaMacris);
 
   return {
-    forma: sineMacris(formaMacris).toLowerCase(),
+    forma: sineMacris(formaMacris),
     lemma: lemmaNudum,
     pars_orationis: pars,
     genus,
     numerus,
     casus,
     syllabae: syllabaeMacris
-      .map(s => sineMacris(s).toLowerCase())
+      .map(s => sineMacris(s))
       .join('.'),
     longae: indicesLongarum(syllabaeMacris)
   };
@@ -1205,7 +1205,7 @@ function generaAdiectivumI({
 
 function generaSubstantivumA({ lemmaInput, genus, numerusTyp }) {
   const lemmaMacris = exColonibusMacra(lemmaInput).trim();
-  const lemmaNudum = sineMacris(lemmaMacris).toLowerCase();
+  const lemmaNudum = sineMacris(lemmaMacris);
   const stemma = lemmaMacris.replace(/a$/i, '');
   const formae = [];
   const add = (casus, numerus, exitus) => formae.push(recordumFormae({ formaMacris: stemma + exitus, lemmaNudum, pars:'substantivum', genus, numerus, casus }));
@@ -1248,7 +1248,7 @@ function recordumVerbi({
   });
 
   return {
-    forma: sineMacris(forma).toLowerCase(),
+    forma: sineMacris(forma),
     lemma: lemmaNudum,
     lexeme_id: lexemeId,
     pars_orationis: pars,
@@ -1260,7 +1260,7 @@ function recordumVerbi({
     modus,
     vox,
     syllabae: syllabaeMacris
-      .map(s => sineMacris(s).toLowerCase())
+      .map(s => sineMacris(s))
       .join('.'),
     longae: indicesLongarum(syllabaeMacris)
   };
@@ -1291,7 +1291,7 @@ function generaVerbumA({
   uoces
 }) {
   const lemmaMacris = exColonibusMacra(lemmaInput).trim();
-  const lemmaNudum = sineMacris(lemmaMacris).toLowerCase();
+  const lemmaNudum = sineMacris(lemmaMacris);
   const lexemeId = crypto.randomUUID();
 
   const infinitivus = exColonibusMacra(infinitivusInput).trim();
@@ -2047,7 +2047,7 @@ async function speichereAddeFormular() {
   }
 
   const lemmaMacris = exColonibusMacra(lemmaInput);
-  const lemmaNudum = sineMacris(lemmaMacris).toLowerCase();
+  const lemmaNudum = sineMacris(lemmaMacris);
   const record = recordumFormae({ formaMacris: lemmaMacris, lemmaNudum, pars, genus:null, numerus:null, casus:null });
   const { error } = await window.whatseposSupabase.from('formae').insert([record]);
   if (error) { statusAdde(error.message); return; }
