@@ -229,7 +229,18 @@ function formaSignataHtml(forma){
   return html;
 }
   
-function formaProLemmaHtml(forma){return formaSignataHtml(forma)||'—';}
+function formaProLemmaHtml(forma){
+  const html = formaSignataHtml(forma) || '—';
+
+  if (
+    forma?.enclitica === true &&
+    html !== '—'
+  ) {
+    return '-' + html.replace(/^-+/, '');
+  }
+
+  return html;
+}
 function breviaSyllabam(s){return String(s||'').replace(/[aeiouyAEIOUY]/,l=>breves[l]||l);}
 function estAblativusSingularisLongaeDeclinationis(f){if(normalisiere(f?.casus)!=='abl'||normalisiere(f?.numerus)!=='sg')return false;return /[aoieu]$/.test(normalisiere(f?.forma||''));}
 function syllabaNaturaliterLongaEst(forma,i){const syllabae=syllabaeFormae(forma),dataLongae=new Set(longaeIndices(forma)),s=syllabae[i]||'';return dataLongae.has(i)||syllabaDiphthongoLongaEst(s)||syllabaMacronLongaEst(s);}
@@ -577,6 +588,38 @@ function zeigeFlexio(formae){
   return;
 }
 
+  if (partes.has('coniunctio')) {
+  const coniunctio =
+    formae.find(forma =>
+      normalisierePars(forma.pars_orationis) === 'coniunctio'
+    ) ||
+    formae[0];
+
+  const typus =
+    normalisiere(
+      coniunctio?.typus_coniunctionis || ''
+    );
+
+  const descriptio =
+    typus === 'paratactica'
+      ? 'Coniunctio paratactica'
+      : typus === 'hypotactica'
+        ? 'Subiunctio hypotactica'
+        : 'Coniunctio';
+
+  z.textContent = [
+    'Indeclinabile',
+    descriptio,
+    coniunctio?.enclitica === true
+      ? 'enclitica'
+      : ''
+  ]
+    .filter(Boolean)
+    .join(' · ');
+
+  return;
+}
+
 if (
   partes.has('praepositio') ||
   partes.has('postpositio')
@@ -734,7 +777,34 @@ formaePraeparatae.forEach(({ forma, textus, sigla, status }) => {
 }
   
 async function lemmaExLexemeId(){if(lemma||!lexemeId)return;const{data,error}=await supabase.from('formae').select('lemma').eq('lexeme_id',lexemeId).limit(1);if(!error&&data&&data[0]?.lemma){lemma=data[0].lemma;lemmaDisplayActuale=lemma}}
-async function ladeLemma(){await lemmaExLexemeId();if(!lemma&&!lexemeId)return;const lemmaNormal=normalisiere(lemma);document.getElementById('lemmaTitulus').textContent=lemma||'—';lemmaQuaere.value=lemma||'';const basis=supabase.from('formae').select('forma, lemma, pars_orationis, genus, numerus, casus, persona, tempus, modus, vox, syllabae, longae, lexeme_id');const query=lexemeId?basis.eq('lexeme_id',lexemeId):basis.ilike('lemma',lemmaNormal);const{data,error}=await query.order('forma',{ascending:true});if(error){document.getElementById('lemmaFlexio').textContent=error.message;return}const formae=(data||[]).map(formaCorrecta);const head=eligeFormamHeadword(formae);if(head){lemmaDisplayActuale=head.lemma||lemma;document.getElementById('lemmaTitulus').innerHTML=formaProLemmaHtml({...head,forma:lemmaDisplayActuale});document.getElementById('lemmaPars').textContent=head.pars_orationis||'—'}zeigeFlexio(formae);zeigeFormaeMetricae(formae);}
+async function ladeLemma(){
+  await lemmaExLexemeId();
+  if(!lemma&&!lexemeId)
+    return;
+  const lemmaNormal=normalisiere(lemma);
+  document.getElementById('lemmaTitulus').textContent=lemma||'—';
+  lemmaQuaere.value=lemma||'';
+  const basis=supabase.from('formae').select('forma, lemma, pars_orationis, genus, numerus, casus, persona, tempus, modus, vox, syllabae, longae, lexeme_id, typus_coniunctionis, enclitica')
+  const query=lexemeId?basis.eq('lexeme_id',lexemeId):basis.ilike('lemma',lemmaNormal);
+  const{data,error}=
+    await query.order('forma',{ascending:true});
+    if(error){document.getElementById('lemmaFlexio').textContent=error.message;
+              return
+             }
+  const formae=(data||[]).map(formaCorrecta);
+  const head=eligeFormamHeadword(formae);
+  if(head){
+      lemmaDisplayActuale=head.lemma||lemma;
+      document.getElementById('lemmaTitulus').innerHTML=formaProLemmaHtml({...head,forma:lemmaDisplayActuale});
+      document.getElementById('lemmaPars').textContent=
+        head.pars_orationis==='coniunctio' &&
+        head.typus_coniunctionis==='hypotactica'
+          ? 'subiunctio'
+          : head.pars_orationis||'—'
+        }
+        zeigeFlexio(formae);
+        zeigeFormaeMetricae(formae);
+                          }
 lemmaQuaere.addEventListener('keydown',e=>{if(e.key!=='Enter')return;e.preventDefault();const q=lemmaQuaere.value.trim();if(q)location.href=`index.html?tab=vocabularium&q=${encodeURIComponent(q)}`});
 ladeLemma();
 </script>
