@@ -1545,6 +1545,79 @@ function generaSubstantivumA({ lemmaInput, genus, numerusTyp }) {
   return { lemmaNudum, formae };
 }
 
+function generaSubstantivumConsonanticumNeutrum({
+  lemmaInput,
+  genitivusInput,
+  numerusTyp
+}) {
+  const lemmaMacris =
+    exColonibusMacra(lemmaInput).trim();
+
+  const genitivusMacris =
+    exColonibusMacra(genitivusInput).trim();
+
+  if (!lemmaMacris) {
+    throw new Error(
+      'Nominativus singularis inserendus est.'
+    );
+  }
+
+  if (!/is$/i.test(genitivusMacris)) {
+    throw new Error(
+      'Genitivus substantivi tertiae declinationis in -is desinere debet.'
+    );
+  }
+
+  const lemmaNudum =
+    sineMacris(lemmaMacris);
+
+  const stemma =
+    genitivusMacris.replace(/is$/i, '');
+
+  const genus = 'n';
+  const formae = [];
+
+  const add = (
+    casus,
+    numerus,
+    formaMacris
+  ) => {
+    formae.push(
+      recordumFormae({
+        formaMacris,
+        lemmaNudum,
+        pars: 'substantivum',
+        genus,
+        numerus,
+        casus
+      })
+    );
+  };
+
+  if (numerusTyp !== 'plurale_tantum') {
+    add('nom', 'sg', lemmaMacris);
+    add('gen', 'sg', genitivusMacris);
+    add('dat', 'sg', stemma + 'ī');
+    add('acc', 'sg', lemmaMacris);
+    add('abl', 'sg', stemma + 'e');
+    add('voc', 'sg', lemmaMacris);
+  }
+
+  if (numerusTyp !== 'singulare_tantum') {
+    add('nom', 'pl', stemma + 'a');
+    add('gen', 'pl', stemma + 'um');
+    add('dat', 'pl', stemma + 'ibus');
+    add('acc', 'pl', stemma + 'a');
+    add('abl', 'pl', stemma + 'ibus');
+    add('voc', 'pl', stemma + 'a');
+  }
+
+  return {
+    lemmaNudum,
+    formae
+  };
+}
+
 function recordumVerbi({
   formaMacris,
   lemmaNudum,
@@ -2040,20 +2113,24 @@ function casusAdpositionisSelecti() {
 }
 
 function syncAddeForm() {
-  const lemma = document.getElementById('addeLemma')?.value.trim() || '';
-  const pars = document.getElementById('addePars')?.value || '';
-  const genus = document.getElementById('addeGenus')?.value || '';
-  const declinatio = document.getElementById('addeDeclinatio')?.value || '';
-  const numerusTyp = document.getElementById('addeNumerusTyp')?.value || '';
-    const coniunctioTypus =
+  const lemma = 
+    document.getElementById('addeLemma')?.value.trim() || '';
+  const pars = 
+    document.getElementById('addePars')?.value || '';
+  const genus = 
+    document.getElementById('addeGenus')?.value || '';
+  const declinatio = 
+    document.getElementById('addeDeclinatio')?.value || '';
+  const numerusTyp = 
+    document.getElementById('addeNumerusTyp')?.value || '';
+  const genitivus =
+    document.getElementById('addeGenitivus')?.value.trim() || '';
+  const coniunctioTypus =
     document.getElementById('addeConiunctioTypus')?.value || '';
-
   const coniunctioEnclitica =
     document.getElementById('addeConiunctioEnclitica')?.value || '';
-
   const adpositioTypus =
-    document.getElementById('addeAdpositioTypus')?.value || '';
-  
+    document.getElementById('addeAdpositioTypus')?.value || '';  
   const casusAdpositionis =
     casusAdpositionisSelecti();
 
@@ -2134,8 +2211,17 @@ function syncAddeForm() {
 
   let potestServari = Boolean(lemma && pars);
 
-    if (pars === 'substantivum') {
-    potestServari = Boolean(lemma && genus && declinatio && numerusTyp);
+  if (pars === 'substantivum') {
+    potestServari = Boolean(
+      lemma &&
+      genus &&
+      declinatio &&
+      numerusTyp &&
+      (
+        declinatio !== 'consonantica' ||
+        genitivus
+      )
+    );
   }
 
     if (pars === 'adiectivum') {
