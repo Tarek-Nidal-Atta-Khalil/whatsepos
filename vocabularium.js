@@ -1556,6 +1556,92 @@ function generaSubstantivumA({ lemmaInput, genus, numerusTyp }) {
   return { lemmaNudum, formae };
 }
 
+function generaSubstantivumONeutrum({
+  lemmaInput,
+  numerusTyp
+}) {
+  const lemmaMacris =
+    exColonibusMacra(lemmaInput).trim();
+
+  if (!lemmaMacris) {
+    throw new Error(
+      'Lemma substantivi inserendum est.'
+    );
+  }
+
+  const estPluraleTantum =
+    numerusTyp === 'plurale_tantum';
+
+  if (
+    estPluraleTantum &&
+    !/a$/i.test(lemmaMacris)
+  ) {
+    throw new Error(
+      'Nominativus pluralis substantivi neutri o-declinationis pluralis tantum in -a desinere debet.'
+    );
+  }
+
+  if (
+    !estPluraleTantum &&
+    !/um$/i.test(lemmaMacris)
+  ) {
+    throw new Error(
+      'Nominativus singularis substantivi neutri o-declinationis in -um desinere debet.'
+    );
+  }
+
+  const lemmaNudum =
+    sineMacris(lemmaMacris);
+
+  const stemma =
+    estPluraleTantum
+      ? lemmaMacris.replace(/a$/i, '')
+      : lemmaMacris.replace(/um$/i, '');
+
+  const genus = 'n';
+  const formae = [];
+
+  const add = (
+    casus,
+    numerus,
+    formaMacris
+  ) => {
+    formae.push(
+      recordumFormae({
+        formaMacris,
+        lemmaNudum,
+        pars: 'substantivum',
+        genus,
+        numerus,
+        casus
+      })
+    );
+  };
+
+  if (numerusTyp !== 'plurale_tantum') {
+    add('nom', 'sg', lemmaMacris);
+    add('gen', 'sg', stemma + 'ī');
+    add('dat', 'sg', stemma + 'ō');
+    add('acc', 'sg', lemmaMacris);
+    add('abl', 'sg', stemma + 'ō');
+    add('voc', 'sg', lemmaMacris);
+  }
+
+  if (numerusTyp !== 'singulare_tantum') {
+    add('nom', 'pl', stemma + 'a');
+    add('gen', 'pl', stemma + 'ōrum');
+    add('dat', 'pl', stemma + 'īs');
+    add('acc', 'pl', stemma + 'a');
+    add('abl', 'pl', stemma + 'īs');
+    add('voc', 'pl', stemma + 'a');
+  }
+
+  return {
+    lemmaNudum,
+    formae
+  };
+}
+
 function generaSubstantivumConsonanticumNeutrum({
   lemmaInput,
   genitivusInput,
@@ -2689,6 +2775,15 @@ async function speichereAddeFormular() {
             numerusTyp
           });
       } else if (
+        declinatio === 'o' &&
+        genus === 'n'
+      ) {
+        paradigma =
+          generaSubstantivumONeutrum({
+            lemmaInput,
+            numerusTyp
+          });
+      } else if (
         declinatio === 'consonantica' &&
         genus === 'n'
       ) {
@@ -2700,7 +2795,7 @@ async function speichereAddeFormular() {
           });
       } else {
         statusAdde(
-          'Nunc tantum substantiva a-declinationis et substantiva neutra consonantica tertiae declinationis servari possunt.'
+          'Nunc tantum substantiva a-declinationis, substantiva neutra o-declinationis et substantiva neutra consonantica tertiae declinationis servari possunt.'
         );
 
         return;
