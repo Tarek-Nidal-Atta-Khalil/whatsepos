@@ -29,6 +29,28 @@ style.textContent = `
 .adde-uerbum-field select:focus{outline:none;border-bottom-color:#673ab7;box-shadow:none}
 .adde-card-help{margin-top:8px;color:#6b7280;font-size:.95rem}
 .adde-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+
+.adde-adpositio-casus{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px 20px;
+  margin-top:8px
+}
+
+.adde-adpositio-casus label{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin:0;
+  font-weight:400;
+  cursor:pointer
+}
+
+.adde-adpositio-casus input{
+  width:auto;
+  margin:0
+}
+
 .adde-uerbum-actions{display:flex;gap:12px;justify-content:flex-end;margin-top:20px}
 .adde-uerbum-actions button{border-radius:16px}
 .adde-uerbum-primary{border:none;background:#673ab7;color:white}
@@ -686,6 +708,47 @@ function notaeVerbi(item) {
     .join(', ');
 }
 
+function notaeAdpositionis(item) {
+  const casusNomina = {
+    gen: 'Gen.',
+    dat: 'Dat.',
+    acc: 'Acc.',
+    abl: 'Abl.'
+  };
+
+  const ordo = [
+    'gen',
+    'dat',
+    'acc',
+    'abl'
+  ];
+
+  const casus =
+    [
+      ...new Set(
+        formaeLemmae(item)
+          .map(forma =>
+            normalisiere(forma?.casus || '')
+          )
+          .filter(Boolean)
+      )
+    ]
+      .sort(
+        (a, b) =>
+          ordo.indexOf(a) -
+          ordo.indexOf(b)
+      )
+      .map(casusSingularis =>
+        casusNomina[casusSingularis] ||
+        casusSingularis
+      );
+
+  return {
+    textus: casus.join(', '),
+    genus: ''
+  };
+}
+
 function notaeLemmae(item) {
   if (estParsOrationis(item, 'substantivum')) {
     return notaeSubstantivi(item);
@@ -712,6 +775,13 @@ function notaeLemmae(item) {
     };
   }
 
+  if (
+    estParsOrationis(item, 'praepositio') ||
+    estParsOrationis(item, 'postpositio')
+  ) {
+    return notaeAdpositionis(item);
+  }
+
   return {
     textus: '',
     genus: ''
@@ -727,13 +797,21 @@ function eligeRecordumPrincipale(formae) {
         estParsOrationis(forma, 'verbum') ||
         estParsOrationis(forma, 'substantivum') ||
         estParsOrationis(forma, 'adiectivum') ||
-        estParsOrationis(forma, 'pronomen')
+        estParsOrationis(forma, 'pronomen') ||
+        estParsOrationis(forma, 'praepositio') ||
+        estParsOrationis(forma, 'postpositio')
       )
     ) ||
     formae.find(forma => estParsOrationis(forma, 'verbum')) ||
     formae.find(forma => estParsOrationis(forma, 'substantivum')) ||
     formae.find(forma => estParsOrationis(forma, 'adiectivum')) ||
     formae.find(forma => estParsOrationis(forma, 'pronomen')) ||
+    formae.find(forma =>
+      estParsOrationis(forma, 'praepositio')
+    ) ||
+    formae.find(forma =>
+      estParsOrationis(forma, 'postpositio')
+    ) ||
     formae[0]
   );
 }
@@ -1774,12 +1852,25 @@ function statusAdde(textus) {
   if (p) p.textContent = textus || '';
 }
 
+function casusAdpositionisSelecti() {
+  return [
+    ...document.querySelectorAll(
+      'input[name="addeAdpositioCasus"]:checked'
+    )
+  ].map(input => input.value);
+}
+
 function syncAddeForm() {
   const lemma = document.getElementById('addeLemma')?.value.trim() || '';
   const pars = document.getElementById('addePars')?.value || '';
   const genus = document.getElementById('addeGenus')?.value || '';
   const declinatio = document.getElementById('addeDeclinatio')?.value || '';
   const numerusTyp = document.getElementById('addeNumerusTyp')?.value || '';
+  const adpositioTypus =
+    document.getElementById('addeAdpositioTypus')?.value || '';
+  
+  const casusAdpositionis =
+    casusAdpositionisSelecti();
 
   document.getElementById('addeParsCard').hidden = lemma.length === 0;
   document.getElementById('addeGenusCard').hidden = pars !== 'substantivum';
@@ -1812,7 +1903,14 @@ function syncAddeForm() {
     !femininumAdiectivi ||
     !neutrumAdiectivi;
 
-    const coniugatio = document.getElementById('addeConiugatio')?.value || '';
+  document.getElementById('addeAdpositioTypusCard').hidden =
+    pars !== 'adpositio';
+  
+  document.getElementById('addeAdpositioCasusCard').hidden =
+    pars !== 'adpositio' ||
+    !adpositioTypus;
+
+  const coniugatio = document.getElementById('addeConiugatio')?.value || '';
   const typusVerbi = document.getElementById('addeVerbumTypus')?.value || '';
   const voxTypus = document.getElementById('addeVoxTypus')?.value || '';
   const infinitivus = document.getElementById('addeInfinitivus')?.value.trim() || '';
@@ -1853,6 +1951,14 @@ function syncAddeForm() {
       femininumAdiectivi &&
       neutrumAdiectivi &&
       adiectivumDeclinatio
+    );
+  }
+
+  if (pars === 'adpositio') {
+    potestServari = Boolean(
+      lemma &&
+      adpositioTypus &&
+      casusAdpositionis.length > 0
     );
   }
 
@@ -1898,6 +2004,14 @@ function aperiAddeUerbum(lemmaPraeplenum = '') {
   document.getElementById('addeAdiectivumNeutrum').value = '';
   document.getElementById('addeAdiectivumDeclinatio').value = '';
 
+  document.getElementById('addeAdpositioTypus').value = '';
+  
+  document
+    .querySelectorAll('input[name="addeAdpositioCasus"]')
+    .forEach(input => {
+      input.checked = false;
+    });
+  
   document.getElementById('addeConiugatio').value = '';
   document.getElementById('addeVerbumTypus').value = '';
   document.getElementById('addeVoxTypus').value = '';
@@ -1972,12 +2086,90 @@ function aperiNouumLemma(lemmaNudum) {
   window.location.href = `lemma.html?lemma=${encodeURIComponent(lemmaNudum)}`;
 }
 
+function generaAdpositionem({
+  lemmaInput,
+  typus,
+  casus
+}) {
+  const lemmaMacris =
+    exColonibusMacra(lemmaInput).trim();
+
+  const lemmaNudum =
+    sineMacris(lemmaMacris);
+
+  const lexemeId =
+    crypto.randomUUID();
+
+  const formae =
+    casus.map(casusSingularis => ({
+      ...recordumFormae({
+        formaMacris: lemmaMacris,
+        lemmaNudum,
+        pars: typus,
+        genus: null,
+        numerus: null,
+        casus: casusSingularis
+      }),
+      lexeme_id: lexemeId
+    }));
+
+  return {
+    lemmaNudum,
+    lexemeId,
+    formae
+  };
+}
+
 async function speichereAddeFormular() {
   if (!window.whatseposSupabase) return;
   const lemmaInput = document.getElementById('addeLemma')?.value.trim();
   const pars = document.getElementById('addePars')?.value;
   if (!lemmaInput || !pars) { statusAdde('Lemma et pars orationis necessaria sunt.'); return; }
-    if (pars === 'verbum') {
+
+  if (pars === 'adpositio') {
+  const typus =
+    document.getElementById('addeAdpositioTypus')?.value || '';
+
+  const casus =
+    casusAdpositionisSelecti();
+
+  if (!typus) {
+    statusAdde('Typus adpositionis eligendus est.');
+    return;
+  }
+
+  if (!casus.length) {
+    statusAdde('Saltem unus casus eligendus est.');
+    return;
+  }
+
+  const {
+    lemmaNudum,
+    lexemeId,
+    formae
+  } = generaAdpositionem({
+    lemmaInput,
+    typus,
+    casus
+  });
+
+  const { error } =
+    await window.whatseposSupabase
+      .from('formae')
+      .insert(formae);
+
+  if (error) {
+    statusAdde(error.message);
+    return;
+  }
+
+  window.location.href =
+    `lemma.html?lexeme_id=${encodeURIComponent(lexemeId)}`;
+
+  return;
+}
+  
+  if (pars === 'verbum') {
     const coniugatio =
       document.getElementById('addeConiugatio')?.value || '';
 
@@ -2185,6 +2377,25 @@ document.getElementById('addeVoxTypus')?.addEventListener('change', syncAddeForm
 document.getElementById('addeInfinitivus')?.addEventListener('input', syncAddeForm);
 document.getElementById('addePerfectum')?.addEventListener('input', syncAddeForm);
 document.getElementById('addeSupinum')?.addEventListener('input', syncAddeForm);
+
+document
+  .getElementById('addeAdpositioTypus')
+  ?.addEventListener(
+    'change',
+    syncAddeForm
+  );
+
+document
+  .querySelectorAll(
+    'input[name="addeAdpositioCasus"]'
+  )
+  .forEach(input => {
+    input.addEventListener(
+      'change',
+      syncAddeForm
+    );
+  });
+
 document.getElementById('addeCancel')?.addEventListener('click', schliesseAddeUerbum);
 document.getElementById('addeSave')?.addEventListener('click', speichereAddeFormular);
 ladeLemmataOmnia().then(() => {
