@@ -215,6 +215,7 @@ addePanel.innerHTML = `
         <option value="adiectivum">adiectivum</option>
         <option value="verbum">verbum</option>
         <option value="adverbium">adverbium</option>
+        <option value="coniunctio">coniunctio</option>
         <option value="adpositio">adpositio</option>
       </select>
       <div class="adde-card-help">Deinde genus uerbi elige; tum tantum reliqua campa aperientur.</div>
@@ -312,6 +313,42 @@ addePanel.innerHTML = `
 
     <div class="adde-card-help">
       Nunc adiectiua a-/o-declinationis et adiectiua i-declinationis trium terminationum generari possunt.
+    </div>
+  </div>
+</div>
+
+<div class="adde-form-card" id="addeConiunctioTypusCard" hidden>
+  <div class="adde-uerbum-field">
+    <label for="addeConiunctioTypus">
+      Typus coniunctionis
+    </label>
+
+    <select id="addeConiunctioTypus">
+      <option value="">elige...</option>
+      <option value="paratactica">coniunctio paratactica</option>
+      <option value="hypotactica">subiunctio hypotactica</option>
+    </select>
+
+    <div class="adde-card-help">
+      Elige utrum coniunctio membra paratactice an hypotactice conectat.
+    </div>
+  </div>
+</div>
+
+<div class="adde-form-card" id="addeConiunctioEncliticaCard" hidden>
+  <div class="adde-uerbum-field">
+    <label for="addeConiunctioEnclitica">
+      Estne enclitica?
+    </label>
+
+    <select id="addeConiunctioEnclitica">
+      <option value="">elige...</option>
+      <option value="false">non</option>
+      <option value="true">ita</option>
+    </select>
+
+    <div class="adde-card-help">
+      Exemplum: -que enclitica est. Hyphen initiale inseri potest, sed non servabitur.
     </div>
   </div>
 </div>
@@ -507,8 +544,18 @@ function exColonibusMacra(textus) {
   return String(textus || '').replace(/([aeiouyAEIOUY]):/g, (_, v) => MACRA[v] || v);
 }
 
+function sineHyphenoInitiali(textus) {
+  return String(textus || '')
+    .trim()
+    .replace(/^-+/, '');
+}
+
 function clavisQuaestionis(textus) {
-  return normalisiere(sineMacris(textus));
+  return normalisiere(
+    sineMacris(
+      sineHyphenoInitiali(textus)
+    )
+  );
 }
 
 function clavisLemmae(item) {
@@ -605,6 +652,20 @@ function formaCumMacris(recordum) {
         : syllaba
     )
     .join('');
+
+  function formaCumPraefixoEnclitico(recordum) {
+  const forma =
+    formaCumMacris(recordum) ||
+    recordum?.lemma ||
+    '';
+
+  if (recordum?.enclitica !== true) {
+    return forma;
+  }
+
+  return '-' + sineHyphenoInitiali(forma);
+}
+  
 }
 
 function primaForma(formae, condicio) {
@@ -802,7 +863,47 @@ function notaeAdpositionis(item) {
   };
 }
 
+function notaeConiunctionis(item) {
+  const typus =
+    normalisiere(item?.typus_coniunctionis || '');
+
+  const notaTypi =
+    typus === 'paratactica'
+      ? 'paratactica'
+      : typus === 'hypotactica'
+        ? 'hypotactica'
+        : '';
+
+  return {
+    textus: [
+      notaTypi,
+      item?.enclitica === true
+        ? 'enclitica'
+        : ''
+    ]
+      .filter(Boolean)
+      .join(' · '),
+
+    genus: ''
+  };
+}
+
+function parsOrationisVisibilis(item) {
+  if (
+    estParsOrationis(item, 'coniunctio') &&
+    normalisiere(item?.typus_coniunctionis || '') === 'hypotactica'
+  ) {
+    return 'subiunctio';
+  }
+
+  return item?.pars_orationis || '';
+}
+
 function notaeLemmae(item) {
+  if (estParsOrationis(item, 'coniunctio')) {
+    return notaeConiunctionis(item);
+  }
+
   if (estParsOrationis(item, 'substantivum')) {
     return notaeSubstantivi(item);
   }
@@ -851,6 +952,7 @@ function eligeRecordumPrincipale(formae) {
         estParsOrationis(forma, 'substantivum') ||
         estParsOrationis(forma, 'adiectivum') ||
         estParsOrationis(forma, 'pronomen') ||
+        estParsOrationis(forma, 'coniunctio') ||
         estParsOrationis(forma, 'praepositio') ||
         estParsOrationis(forma, 'postpositio')
       )
@@ -859,6 +961,7 @@ function eligeRecordumPrincipale(formae) {
     formae.find(forma => estParsOrationis(forma, 'substantivum')) ||
     formae.find(forma => estParsOrationis(forma, 'adiectivum')) ||
     formae.find(forma => estParsOrationis(forma, 'pronomen')) ||
+    formae.find(forma => estParsOrationis(forma, 'coniunctio')) ||
     formae.find(forma =>
       estParsOrationis(forma, 'praepositio')
     ) ||
@@ -927,16 +1030,15 @@ function reddeLemmaListam() {
     button.dataset.lexemeId = item.lexeme_id || '';
     button.setAttribute('role', 'option');
 
-        const principale = document.createElement('span');
+    const principale = document.createElement('span');
     principale.className = 'vocabularium-lemma-principale';
 
-    const strong = document.createElement('strong');
     strong.textContent =
-      formaCumMacris(item) ||
-      item.lemma ||
-      '—';
+    formaCumPraefixoEnclitico(item) ||
+    item.lemma ||
+    '—';
 
-        const notae = notaeLemmae(item);
+    const notae = notaeLemmae(item);
 
     const info = document.createElement('span');
     info.className = 'vocabularium-lemma-info';
@@ -963,7 +1065,7 @@ function reddeLemmaListam() {
     
     const span = document.createElement('span');
     span.className = 'vocabularium-lemma-pars';
-    span.textContent = item.pars_orationis || '';
+    span.textContent = parsOrationisVisibilis(item);
 
     principale.appendChild(strong);
 
@@ -1021,7 +1123,7 @@ async function ladeLemmataOmnia() {
       const { data, error } =
         await supabase
           .from('formae')
-          .select('lemma, lexeme_id, pars_orationis, forma, genus, numerus, casus, persona, tempus, modus, vox, syllabae, longae')
+          .select('lemma, lexeme_id, pars_orationis, forma, genus, numerus, casus, persona, tempus, modus, vox, syllabae, longae, typus_coniunctionis, enclitica')
           .not('lemma', 'is', null)
           .order('lemma', { ascending: true })
           .range(initium, initium + amplitudo - 1);
@@ -1942,6 +2044,12 @@ function syncAddeForm() {
   const genus = document.getElementById('addeGenus')?.value || '';
   const declinatio = document.getElementById('addeDeclinatio')?.value || '';
   const numerusTyp = document.getElementById('addeNumerusTyp')?.value || '';
+    const coniunctioTypus =
+    document.getElementById('addeConiunctioTypus')?.value || '';
+
+  const coniunctioEnclitica =
+    document.getElementById('addeConiunctioEnclitica')?.value || '';
+
   const adpositioTypus =
     document.getElementById('addeAdpositioTypus')?.value || '';
   
@@ -1978,6 +2086,13 @@ function syncAddeForm() {
     pars !== 'adiectivum' ||
     !femininumAdiectivi ||
     !neutrumAdiectivi;
+
+  document.getElementById('addeConiunctioTypusCard').hidden =
+    pars !== 'coniunctio';
+
+  document.getElementById('addeConiunctioEncliticaCard').hidden =
+    pars !== 'coniunctio' ||
+    !coniunctioTypus;
 
   document.getElementById('addeAdpositioTypusCard').hidden =
     pars !== 'adpositio';
@@ -2034,6 +2149,14 @@ function syncAddeForm() {
     );
   }
 
+  if (pars === 'coniunctio') {
+    potestServari = Boolean(
+      lemma &&
+      coniunctioTypus &&
+      coniunctioEnclitica !== ''
+    );
+  }
+
   if (pars === 'adpositio') {
     potestServari = Boolean(
       lemma &&
@@ -2085,6 +2208,9 @@ function aperiAddeUerbum(lemmaPraeplenum = '') {
   document.getElementById('addeAdiectivumFemininum').value = '';
   document.getElementById('addeAdiectivumNeutrum').value = '';
   document.getElementById('addeAdiectivumDeclinatio').value = '';
+
+  document.getElementById('addeConiunctioTypus').value = '';
+  document.getElementById('addeConiunctioEnclitica').value = '';
 
   document.getElementById('addeAdpositioTypus').value = '';
   document.getElementById('addeAdpositioFormaeVariae').value = '';
@@ -2169,6 +2295,50 @@ function aperiNouumLemma(lemmaNudum) {
   window.location.href = `lemma.html?lemma=${encodeURIComponent(lemmaNudum)}`;
 }
 
+function generaConiunctionem({
+  lemmaInput,
+  typus,
+  enclitica
+}) {
+  const lemmaMacris =
+    exColonibusMacra(
+      sineHyphenoInitiali(lemmaInput)
+    ).trim();
+
+  if (!lemmaMacris) {
+    throw new Error(
+      'Lemma coniunctionis vacuum esse non potest.'
+    );
+  }
+
+  const lemmaNudum =
+    sineMacris(lemmaMacris);
+
+  const lexemeId =
+    crypto.randomUUID();
+
+  const recordum = {
+    ...recordumFormae({
+      formaMacris: lemmaMacris,
+      lemmaNudum,
+      pars: 'coniunctio',
+      genus: null,
+      numerus: null,
+      casus: null
+    }),
+
+    lexeme_id: lexemeId,
+    typus_coniunctionis: typus,
+    enclitica: enclitica === true
+  };
+
+  return {
+    lemmaNudum,
+    lexemeId,
+    formae: [recordum]
+  };
+}
+
 function generaAdpositionem({
   lemmaInput,
   typus,
@@ -2234,6 +2404,57 @@ async function speichereAddeFormular() {
   const pars = document.getElementById('addePars')?.value;
   if (!lemmaInput || !pars) { statusAdde('Lemma et pars orationis necessaria sunt.'); return; }
 
+  if (pars === 'coniunctio') {
+    const typus =
+      document.getElementById('addeConiunctioTypus')?.value || '';
+
+    const encliticaValor =
+      document.getElementById('addeConiunctioEnclitica')?.value || '';
+
+    if (!typus) {
+      statusAdde('Typus coniunctionis eligendus est.');
+      return;
+    }
+
+    if (!['true', 'false'].includes(encliticaValor)) {
+      statusAdde('Dic utrum coniunctio enclitica sit.');
+      return;
+    }
+
+    let paradigma;
+
+    try {
+      paradigma = generaConiunctionem({
+        lemmaInput,
+        typus,
+        enclitica: encliticaValor === 'true'
+      });
+    } catch (error) {
+      statusAdde(error.message);
+      return;
+    }
+
+    const {
+      lexemeId,
+      formae
+    } = paradigma;
+
+    const { error } =
+      await window.whatseposSupabase
+        .from('formae')
+        .insert(formae);
+
+    if (error) {
+      statusAdde(error.message);
+      return;
+    }
+
+    window.location.href =
+      `lemma.html?lexeme_id=${encodeURIComponent(lexemeId)}`;
+
+    return;
+  }
+  
   if (pars === 'adpositio') {
   const typus =
     document.getElementById('addeAdpositioTypus')?.value || '';
@@ -2486,6 +2707,8 @@ document.getElementById('addeNumerusTyp')?.addEventListener('change', syncAddeFo
 document.getElementById('addeAdiectivumFemininum')?.addEventListener('input', syncAddeForm);
 document.getElementById('addeAdiectivumNeutrum')?.addEventListener('input', syncAddeForm);
 document.getElementById('addeAdiectivumDeclinatio')?.addEventListener('change', syncAddeForm);
+document.getElementById('addeConiunctioTypus')?.addEventListener('change', syncAddeForm);
+document.getElementById('addeConiunctioEnclitica')?.addEventListener('change', syncAddeForm);
 document.getElementById('addeConiugatio')?.addEventListener('change', syncAddeForm);
 document.getElementById('addeVerbumTypus')?.addEventListener('change', syncAddeForm);
 document.getElementById('addeVoxTypus')?.addEventListener('change', syncAddeForm);
