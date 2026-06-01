@@ -305,3 +305,96 @@ html body .lemma-card .diphthongus::before {
   border-color:#d1d5db;
   box-shadow:0 4px 18px rgba(107,114,128,.10);
 }
+
+.lectorium-card {
+  width: min(100%, 980px);
+  margin: 0 auto 48px;
+  padding: 34px 42px 42px;
+  border-radius: 28px;
+  background: white;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .06);
+  text-align: left;
+}
+
+.lectorium-header {
+  margin-bottom: 30px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.lectorium-auctor {
+  margin: 0 0 4px;
+  color: #6b7280;
+  font-size: 18px;
+}
+
+.lectorium-header h2 {
+  margin: 0;
+  font-size: 42px;
+}
+
+.lectorium-locus {
+  margin: 8px 0 0;
+  color: #6b7280;
+  font-size: 18px;
+}
+
+.lectorium-versus {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.lectorium-versus-linea {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  align-items: baseline;
+  gap: 14px;
+}
+
+.lectorium-versus-numerus {
+  color: #9ca3af;
+  font-size: 16px;
+  text-align: right;
+}
+
+.lectorium-versus-textus {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 23px;
+  line-height: 1.55;
+}
+
+.lectorium-verbum {
+  display: inline;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.lectorium-verbum:hover,
+.lectorium-verbum:focus {
+  outline: none;
+  background: #ede9fe;
+  color: #5b21b6;
+}
+
+@media (max-width: 620px) {
+  .lectorium-card {
+    padding: 24px 18px 30px;
+  }
+
+  .lectorium-versus-linea {
+    grid-template-columns: 28px minmax(0, 1fr);
+    gap: 9px;
+  }
+
+  .lectorium-versus-textus {
+    font-size: 20px;
+  }
+}
