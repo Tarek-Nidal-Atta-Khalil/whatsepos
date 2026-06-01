@@ -2,6 +2,12 @@ import {
   estDiphthongusCommunis
 } from './hexameter.js?v=20260531-u-intervocalicum-1';
 
+import {
+  schemataUocis,
+  reddeElectionem,
+  legeElectionem
+} from "./uerbum_formularium.js";
+
 const input = document.getElementById('vocabulariumQuaere');
 const status = document.getElementById('vocabulariumStatus');
 const eventus = document.getElementById('vocabulariumEventus');
@@ -452,34 +458,35 @@ addePanel.innerHTML = `
     </div>
   </div>
 
-  <div class="adde-form-card" id="addeVerbumTypusCard" hidden>
-    <div class="adde-uerbum-field">
-      <label for="addeVerbumTypus">Typus verbi</label>
-      <select id="addeVerbumTypus">
-        <option value="">elige...</option>
-        <option value="normale">normale</option>
-        <option value="deponens">deponens</option>
-        <option value="semideponens">semideponens</option>
-        <option value="impersonale">impersonale</option>
-      </select>
-      <div class="adde-card-help">Deinde typum uerbi elige.</div>
-    </div>
-  </div>
+  <div
+  class="adde-form-card"
+  id="addeUoxSchemaCard"
+  hidden
+>
+  <div class="adde-uerbum-field">
+    <label>
+      Quomodo uoces adhibentur?
+    </label>
 
-  <div class="adde-form-card" id="addeVoxTypusCard" hidden>
-    <div class="adde-uerbum-field">
-      <label for="addeVoxTypus">Usus vocis</label>
-      <select id="addeVoxTypus">
-        <option value="">elige...</option>
-        <option value="utraque">activum et passivum</option>
-        <option value="activum_tantum">activum tantum</option>
-        <option value="passivum_tantum">passivum tantum</option>
-      </select>
-      <div class="adde-card-help">
-        Elige utrum formae actiuae, passiuae an utraeque generandae sint.
-      </div>
-    </div>
+    <div id="addeUoxSchema"></div>
   </div>
+</div>
+
+<div
+  class="adde-form-card"
+  id="addeImpersonaleCard"
+  hidden
+>
+  <div class="adde-uerbum-field">
+    <label>
+      <input
+        id="addeImpersonale"
+        type="checkbox"
+      >
+      impersonale
+    </label>
+  </div>
+</div>
 
   <div class="adde-form-card" id="addeInfinitivusCard" hidden>
     <div class="adde-uerbum-field">
@@ -2354,19 +2361,32 @@ function syncAddeForm() {
     !adpositioTypus;
 
   const coniugatio = document.getElementById('addeConiugatio')?.value || '';
-  const typusVerbi = document.getElementById('addeVerbumTypus')?.value || '';
-  const voxTypus = document.getElementById('addeVoxTypus')?.value || '';
+  const schemaUocis =
+    legeElectionem(
+      "addeUoxSchema"
+    );
   const infinitivus = document.getElementById('addeInfinitivus')?.value.trim() || '';
   const perfectum = document.getElementById('addePerfectum')?.value.trim() || '';
 
   document.getElementById('addeConiugatioCard').hidden =
     pars !== 'verbum';
 
-  document.getElementById('addeVerbumTypusCard').hidden =
-    pars !== 'verbum' || !coniugatio;
+  document
+  .getElementById(
+    "addeUoxSchemaCard"
+  )
+  .hidden =
+    pars !== "verbum" ||
+    !coniugatio;
 
-  document.getElementById('addeVoxTypusCard').hidden =
-    pars !== 'verbum' || !coniugatio || !typusVerbi;
+document
+  .getElementById(
+    "addeImpersonaleCard"
+  )
+  .hidden =
+    pars !== "verbum" ||
+    !coniugatio ||
+    !schemaUocis;
 
   document.getElementById('addeInfinitivusCard').hidden =
     pars !== 'verbum' || !coniugatio || !typusVerbi || !voxTypus;
@@ -2766,11 +2786,19 @@ async function speichereAddeFormular() {
     const coniugatio =
       document.getElementById('addeConiugatio')?.value || '';
 
-    const typus =
-      document.getElementById('addeVerbumTypus')?.value || '';
-
-    const uoces =
-      document.getElementById('addeVoxTypus')?.value || '';
+   const schemaUocis =
+      legeElectionem(
+        "addeUoxSchema"
+      );
+    
+    const impersonale =
+      Boolean(
+        document
+          .getElementById(
+            "addeImpersonale"
+          )
+          ?.checked
+      );
 
     const infinitivus =
       document.getElementById('addeInfinitivus')?.value.trim() || '';
