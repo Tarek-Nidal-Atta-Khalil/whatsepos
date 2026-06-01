@@ -16,10 +16,11 @@
 
   <div id="sideMenu" class="side-menu">
   <button onclick="zeigeTab('meineTexte')">Mei textus</button>
+  <button onclick="zeigeTab('lectorium')">Lectorium</button>
   <button onclick="zeigeTab('vocabularium')">Vocabularium</button>
   <button onclick="zeigeTab('veroeffentlichungen')">Bibliotheca</button>
   <button onclick="zeigeTab('profil')">Persona</button>
-
+    
   <div id="authLoggedOut" class="auth-bottom">
     <button onclick="zeigeTab('login')">Ingressus</button>
     <button onclick="zeigeTab('register')">Registratio</button>
@@ -109,6 +110,18 @@
       <div id="meineTexteListe"></div>
     </div>
 
+    <div id="lectorium" class="tab-content" style="display: none;">
+      <section class="lectorium-card">
+        <header class="lectorium-header">
+          <p class="lectorium-auctor">Vergilius</p>
+          <h2>Aeneis</h2>
+          <p class="lectorium-locus">Liber I · versus 1–11</p>
+        </header>
+    
+        <div id="lectoriumVersus" class="lectorium-versus"></div>
+      </section>
+    </div>
+    
     <div id="vocabularium" class="tab-content" style="display: none;">
       <input id="vocabulariumQuaere" type="search" placeholder="Verbum Latinum quaere">
       <p id="vocabulariumStatus" class="status"></p>
@@ -136,9 +149,10 @@
   <script type="module" src="app.js?v=20260531-u-intervocalicum-1"></script>
   <script type="module" src="vocabularium.js?v=20260531-substantiva-o-neutra-1"></script>
   <script type="module" src="flexio.js?v=20260524-ao-1"></script>
-  <script type="module" src="vocabularium_direct_search.js?v=20260525-direct-search-1"></script>
+  <script type="module" src="vocabularium_direct_search.js?v=20260601-enclitica-1"></script>
   <script type="module" src="vocabularium_declinationes.js"></script>
   <script src="vocabularium_enter_fix.js"></script>
+  <script type="module" src="lectorium.js?v=20260601-aeneis-1"></script>
   <script src="publications.js"></script>
 </body>
 </html>
