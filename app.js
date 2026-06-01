@@ -122,7 +122,7 @@ versWerkzeuge.appendChild(versLoeschenKnopf);
 document.body.appendChild(versWerkzeuge);
 
 window.zeigeTab = async function(tabName) {
-  ["login", "register", "hexameter", "meineTexte", "vocabularium", "veroeffentlichungen", "profil"].forEach(id => {
+  ["login", "register", "hexameter", "meineTexte", "lectorium", "vocabularium", "veroeffentlichungen", "profil"].forEach(id => {
     document.getElementById(id).style.display = "none";
   });
 
@@ -718,13 +718,15 @@ window.einloggen = async function() {
 
   await ladeGedichtsliste();
 
-  const tabExUrl = new URLSearchParams(location.search).get("tab");
+  const tabExUrl =
+  new URLSearchParams(location.search).get("tab");
 
-  zeigeTab(
-    tabExUrl === "vocabularium"
-      ? "vocabularium"
-      : "meineTexte"
-  );
+  const tabInitium =
+    ["vocabularium", "lectorium"].includes(tabExUrl)
+      ? tabExUrl
+      : "meineTexte";
+  
+  zeigeTab(tabInitium);
 };
 
 window.ausloggen = async function() {
