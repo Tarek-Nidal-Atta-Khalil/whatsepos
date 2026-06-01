@@ -760,19 +760,6 @@ function aperiLemma(
   }
 }
 
-
-function aperiAddeUerbum(
-  forma
-) {
-  window.location.href =
-    `index.html?tab=vocabularium&adde=${
-      encodeURIComponent(
-        forma
-      )
-    }`;
-}
-
-
 function addeActionem(
   textus,
   onclick,
