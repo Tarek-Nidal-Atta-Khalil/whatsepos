@@ -164,6 +164,31 @@ style.textContent = `
     font-size:.78rem
   }
 }
+
+.uerbum-electio {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 12px 0 0;
+  padding: 0;
+  border: 0;
+}
+
+.uerbum-electio-optio {
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+  margin: 0 !important;
+  font-weight: 400 !important;
+  cursor: pointer;
+}
+
+.uerbum-electio-optio input {
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
 `;
 document.head.appendChild(style);
 
@@ -2402,13 +2427,22 @@ document
     !schemaUocis;
 
   document.getElementById('addeInfinitivusCard').hidden =
-    pars !== 'verbum' || !coniugatio || !typusVerbi || !voxTypus;
-
+    pars !== 'verbum' ||
+    !coniugatio ||
+    !schemaUocis;
+  
   document.getElementById('addePerfectumCard').hidden =
-    pars !== 'verbum' || !coniugatio || !typusVerbi || !voxTypus || !infinitivus;
-
+    pars !== 'verbum' ||
+    !coniugatio ||
+    !schemaUocis ||
+    !infinitivus;
+  
   document.getElementById('addeSupinumCard').hidden =
-    pars !== 'verbum' || !coniugatio || !typusVerbi || !voxTypus || !infinitivus || !perfectum;
+    pars !== 'verbum' ||
+    !coniugatio ||
+    !schemaUocis ||
+    !infinitivus ||
+    !perfectum;
 
   syncDeclinationesSubstantivi();
 
@@ -2456,18 +2490,22 @@ document
   }
 
   if (pars === 'verbum') {
-      const supinum = document.getElementById('addeSupinum')?.value.trim() || '';
+    const supinum =
+      document
+        .getElementById('addeSupinum')
+        ?.value
+        .trim() ||
+      '';
   
-      potestServari = Boolean(
-        lemma &&
-        coniugatio &&
-        typusVerbi &&
-        voxTypus &&
-        infinitivus &&
-        perfectum &&
-        supinum
-      );
-    }
+    potestServari = Boolean(
+      lemma &&
+      coniugatio &&
+      schemaUocis &&
+      infinitivus &&
+      perfectum &&
+      supinum
+    );
+  }
 
   document.getElementById('addeSave').disabled = !potestServari;
 }
@@ -2512,11 +2550,20 @@ function aperiAddeUerbum(lemmaPraeplenum = '') {
     });
   
   document.getElementById('addeConiugatio').value = '';
-  document.getElementById('addeVerbumTypus').value = '';
-  document.getElementById('addeVoxTypus').value = '';
-  document.getElementById('addeInfinitivus').value = '';
-  document.getElementById('addePerfectum').value = '';
-  document.getElementById('addeSupinum').value = '';
+
+document
+  .querySelectorAll(
+    'input[name="addeUoxSchema"]'
+  )
+  .forEach(input => {
+    input.checked = false;
+  });
+
+document.getElementById('addeImpersonale').checked = false;
+
+document.getElementById('addeInfinitivus').value = '';
+document.getElementById('addePerfectum').value = '';
+document.getElementById('addeSupinum').value = '';
 
   syncAddeForm();
   statusAdde('');
@@ -2826,22 +2873,31 @@ async function speichereAddeFormular() {
       statusAdde('Nunc tantum uerba a-coniugationis servari possunt.');
       return;
     }
+if (
+  ![
+    'utraque',
+    'activum_tantum',
+    'passivum_tantum'
+  ].includes(schemaUocis)
+) {
+  statusAdde(
+    'Nunc tantum uerba actiua et passiua regularia servari possunt. Deponentia et semideponentia mox addentur.'
+  );
 
-    if (typus !== 'normale') {
-      statusAdde('Nunc tantum uerba normalia servari possunt.');
-      return;
-    }
+  return;
+}
 
-    let paradigma;
+let paradigma;
 
-    try {
-      paradigma = generaVerbumA({
-        lemmaInput,
-        infinitivusInput: infinitivus,
-        perfectumInput: perfectum,
-        supinumInput: supinum,
-        uoces
-      });
+try {
+  paradigma = generaVerbumA({
+    lemmaInput,
+    infinitivusInput: infinitivus,
+    perfectumInput: perfectum,
+    supinumInput: supinum,
+    uoces: schemaUocis
+  });
+  
     } catch (error) {
       statusAdde(error.message);
       return;
@@ -3072,9 +3128,31 @@ document.getElementById('addeAdiectivumNeutrum')?.addEventListener('input', sync
 document.getElementById('addeAdiectivumDeclinatio')?.addEventListener('change', syncAddeForm);
 document.getElementById('addeConiunctioTypus')?.addEventListener('change', syncAddeForm);
 document.getElementById('addeConiunctioEnclitica')?.addEventListener('change', syncAddeForm);
-document.getElementById('addeConiugatio')?.addEventListener('change', syncAddeForm);
-document.getElementById('addeVerbumTypus')?.addEventListener('change', syncAddeForm);
-document.getElementById('addeVoxTypus')?.addEventListener('change', syncAddeForm);
+document
+  .getElementById('addeConiugatio')
+  ?.addEventListener(
+    'change',
+    syncAddeForm
+  );
+
+document
+  .querySelectorAll(
+    'input[name="addeUoxSchema"]'
+  )
+  .forEach(input => {
+    input.addEventListener(
+      'change',
+      syncAddeForm
+    );
+  });
+
+document
+  .getElementById('addeImpersonale')
+  ?.addEventListener(
+    'change',
+    syncAddeForm
+  );
+
 document.getElementById('addeInfinitivus')?.addEventListener('input', syncAddeForm);
 document.getElementById('addePerfectum')?.addEventListener('input', syncAddeForm);
 document.getElementById('addeSupinum')?.addEventListener('input', syncAddeForm);
