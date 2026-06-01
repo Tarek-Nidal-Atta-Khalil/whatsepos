@@ -785,13 +785,15 @@ async function pruefeSitzung() {
         await ladeGedichtsliste();
     await aktualisiereMenuButton();
 
-    const tabExUrl = new URLSearchParams(location.search).get("tab");
-
-    zeigeTab(
-      tabExUrl === "vocabularium"
-        ? "vocabularium"
-        : "meineTexte"
-    );
+    const tabExUrl =
+      new URLSearchParams(location.search).get("tab");
+    
+    const tabInitium =
+      ["vocabularium", "lectorium"].includes(tabExUrl)
+        ? tabExUrl
+        : "meineTexte";
+    
+    zeigeTab(tabInitium);
   } else {
     aktuellerUser = null;
     aktualisiereAuthMenu();
