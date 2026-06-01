@@ -783,7 +783,9 @@ function reddeVersum({
   tokeniza(textus).forEach(token => {
     if (!estVerbum(token)) {
       textusElementum.appendChild(
-        document.createTextNode(token)
+        document.createTextNode(
+          " "
+        )
       );
 
       return;
