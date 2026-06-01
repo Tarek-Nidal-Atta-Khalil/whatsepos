@@ -601,7 +601,7 @@ function formaSignataLectorii(
 
   if (!recorda.length) {
     return orthographiaLectorii(
-      originale
+      originale.toLowerCase()
     );
   }
 
@@ -610,38 +610,41 @@ function formaSignataLectorii(
       recorda.map(
         recordum =>
           (
-            applicaMacraTextuiLectorii(
-              basisOriginalis,
+            orthographiaLectorii(
               formaCumMacrisLectorii(
                 recordum
               )
             ) +
             orthographiaLectorii(
               suffixOriginalis
+                .toLowerCase()
             )
           )
       )
     );
 
   /*
-   * Falls mehrere Datenbankformen
-   * unterschiedliche Naturlängen
-   * ergeben, zeigen wir lieber
-   * keine womöglich falsche Länge.
+   * Großschreibung und Naturlängen
+   * stammen ausschließlich aus dem
+   * Uocabularium.
+   *
+   * Bei widersprüchlichen Einträgen
+   * fällt die Anzeige auf eine
+   * kleingeschriebene Form ohne
+   * ergänzte Naturlängen zurück.
    */
   if (
     formaeSignatae.size !==
     1
   ) {
     return orthographiaLectorii(
-      originale
+      originale.toLowerCase()
     );
   }
 
   return [
     ...formaeSignatae
   ][0];
-}
 
 window.orthographiaLectorii =
   orthographiaLectorii;
