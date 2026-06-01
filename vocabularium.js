@@ -189,6 +189,7 @@ const lemmaNumerus =
 
 let lemmataOmnia = [];
 let lemmataPromissum = null;
+let addeExUrlIamApertum = false;
 
 const addePanel = document.createElement('section');
 addePanel.id = 'addeUerbumPanel';
@@ -2970,8 +2971,28 @@ window.zeigeTab = async function(tabName) {
       lemmaListaRahmen.style.display = '';
     }
 
-    await ladeLemmataOmnia();
+        await ladeLemmataOmnia();
     reddeLemmaListam();
+
+    const addeExUrl =
+      new URLSearchParams(
+        window.location.search
+      )
+        .get('adde')
+        ?.trim() ||
+      '';
+
+    if (
+      addeExUrl &&
+      !addeExUrlIamApertum
+    ) {
+      addeExUrlIamApertum =
+        true;
+
+      aperiAddeUerbum(
+        addeExUrl
+      );
+    }
 
     if (scriptoriumTitulus) {
       scriptoriumTitulus.textContent = 'Uocabularium';
