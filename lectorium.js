@@ -645,6 +645,7 @@ function formaSignataLectorii(
   return [
     ...formaeSignatae
   ][0];
+}
 
 window.orthographiaLectorii =
   orthographiaLectorii;
