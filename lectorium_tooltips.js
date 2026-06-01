@@ -760,6 +760,117 @@ function aperiLemma(
   }
 }
 
+function reddeAddeUerbumInline(
+  button
+) {
+  sprechbulla.innerHTML =
+    "";
+
+  const forma =
+    formaVisibilisSprechbullae(
+      button
+    );
+
+  sprechbulla.appendChild(
+    elementum(
+      "strong",
+      "lectorium-bulla-forma",
+      forma
+    )
+  );
+
+  sprechbulla.appendChild(
+    elementum(
+      "p",
+      "lectorium-bulla-nota",
+      "Quae pars orationis est?"
+    )
+  );
+
+  const actiones =
+    elementum(
+      "div",
+      "lectorium-bulla-actiones"
+    );
+
+  actiones.appendChild(
+    addeActionem(
+      "substantiuum",
+      () => {
+        sprechbulla.appendChild(
+          elementum(
+            "p",
+            "lectorium-bulla-nota",
+            "Formularium substantivi mox addetur."
+          )
+        );
+
+        rePositiona(button);
+      }
+    )
+  );
+
+  actiones.appendChild(
+    addeActionem(
+      "adiectiuum",
+      () => {
+        sprechbulla.appendChild(
+          elementum(
+            "p",
+            "lectorium-bulla-nota",
+            "Formularium adiectivi mox addetur."
+          )
+        );
+
+        rePositiona(button);
+      }
+    )
+  );
+
+  actiones.appendChild(
+    addeActionem(
+      "uerbum",
+      () => {
+        sprechbulla.appendChild(
+          elementum(
+            "p",
+            "lectorium-bulla-nota",
+            "Nunc coniugatio eligenda erit."
+          )
+        );
+
+        rePositiona(button);
+      },
+      "lectorium-bulla-actio lectorium-bulla-actio-principalis"
+    )
+  );
+
+  actiones.appendChild(
+    addeActionem(
+      "alia pars orationis",
+      () => {
+        sprechbulla.appendChild(
+          elementum(
+            "p",
+            "lectorium-bulla-nota",
+            "Formularium aliarum partium orationis mox addetur."
+          )
+        );
+
+        rePositiona(button);
+      }
+    )
+  );
+
+  sprechbulla.appendChild(
+    actiones
+  );
+
+  rePositiona(
+    button
+  );
+}
+
 function addeActionem(
   textus,
   onclick,
@@ -1401,10 +1512,10 @@ function reddeSprechbulam(
       addeActionem(
         "adde uerbum",
         () =>
-          aperiAddeUerbum(
-            forma
+          reddeAddeUerbumInline(
+            button
           ),
-
+      
         "lectorium-bulla-actio lectorium-bulla-actio-principalis"
       )
     );
