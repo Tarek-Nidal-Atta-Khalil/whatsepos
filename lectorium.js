@@ -62,6 +62,16 @@ function estVerbum(token) {
   ).test(token);
 }
 
+function orthographiaLectorii(
+  textus
+) {
+  return String(
+    textus || ""
+  )
+    .replace(/v/g, "u")
+    .replace(/[UV]/g, "V");
+}
+
 function aperiInVocabulario(verbum) {
   window.location.href =
     `index.html?tab=vocabularium&q=${
@@ -121,7 +131,9 @@ function reddeVersum({
       "lectorium-verbum";
 
     button.textContent =
-      token;
+      orthographiaLectorii(
+        token
+      );
 
     button.dataset.versusId =
       id || "";
