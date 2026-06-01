@@ -417,6 +417,7 @@ async function initialisiere() {
         await legeOmnia(
           "formae",
                     [
+            "id",
             "forma",
             "lemma",
             "lexeme_id",
@@ -444,6 +445,7 @@ async function initialisiere() {
             "ordo_verbi",
             "forma_textus",
             "lexeme_id",
+            "forma_id",
             "lemma",
             "pars_orationis",
             "correctio_manuala"
@@ -600,6 +602,27 @@ function candidatusExLoco(
   if (!locus) {
     return null;
   }
+
+  if (locus.forma_id) {
+  for (
+    const candidatus
+    of candidatiAutomatici
+  ) {
+    const recordum =
+      candidatus.recorda.find(
+        recordum =>
+          String(recordum.id) ===
+          String(locus.forma_id)
+      );
+
+    if (recordum) {
+      return {
+        ...candidatus,
+        recorda: [recordum]
+      };
+    }
+  }
+}
 
   const clavis =
     clavisGregisExLoco(
@@ -897,18 +920,43 @@ function reddeCandidatum(
     );
   }
 
-  descriptio
-    .analyses
-    .forEach(analysis => {
+  candidatus.recorda.forEach(
+  recordum => {
+    const analysis =
+      brevisAnalysis(
+        recordum
+      );
+
+    if (!analysis) {
+      return;
+    }
+
+    if (servare) {
       card.appendChild(
-        elementum(
-          "span",
-          "lectorium-bulla-analysis",
-          analysis
+        addeActionem(
+          analysis,
+          () =>
+            servaFormam(
+              recordum,
+              verbumActuale
+            ),
+          "lectorium-bulla-analysis lectorium-bulla-analysis-optio"
         )
       );
-    });
 
+      return;
+    }
+
+    card.appendChild(
+      elementum(
+        "span",
+        "lectorium-bulla-analysis",
+        analysis
+      )
+    );
+  }
+);
+  
   if (
     descriptio.encliticum
   ) {
@@ -939,21 +987,6 @@ function reddeCandidatum(
     )
   );
 
-  if (servare) {
-    actiones.appendChild(
-      addeActionem(
-        "hoc lemma servare",
-        () =>
-          servaCandidatum(
-            candidatus,
-            verbumActuale
-          ),
-
-        "lectorium-bulla-actio lectorium-bulla-actio-principalis"
-      )
-    );
-  }
-
   card.appendChild(
     actiones
   );
@@ -961,6 +994,97 @@ function reddeCandidatum(
   return card;
 }
 
+async function servaFormam(
+  recordum,
+  button
+) {
+  if (
+    !button ||
+    !supabaseLectorii
+  ) {
+    return;
+  }
+
+  const payload = {
+    versus_id:
+      button.dataset.versusId,
+
+    ordo_verbi:
+      Number(
+        button.dataset.ordoVerbi
+      ),
+
+    forma_textus:
+      button.dataset.forma,
+
+    lexeme_id:
+      recordum.lexeme_id ||
+      null,
+
+    forma_id:
+      recordum.id ||
+      null,
+
+    lemma:
+      recordum.lemma ||
+      null,
+
+    pars_orationis:
+      recordum.pars_orationis ||
+      null,
+
+    correctio_manuala:
+      true
+  };
+
+  const {
+    data,
+    error
+  } =
+    await supabaseLectorii
+      .from("lectiones_loci")
+      .upsert(
+        payload,
+        {
+          onConflict:
+            "versus_id,ordo_verbi"
+        }
+      )
+      .select(
+        [
+          "id",
+          "versus_id",
+          "ordo_verbi",
+          "forma_textus",
+          "lexeme_id",
+          "forma_id",
+          "lemma",
+          "pars_orationis",
+          "correctio_manuala"
+        ].join(", ")
+      )
+      .single();
+
+  if (error) {
+    sprechbulla.appendChild(
+      elementum(
+        "p",
+        "lectorium-bulla-error",
+        error.message
+      )
+    );
+
+    rePositiona(button);
+    return;
+  }
+
+  lociIndex.set(
+    clavisLoci(button),
+    data
+  );
+
+  reddeSprechbulam(button);
+}
 
 async function servaCandidatum(
   candidatus,
