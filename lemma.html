@@ -35,12 +35,155 @@
   .lemma-locus:hover,.lemma-locus:focus{background:#f5f3ff;outline:none}
   .lemma-locus-referentia{color:#6d28d9;font-weight:700;white-space:nowrap}
   .lemma-locus-textus{font-family:Georgia,"Times New Roman",serif;font-size:18px;line-height:1.4}
+
+.lemma-tabulae {
+  display: flex;
+  align-items: end;
+  gap: 8px;
+  margin-top: 38px;
+  padding: 0 18px;
+  position: relative;
+  z-index: 2;
+}
+
+.lemma-tab {
+  appearance: none;
+  border: 0;
+  min-width: 190px;
+  padding: 14px 30px 13px;
+  background: #e5e7eb;
+  color: #4b5563;
+  font-family: inherit;
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.15;
+  cursor: pointer;
+
+  /* symmetrisches Trapez */
+  clip-path: polygon(
+    12% 0,
+    88% 0,
+    100% 100%,
+    0 100%
+  );
+
+  transition:
+    background .16s ease,
+    color .16s ease,
+    transform .16s ease;
+}
+
+.lemma-tab:hover,
+.lemma-tab:focus-visible {
+  background: #ddd6fe;
+  color: #5b21b6;
+}
+
+.lemma-tab-activa {
+  background: #f8f7ff;
+  color: #5b21b6;
+  transform: translateY(1px);
+}
+
+.lemma-pagina {
+  min-height: 270px;
+  padding: 24px 0 0;
+  border-top: 3px solid #f8f7ff;
+}
+
+.lemma-tab-panel[hidden] {
+  display: none;
+}
+
+.lemma-tab-panel {
+  margin-top: 0;
+}
+  
 </style>
 </head>
 <body>
 <h1 id="siteTitle">Uocabularium</h1><a href="index.html?tab=vocabularium" class="lemma-revertere">← Retro</a>
-<div class="container lemma-container"><div class="lemma-topbar"><input id="lemmaQuaere" type="search" placeholder="Aliud verbum quaere"></div><article class="lemma-card"><header><h1 id="lemmaTitulus">—</h1><p id="lemmaPars">—</p></header><section class="lemma-section"><h2>Flexio</h2><div id="lemmaFlexio">Tabula nondum onerata est.</div></section>
-  <section class="lemma-section"><h2>Formae metricae</h2><div id="lemmaFormae">—</div></section><section class="lemma-section"><h2>Loci</h2><div id="lemmaLoci">—</div></section>
+<div class="container lemma-container">
+  <div class="lemma-topbar">
+    <input id="lemmaQuaere" type="search" placeholder="Aliud verbum quaere">
+  </div>
+  <article class="lemma-card">
+  <header>
+    <h1 id="lemmaTitulus">—</h1>
+    <p id="lemmaPars">—</p>
+  </header>
+
+  <div
+    class="lemma-tabulae"
+    role="tablist"
+    aria-label="Partes lemmatis"
+  >
+    <button
+      type="button"
+      class="lemma-tab lemma-tab-activa"
+      role="tab"
+      aria-selected="true"
+      aria-controls="lemmaPanelFlexio"
+      data-lemma-tab="flexio"
+    >
+      Flexio
+    </button>
+
+    <button
+      type="button"
+      class="lemma-tab"
+      role="tab"
+      aria-selected="false"
+      aria-controls="lemmaPanelFormae"
+      data-lemma-tab="formae"
+    >
+      Formae metricae
+    </button>
+
+    <button
+      type="button"
+      class="lemma-tab"
+      role="tab"
+      aria-selected="false"
+      aria-controls="lemmaPanelLoci"
+      data-lemma-tab="loci"
+    >
+      Loci
+    </button>
+  </div>
+
+  <div class="lemma-pagina">
+    <section
+      id="lemmaPanelFlexio"
+      class="lemma-section lemma-tab-panel"
+      role="tabpanel"
+      data-lemma-panel="flexio"
+    >
+      <div id="lemmaFlexio">
+        Tabula nondum onerata est.
+      </div>
+    </section>
+
+    <section
+      id="lemmaPanelFormae"
+      class="lemma-section lemma-tab-panel"
+      role="tabpanel"
+      data-lemma-panel="formae"
+      hidden
+    >
+      <div id="lemmaFormae">—</div>
+    </section>
+
+    <section
+      id="lemmaPanelLoci"
+      class="lemma-section lemma-tab-panel"
+      role="tabpanel"
+      data-lemma-panel="loci"
+      hidden
+    >
+      <div id="lemmaLoci">—</div>
+    </section>
+  </div>
 </article></div>
 <script type="module">
 import { estDiphthongusCommunis } from './hexameter.js?v=20260531-u-intervocalicum-1';
@@ -1087,7 +1230,46 @@ await zeigeLoci(
 );
                           }
 lemmaQuaere.addEventListener('keydown',e=>{if(e.key!=='Enter')return;e.preventDefault();const q=lemmaQuaere.value.trim();if(q)location.href=`index.html?tab=vocabularium&q=${encodeURIComponent(q)}`});
-ladeLemma();
+
+  function zeigeLemmaTab(nomen) {
+  document
+    .querySelectorAll('[data-lemma-tab]')
+    .forEach(button => {
+      const activa =
+        button.dataset.lemmaTab === nomen;
+
+      button.classList.toggle(
+        'lemma-tab-activa',
+        activa
+      );
+
+      button.setAttribute(
+        'aria-selected',
+        String(activa)
+      );
+    });
+
+  document
+    .querySelectorAll('[data-lemma-panel]')
+    .forEach(panel => {
+      panel.hidden =
+        panel.dataset.lemmaPanel !== nomen;
+    });
+}
+
+document
+  .querySelectorAll('[data-lemma-tab]')
+  .forEach(button => {
+    button.addEventListener(
+      'click',
+      () =>
+        zeigeLemmaTab(
+          button.dataset.lemmaTab
+        )
+    );
+  });
+  
+  ladeLemma();
 </script>
 </body>
 </html>
