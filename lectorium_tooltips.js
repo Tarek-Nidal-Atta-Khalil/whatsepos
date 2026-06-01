@@ -54,6 +54,101 @@ function normalisiere(textus) {
     .replace(/[ȳýỳŷÿ]/g, "y");
 }
 
+function orthographiaSprechbullae(
+  textus
+) {
+  if (
+    typeof window
+      .orthographiaLectorii ===
+    "function"
+  ) {
+    return window
+      .orthographiaLectorii(
+        textus
+      );
+  }
+
+  return String(
+    textus || ""
+  )
+    .replace(/v/g, "u")
+    .replace(/[UV]/g, "V");
+}
+
+
+function formaRecordiSignataSprechbullae(
+  recordum
+) {
+  if (
+    typeof window
+      .formaCumMacrisLectorii ===
+    "function"
+  ) {
+    return orthographiaSprechbullae(
+      window
+        .formaCumMacrisLectorii(
+          recordum
+        )
+    );
+  }
+
+  return orthographiaSprechbullae(
+    recordum?.forma ||
+    ""
+  );
+}
+
+
+function lemmaSignatumSprechbullae(
+  grex
+) {
+  const lemma =
+    grex?.lemma ||
+    "";
+
+  const recordumLemmae =
+    (
+      grex?.formae ||
+      []
+    ).find(
+      recordum =>
+        normalisiere(
+          recordum?.forma ||
+          ""
+        ) ===
+        normalisiere(
+          lemma
+        )
+    );
+
+  if (recordumLemmae) {
+    return formaRecordiSignataSprechbullae(
+      recordumLemmae
+    );
+  }
+
+  return orthographiaSprechbullae(
+    lemma
+  );
+}
+
+
+function formaVisibilisSprechbullae(
+  button
+) {
+  /*
+   * Der Wortbutton enthält bereits
+   * exakt die Form, die auch im
+   * Lesetext sichtbar ist.
+   */
+  return (
+    button?.textContent ||
+    orthographiaSprechbullae(
+      button?.dataset?.forma ||
+      ""
+    )
+  );
+}
 
 function clavisLoci(button) {
   return [
@@ -321,7 +416,7 @@ async function initialisiere() {
       formaeOmnes =
         await legeOmnia(
           "formae",
-          [
+                    [
             "forma",
             "lemma",
             "lexeme_id",
@@ -332,7 +427,9 @@ async function initialisiere() {
             "persona",
             "tempus",
             "modus",
-            "vox"
+            "vox",
+            "syllabae",
+            "longae"
           ].join(", ")
         );
 
@@ -579,9 +676,9 @@ function descriptioCandidati(
 
   return {
     lemma:
-      candidatus
-        .grex
-        .lemma ||
+      lemmaSignatumSprechbullae(
+        candidatus.grex
+      ) ||
       "—",
 
     pars:
@@ -977,8 +1074,9 @@ function reddeLemmaQuaestionem(
     "";
 
   const forma =
-    button.dataset.forma ||
-    "";
+    formaVisibilisSprechbullae(
+      button
+    );
 
   sprechbulla.appendChild(
     elementum(
@@ -1047,7 +1145,9 @@ function reddeLemmaQuaestionem(
       const b =
         addeActionem(
           [
-            grex.lemma,
+            lemmaSignatumSprechbullae(
+              grex
+            ),
             grex
               .pars_orationis
               ? ` · ${
@@ -1116,8 +1216,9 @@ function reddeSprechbulam(
     false;
 
   const forma =
-    button.dataset.forma ||
-    "";
+    formaVisibilisSprechbullae(
+      button
+    );
 
   sprechbulla.appendChild(
     elementum(
@@ -1129,6 +1230,7 @@ function reddeSprechbulam(
 
   const candidati =
     candidatiProForma(
+      button.dataset.forma ||
       forma
     );
 
