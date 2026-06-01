@@ -516,6 +516,19 @@ addePanel.innerHTML = `
   <p id="addeStatus" class="adde-uerbum-status"></p>
 `;
 
+document
+  .getElementById(
+    "addeUoxSchema"
+  )
+  ?.appendChild(
+    reddeElectionem({
+      nomen:
+        "addeUoxSchema",
+      optiones:
+        schemataUocis
+    })
+  );
+
 let row = null;
 
 if (input && vocabulariumTab) {
