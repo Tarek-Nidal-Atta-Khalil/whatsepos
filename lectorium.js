@@ -70,6 +70,7 @@ function aperiInVocabulario(verbum) {
 }
 
 function reddeVersum({
+  id,
   numerus,
   textus
 }) {
@@ -97,6 +98,8 @@ function reddeVersum({
   textusElementum.className =
     "lectorium-versus-textus";
 
+  let ordoVerbi = 0;
+
   tokeniza(textus).forEach(token => {
     if (!estVerbum(token)) {
       textusElementum.appendChild(
@@ -105,6 +108,8 @@ function reddeVersum({
 
       return;
     }
+
+    ordoVerbi += 1;
 
     const button =
       document.createElement("button");
@@ -118,9 +123,32 @@ function reddeVersum({
     button.textContent =
       token;
 
+    button.dataset.versusId =
+      id || "";
+
+    button.dataset.ordoVerbi =
+      String(ordoVerbi);
+
+    button.dataset.forma =
+      token;
+
     button.addEventListener(
       "click",
-      () => {
+      event => {
+        event.preventDefault();
+
+        if (
+          window
+            .monstraLectoriumSprechbulam
+        ) {
+          window
+            .monstraLectoriumSprechbulam(
+              button
+            );
+
+          return;
+        }
+
         aperiInVocabulario(token);
       }
     );
@@ -226,7 +254,7 @@ async function legeVersusAeneidos() {
     await supabase
       .from("lectiones_versus")
       .select(
-        "numerus, textus"
+        "id, numerus, textus"
       )
       .eq("liber_id", liber.id)
       .order(
