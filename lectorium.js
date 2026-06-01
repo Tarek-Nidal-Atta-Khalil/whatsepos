@@ -643,6 +643,14 @@ function formaSignataLectorii(
   ][0];
 }
 
+window.orthographiaLectorii =
+  orthographiaLectorii;
+
+window.formaCumMacrisLectorii =
+  formaCumMacrisLectorii;
+
+window.formaSignataLectorii =
+  formaSignataLectorii;
 
 async function legeFormasLectorii() {
   const supabase =
