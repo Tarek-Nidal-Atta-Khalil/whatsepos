@@ -30,11 +30,18 @@
   .verbum-nonfinitum{font-weight:700}
   .diphthongus{position:relative;display:inline-block;line-height:1}
   .diphthongus::before{content:"";position:absolute;left:.10em;right:.10em;top:.06em;border-top:.055em solid currentColor;border-radius:999px}
+  .lemma-loci-lista{display:flex;flex-direction:column;gap:8px}
+  .lemma-locus{display:grid;grid-template-columns:150px minmax(0,1fr);gap:14px;padding:11px 13px;border-radius:12px;color:inherit;text-decoration:none}
+  .lemma-locus:hover,.lemma-locus:focus{background:#f5f3ff;outline:none}
+  .lemma-locus-referentia{color:#6d28d9;font-weight:700;white-space:nowrap}
+  .lemma-locus-textus{font-family:Georgia,"Times New Roman",serif;font-size:18px;line-height:1.4}
 </style>
 </head>
 <body>
 <h1 id="siteTitle">Uocabularium</h1><a href="index.html?tab=vocabularium" class="lemma-revertere">← Retro</a>
-<div class="container lemma-container"><div class="lemma-topbar"><input id="lemmaQuaere" type="search" placeholder="Aliud verbum quaere"></div><article class="lemma-card"><header><h1 id="lemmaTitulus">—</h1><p id="lemmaPars">—</p></header><section class="lemma-section"><h2>Flexio</h2><div id="lemmaFlexio">Tabula nondum onerata est.</div></section><section class="lemma-section"><h2>Formae metricae</h2><div id="lemmaFormae">—</div></section></article></div>
+<div class="container lemma-container"><div class="lemma-topbar"><input id="lemmaQuaere" type="search" placeholder="Aliud verbum quaere"></div><article class="lemma-card"><header><h1 id="lemmaTitulus">—</h1><p id="lemmaPars">—</p></header><section class="lemma-section"><h2>Flexio</h2><div id="lemmaFlexio">Tabula nondum onerata est.</div></section>
+  <section class="lemma-section"><h2>Formae metricae</h2><div id="lemmaFormae">—</div></section><section class="lemma-section"><h2>Loci</h2><div id="lemmaLoci">—</div></section>
+</article></div>
 <script type="module">
 import { estDiphthongusCommunis } from './hexameter.js?v=20260531-u-intervocalicum-1';
 import{createClient}from"https://esm.sh/@supabase/supabase-js@2";
@@ -888,8 +895,157 @@ formaePraeparatae.forEach(({ forma, textus, sigla, status }) => {
 
   z.appendChild(lista);
 }
+
+  function reddeLoci(loci) {
+  const z =
+    document.getElementById('lemmaLoci');
+
+  z.innerHTML = '';
+
+  if (!loci.length) {
+    z.textContent =
+      'Nulli loci inventi sunt.';
+
+    return;
+  }
+
+  const lista =
+    document.createElement('div');
+
+  lista.className =
+    'lemma-loci-lista';
+
+  loci.forEach(locus => {
+    const versus =
+      locus.versus;
+
+    const liber =
+      versus?.liber;
+
+    const opus =
+      liber?.opus;
+
+    if (!versus || !liber || !opus) {
+      return;
+    }
+
+    const vinculum =
+      document.createElement('a');
+
+    vinculum.className =
+      'lemma-locus';
+
+    vinculum.href =
+      `index.html?tab=lectorium&versus_id=${
+        encodeURIComponent(versus.id)
+      }`;
+
+    const referentia =
+      document.createElement('span');
+
+    referentia.className =
+      'lemma-locus-referentia';
+
+    referentia.textContent =
+      `${
+        opus.abbreviatio ||
+        `${opus.auctor} ${opus.titulus}`
+      } ${liber.numerus},${versus.numerus}`;
+
+    const textus =
+      document.createElement('span');
+
+    textus.className =
+      'lemma-locus-textus';
+
+    textus.textContent =
+      versus.textus;
+
+    vinculum.appendChild(
+      referentia
+    );
+
+    vinculum.appendChild(
+      textus
+    );
+
+    lista.appendChild(
+      vinculum
+    );
+  });
+
+  if (!lista.children.length) {
+    z.textContent =
+      'Nulli loci inventi sunt.';
+
+    return;
+  }
+
+  z.appendChild(lista);
+}
+
+async function zeigeLoci(
+  lexemeIdActuale
+) {
+  const z =
+    document.getElementById('lemmaLoci');
+
+  if (!lexemeIdActuale) {
+    z.textContent =
+      '—';
+
+    return;
+  }
+
+  z.textContent =
+    'Loci onerantur...';
+
+  const {
+    data,
+    error
+  } =
+    await supabase
+      .from('lectiones_loci')
+      .select(`
+        forma_textus,
+        ordo_verbi,
+        versus:lectiones_versus (
+          id,
+          numerus,
+          textus,
+          liber:lectiones_libri (
+            numerus,
+            opus:lectiones_opera (
+              auctor,
+              titulus,
+              abbreviatio
+            )
+          )
+        )
+      `)
+      .eq(
+        'lexeme_id',
+        lexemeIdActuale
+      )
+      .order(
+        'ordo_verbi',
+        { ascending: true }
+      );
+
+  if (error) {
+    z.textContent =
+      error.message;
+
+    return;
+  }
+
+  reddeLoci(
+    data || []
+  );
+}
   
-async function lemmaExLexemeId(){if(lemma||!lexemeId)return;const{data,error}=await supabase.from('formae').select('lemma').eq('lexeme_id',lexemeId).limit(1);if(!error&&data&&data[0]?.lemma){lemma=data[0].lemma;lemmaDisplayActuale=lemma}}
+async function lemmaExLexemeId(){if(lemma||!lexemeId)return;
+                                 const{data,error}=await supabase.from('formae').select('lemma').eq('lexeme_id',lexemeId).limit(1);if(!error&&data&&data[0]?.lemma){lemma=data[0].lemma;lemmaDisplayActuale=lemma}}
 async function ladeLemma(){
   await lemmaExLexemeId();
   if(!lemma&&!lexemeId)
@@ -916,7 +1072,19 @@ async function ladeLemma(){
           : head.pars_orationis||'—'
         }
         zeigeFlexio(formae);
-        zeigeFormaeMetricae(formae);
+zeigeFormaeMetricae(formae);
+
+const lexemeIdActuale =
+  lexemeId ||
+  head?.lexeme_id ||
+  formae.find(
+    forma => forma.lexeme_id
+  )?.lexeme_id ||
+  '';
+
+await zeigeLoci(
+  lexemeIdActuale
+);
                           }
 lemmaQuaere.addEventListener('keydown',e=>{if(e.key!=='Enter')return;e.preventDefault();const q=lemmaQuaere.value.trim();if(q)location.href=`index.html?tab=vocabularium&q=${encodeURIComponent(q)}`});
 ladeLemma();
