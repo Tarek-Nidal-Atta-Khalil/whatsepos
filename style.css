@@ -398,3 +398,143 @@ html body .lemma-card .diphthongus::before {
     font-size: 20px;
   }
 }
+
+/* Lectorium: lemma preview tooltips */
+
+.lectorium-sprechbulla {
+  position: fixed;
+  z-index: 1600;
+  width: min(360px, calc(100vw - 24px));
+  max-height: min(560px, calc(100vh - 24px));
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding: 16px;
+  border: 1px solid #ddd6fe;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 16px 38px rgba(0, 0, 0, .18);
+  text-align: left;
+}
+
+.lectorium-sprechbulla[hidden] {
+  display: none;
+}
+
+.lectorium-bulla-forma {
+  display: block;
+  margin-bottom: 10px;
+  color: #111827;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 22px;
+}
+
+.lectorium-bulla-candidatus {
+  margin-top: 10px;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  background: #fafafa;
+}
+
+.lectorium-bulla-lemma {
+  display: block;
+  color: #4c1d95;
+  font-size: 20px;
+}
+
+.lectorium-bulla-pars,
+.lectorium-bulla-analysis,
+.lectorium-bulla-encliticum {
+  display: block;
+  margin-top: 5px;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.lectorium-bulla-encliticum {
+  color: #7c3aed;
+  font-weight: 700;
+}
+
+.lectorium-bulla-nota {
+  margin: 6px 0;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.lectorium-bulla-error {
+  margin: 8px 0;
+  color: #b91c1c;
+  font-size: 14px;
+}
+
+.lectorium-bulla-actiones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.lectorium-bulla-actio,
+.lectorium-bulla-lemma-optio {
+  margin: 8px 6px 0 0;
+  padding: 8px 11px;
+  border: 1px solid #d1d5db;
+  border-radius: 11px;
+  background: #ffffff;
+  color: #374151;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.lectorium-bulla-actio:hover,
+.lectorium-bulla-actio:focus,
+.lectorium-bulla-lemma-optio:hover,
+.lectorium-bulla-lemma-optio:focus {
+  outline: none;
+  background: #f5f3ff;
+  border-color: #c4b5fd;
+}
+
+.lectorium-bulla-actio-principalis {
+  border-color: #7c3aed;
+  background: #7c3aed;
+  color: #ffffff;
+}
+
+.lectorium-bulla-actio-principalis:hover,
+.lectorium-bulla-actio-principalis:focus {
+  background: #6d28d9;
+  color: #ffffff;
+}
+
+.lectorium-bulla-actio-secundaria {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.lectorium-bulla-input {
+  display: block;
+  width: 100%;
+  max-width: none;
+  margin: 8px 0;
+  padding: 9px 11px;
+  border: 1px solid #d1d5db;
+  border-radius: 11px;
+  font-size: 16px;
+}
+
+.lectorium-bulla-lemma-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.lectorium-bulla-lemma-optio {
+  display: block;
+  width: 100%;
+  margin: 0;
+  text-align: left;
+}
