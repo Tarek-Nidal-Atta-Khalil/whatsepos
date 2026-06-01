@@ -186,12 +186,17 @@ async function legeVersusAeneidos() {
       )
       .eq("auctor", "Vergilius")
       .eq("titulus", "Aeneis")
-      .single();
-
+      .maybeSingle();
+  
   if (opusError) {
     throw opusError;
   }
-
+  
+  if (!opus) {
+    throw new Error(
+      "Opus non inventum est: Vergilius, Aeneis."
+    );
+  }
   const {
     data: liber,
     error: liberError
@@ -203,12 +208,17 @@ async function legeVersusAeneidos() {
       )
       .eq("opus_id", opus.id)
       .eq("numerus", 1)
-      .single();
-
+      .maybeSingle();
+  
   if (liberError) {
     throw liberError;
   }
-
+  
+  if (!liber) {
+    throw new Error(
+      "Liber non inventus est: Aeneis I."
+    );
+  }
   const {
     data: versus,
     error: versusError
