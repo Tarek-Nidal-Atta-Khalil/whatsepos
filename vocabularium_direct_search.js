@@ -12,6 +12,21 @@ function normalisiere(textus) {
     .replace(/[ȳýỳŷÿ]/g, 'y');
 }
 
+function sineEnclitico(textus) {
+  const forma = String(textus || "");
+
+  for (const encliticum of ["que", "ve", "ne"]) {
+    if (
+      forma.length > encliticum.length + 1 &&
+      forma.endsWith(encliticum)
+    ) {
+      return forma.slice(0, -encliticum.length);
+    }
+  }
+
+  return "";
+}
+
 function exspectaSupabase() {
   if (window.whatseposSupabase) return Promise.resolve(window.whatseposSupabase);
   return new Promise(resolve => {
@@ -56,11 +71,34 @@ async function dirigeQParamAdLemma() {
   const supabase = await exspectaSupabase();
   if (!supabase) return;
 
-  const lemma = await lemmaAutFormamInveni(supabase, normalisiere(q));
-  if (lemma) {
-    window.location.href = `lemma.html?lemma=${encodeURIComponent(lemma)}`;
-    return;
+  const qNormalisata =
+  normalisiere(q);
+
+let lemma =
+  await lemmaAutFormamInveni(
+    supabase,
+    qNormalisata
+  );
+
+if (!lemma) {
+  const basis =
+    sineEnclitico(qNormalisata);
+
+  if (basis) {
+    lemma =
+      await lemmaAutFormamInveni(
+        supabase,
+        basis
+      );
   }
+}
+
+if (lemma) {
+  window.location.href =
+    `lemma.html?lemma=${encodeURIComponent(lemma)}`;
+
+  return;
+}
 
   if (input) input.dispatchEvent(new Event('input', { bubbles: true }));
 }
