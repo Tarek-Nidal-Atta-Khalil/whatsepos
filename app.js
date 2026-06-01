@@ -146,6 +146,13 @@ window.zeigeTab = async function(tabName) {
     ladeProfil();
   }
 
+  if (
+    tabName === "lectorium" &&
+    window.ladeLectorium
+  ) {
+    await window.ladeLectorium();
+  }
+
   if (tabName === "hexameter") {
     await ladeDictionariumMetricum();
     aktualisiereSuggestionesMetricas();
