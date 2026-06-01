@@ -124,61 +124,20 @@
       </section>
     </div>
     
-    <div id="vocabularium" class="tab-content" style="display: none;">
-      <input id="vocabulariumQuaere" type="search" placeholder="Verbum Latinum quaere">
-      <p id="vocabulariumStatus" class="status"></p>
-      <div class="uocabularium-reiterleiste">
-  <button
-    type="button"
-    class="uocabularium-reiter uocabularium-reiter-activus"
-    data-reiter="flexio"
-    onclick="zeigeUocabulariumReiter('flexio')"
+<div id="vocabularium" class="tab-content" style="display: none;">
+  <input
+    id="vocabulariumQuaere"
+    type="search"
+    placeholder="Verbum Latinum quaere"
   >
-    Flexio
-  </button>
 
-  <button
-    type="button"
-    class="uocabularium-reiter"
-    data-reiter="formae-metricae"
-    onclick="zeigeUocabulariumReiter('formae-metricae')"
-  >
-    Formae metricae
-  </button>
+  <p
+    id="vocabulariumStatus"
+    class="status"
+  ></p>
 
-  <button
-    type="button"
-    class="uocabularium-reiter"
-    data-reiter="loci"
-    onclick="zeigeUocabulariumReiter('loci')"
-  >
-    Loci
-  </button>
+  <div id="vocabulariumEventus"></div>
 </div>
-
-<div class="uocabularium-reiter-panels">
-  <section
-    id="uocabulariumPanelFlexio"
-    class="uocabularium-panel uocabularium-panel-activum"
-  >
-    <div id="uocabulariumFlexio"></div>
-  </section>
-
-  <section
-    id="uocabulariumPanelFormaeMetricae"
-    class="uocabularium-panel"
-  >
-    <div id="uocabulariumFormaeMetricae"></div>
-  </section>
-
-  <section
-    id="uocabulariumPanelLoci"
-    class="uocabularium-panel"
-  >
-    <div id="uocabulariumLoci"></div>
-  </section>
-</div>
-    </div>
 
     <div id="veroeffentlichungen" class="tab-content" style="display: none;">
       <h2>Bibliotheca</h2>
