@@ -2241,12 +2241,6 @@ document.addEventListener(
   "click",
   event => {
     if (
-      sprechbulla.hidden
-    ) {
-      return;
-    }
-
-    if (
       sprechbulla.contains(
         event.target
       )
@@ -2262,7 +2256,26 @@ document.addEventListener(
       return;
     }
 
+    const verbum =
+      event.target.closest?.(
+        ".lectorium-verbum"
+      );
+
+    if (
+      sprechbulla.hidden &&
+      !verbum
+    ) {
+      return;
+    }
+
     claudeSprechbulam();
+
+    if (verbum) {
+      window
+        .monstraLectoriumSprechbulam(
+          verbum
+        );
+    }
   }
 );
 
