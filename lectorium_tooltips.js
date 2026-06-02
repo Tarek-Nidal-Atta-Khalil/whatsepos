@@ -766,11 +766,92 @@ function aperiLemma(
   }
 }
 
+function reddeUocesUerbiInline(
+  button,
+  coniugatio
+) {
+  sprechbulla.innerHTML =
+    "";
+
+  sprechbulla.dataset
+    .coniugatio =
+    coniugatio;
+
+  delete sprechbulla
+    .dataset
+    .schemaUocis;
+
+  const forma =
+    formaVisibilisSprechbullae(
+      button
+    );
+
+  sprechbulla.appendChild(
+    elementum(
+      "strong",
+      "lectorium-bulla-forma",
+      forma
+    )
+  );
+
+  sprechbulla.appendChild(
+    elementum(
+      "p",
+      "lectorium-bulla-nota",
+      "Quomodo uoces adhibentur?"
+    )
+  );
+
+  const electioUocis =
+    reddeElectionem({
+      nomen:
+        "lectoriumSchemaUocis",
+
+      optiones:
+        schemataUocis
+    });
+
+  sprechbulla.appendChild(
+    electioUocis
+  );
+
+  electioUocis
+    .querySelectorAll(
+      'input[name="lectoriumSchemaUocis"]'
+    )
+    .forEach(input => {
+      input.addEventListener(
+        "change",
+        () => {
+          sprechbulla.dataset
+            .schemaUocis =
+            input.value;
+
+          rePositiona(
+            button
+          );
+        }
+      );
+    });
+
+  rePositiona(
+    button
+  );
+}
+
 function reddeConiugationemUerbiInline(
   button
 ) {
   sprechbulla.innerHTML =
     "";
+
+  delete sprechbulla
+    .dataset
+    .coniugatio;
+
+  delete sprechbulla
+    .dataset
+    .schemaUocis;
 
   const forma =
     formaVisibilisSprechbullae(
@@ -806,37 +887,6 @@ function reddeConiugationemUerbiInline(
     electioConiugationis
   );
 
-  const sectioUocis =
-    elementum(
-      "section",
-      "lectorium-bulla-sectio"
-    );
-
-  sectioUocis.hidden =
-    true;
-
-  sectioUocis.appendChild(
-    elementum(
-      "p",
-      "lectorium-bulla-nota",
-      "Quomodo uoces adhibentur?"
-    )
-  );
-
-  sectioUocis.appendChild(
-    reddeElectionem({
-      nomen:
-        "lectoriumSchemaUocis",
-
-      optiones:
-        schemataUocis
-    })
-  );
-
-  sprechbulla.appendChild(
-    sectioUocis
-  );
-
   electioConiugationis
     .querySelectorAll(
       'input[name="lectoriumConiugatio"]'
@@ -844,14 +894,11 @@ function reddeConiugationemUerbiInline(
     .forEach(input => {
       input.addEventListener(
         "change",
-        () => {
-          sectioUocis.hidden =
-            false;
-
-          rePositiona(
-            button
-          );
-        }
+        () =>
+          reddeUocesUerbiInline(
+            button,
+            input.value
+          )
       );
     });
 
