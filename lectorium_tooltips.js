@@ -1185,6 +1185,8 @@ function reddeConiugationemUerbiInline(
 function reddeAddeUerbumInline(
   button
 ) {
+  fixaSprechbulam();
+  
   vacuaSprechbulam();
 
   const forma =
@@ -2064,6 +2066,9 @@ function claudeSprechbulam() {
   positioVerticalisSprechbullae =
     "";
 
+  sprechbullaFixata =
+    false;
+
   sprechbulla.style.maxHeight =
     "";
 }
@@ -2073,6 +2078,12 @@ function programmaClausuram() {
   clearTimeout(
     timerClaudendi
   );
+
+  if (
+    sprechbullaFixata
+  ) {
+    return;
+  }
 
   timerClaudendi =
     setTimeout(
@@ -2094,6 +2105,13 @@ window
   async function (
     button
   ) {
+    if (
+      sprechbullaFixata &&
+      !sprechbulla.hidden
+    ) {
+      return;
+    }
+
     retineSprechbulam();
 
     if (
@@ -2219,6 +2237,34 @@ document.addEventListener(
   }
 );
 
+document.addEventListener(
+  "click",
+  event => {
+    if (
+      sprechbulla.hidden
+    ) {
+      return;
+    }
+
+    if (
+      sprechbulla.contains(
+        event.target
+      )
+    ) {
+      return;
+    }
+
+    if (
+      event.target.closest?.(
+        '#vocabulariumQuaere, input[type="search"]'
+      )
+    ) {
+      return;
+    }
+
+    claudeSprechbulam();
+  }
+);
 
 document.addEventListener(
   "keydown",
@@ -2232,6 +2278,16 @@ document.addEventListener(
   }
 );
 
+sprechbulla.addEventListener(
+  "input",
+  fixaSprechbulam
+);
+
+
+sprechbulla.addEventListener(
+  "change",
+  fixaSprechbulam
+);
 
 sprechbulla.addEventListener(
   "mouseenter",
