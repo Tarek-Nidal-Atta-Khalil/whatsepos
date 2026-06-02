@@ -45,6 +45,8 @@ let verbumActuale =
 let timerClaudendi =
   null;
 
+let positioVerticalisSprechbullae =
+  "";
 
 function normalisiere(textus) {
   return String(textus || "")
@@ -1284,11 +1286,50 @@ function positionaSprechbulam(
   const margo =
     12;
 
+  const intervallum =
+    8;
+
+  const spatiumInfra =
+    Math.max(
+      80,
+      window.innerHeight -
+        rect.bottom -
+        intervallum -
+        margo
+    );
+
+  const spatiumSupra =
+    Math.max(
+      80,
+      rect.top -
+        intervallum -
+        margo
+    );
+
+  if (
+    !positioVerticalisSprechbullae
+  ) {
+    positioVerticalisSprechbullae =
+      (
+        spatiumInfra >= 240 ||
+        spatiumInfra >=
+          spatiumSupra
+      )
+        ? "infra"
+        : "supra";
+  }
+
+  const spatiumDisponibile =
+    positioVerticalisSprechbullae ===
+    "supra"
+      ? spatiumSupra
+      : spatiumInfra;
+
+  sprechbulla.style.maxHeight =
+    `${spatiumDisponibile}px`;
+
   let left =
     rect.left;
-
-  let top =
-    rect.bottom + 8;
 
   left =
     Math.min(
@@ -1304,17 +1345,20 @@ function positionaSprechbulam(
       left
     );
 
+  let top;
+
   if (
-    top +
-      sprechbulla.offsetHeight >
-    window.innerHeight -
-      margo
+    positioVerticalisSprechbullae ===
+    "supra"
   ) {
     top =
       rect.top -
-      sprechbulla
-        .offsetHeight -
-      8;
+      sprechbulla.offsetHeight -
+      intervallum;
+  } else {
+    top =
+      rect.bottom +
+      intervallum;
   }
 
   top =
@@ -1976,6 +2020,12 @@ function claudeSprechbulam() {
 
   verbumActuale =
     null;
+
+  positioVerticalisSprechbullae =
+    "";
+
+  sprechbulla.style.maxHeight =
+    "";
 }
 
 
@@ -2005,6 +2055,18 @@ window
     button
   ) {
     retineSprechbulam();
+
+    if (
+      verbumActuale !==
+        button ||
+      sprechbulla.hidden
+    ) {
+      positioVerticalisSprechbullae =
+        "";
+
+      sprechbulla.style.maxHeight =
+        "";
+    }
 
     verbumActuale =
       button;
