@@ -48,6 +48,52 @@ let timerClaudendi =
 let positioVerticalisSprechbullae =
   "";
 
+let sprechbullaFixata =
+  false;
+
+function fixaSprechbulam() {
+  sprechbullaFixata =
+    true;
+
+  retineSprechbulam();
+}
+
+
+function vacuaSprechbulam() {
+  sprechbulla.replaceChildren();
+
+  const claude =
+    elementum(
+      "button",
+      "lectorium-bulla-claude",
+      "×"
+    );
+
+  claude.type =
+    "button";
+
+  claude.title =
+    "claudere";
+
+  claude.setAttribute(
+    "aria-label",
+    "Sprechblase schließen"
+  );
+
+  claude.addEventListener(
+    "click",
+    event => {
+      event.stopPropagation();
+
+      claudeSprechbulam();
+    }
+  );
+
+  sprechbulla.appendChild(
+    claude
+  );
+}
+
 function normalisiere(textus) {
   return String(textus || "")
     .trim()
@@ -813,8 +859,7 @@ function reddeLeitformasUerbiInline(
   coniugatio,
   schemaUocis
 ) {
-  sprechbulla.innerHTML =
-    "";
+  vacuaSprechbulam();
 
   sprechbulla.dataset
     .coniugatio =
@@ -1005,8 +1050,7 @@ function reddeUocesUerbiInline(
   button,
   coniugatio
 ) {
-  sprechbulla.innerHTML =
-    "";
+  vacuaSprechbulam();
 
   sprechbulla.dataset
     .coniugatio =
@@ -1074,8 +1118,7 @@ function reddeUocesUerbiInline(
 function reddeConiugationemUerbiInline(
   button
 ) {
-  sprechbulla.innerHTML =
-    "";
+  vacuaSprechbulam();
 
   delete sprechbulla
     .dataset
@@ -1142,8 +1185,7 @@ function reddeConiugationemUerbiInline(
 function reddeAddeUerbumInline(
   button
 ) {
-  sprechbulla.innerHTML =
-    "";
+  vacuaSprechbulam();
 
   const forma =
     formaVisibilisSprechbullae(
@@ -1707,8 +1749,7 @@ async function servaCandidatum(
 function reddeLemmaQuaestionem(
   button
 ) {
-  sprechbulla.innerHTML =
-    "";
+  vacuaSprechbulam();
 
   const forma =
     formaVisibilisSprechbullae(
@@ -1846,8 +1887,7 @@ function reddeSprechbulam(
   verbumActuale =
     button;
 
-  sprechbulla.innerHTML =
-    "";
+  vacuaSprechbulam();
 
   sprechbulla.hidden =
     false;
@@ -2074,8 +2114,7 @@ window
     sprechbulla.hidden =
       false;
 
-    sprechbulla.innerHTML =
-      "";
+    vacuaSprechbulam();
 
     sprechbulla.appendChild(
       elementum(
@@ -2103,8 +2142,7 @@ window
         button
       );
     } catch (error) {
-      sprechbulla.innerHTML =
-        "";
+      vacuaSprechbulam();
 
       sprechbulla.appendChild(
         elementum(
