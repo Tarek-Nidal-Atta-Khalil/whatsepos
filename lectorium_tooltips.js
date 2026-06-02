@@ -2240,7 +2240,16 @@ document.addEventListener(
 document.addEventListener(
   "click",
   event => {
+      const iterClick =
+      typeof event.composedPath ===
+        "function"
+        ? event.composedPath()
+        : [];
+
     if (
+      iterClick.includes(
+        sprechbulla
+      ) ||
       sprechbulla.contains(
         event.target
       )
