@@ -766,6 +766,239 @@ function aperiLemma(
   }
 }
 
+function addeCampumUerbiInline({
+  titulus,
+  placeholder = ""
+}) {
+  const label =
+    elementum(
+      "label",
+      "lectorium-bulla-campus"
+    );
+
+  label.appendChild(
+    elementum(
+      "span",
+      "lectorium-bulla-nota",
+      titulus
+    )
+  );
+
+  const input =
+    elementum(
+      "input",
+      "lectorium-bulla-input"
+    );
+
+  input.type =
+    "text";
+
+  input.placeholder =
+    placeholder;
+
+  label.appendChild(
+    input
+  );
+
+  return {
+    label,
+    input
+  };
+}
+
+function reddeLeitformasUerbiInline(
+  button,
+  coniugatio,
+  schemaUocis
+) {
+  sprechbulla.innerHTML =
+    "";
+
+  sprechbulla.dataset
+    .coniugatio =
+    coniugatio;
+
+  sprechbulla.dataset
+    .schemaUocis =
+    schemaUocis;
+
+  const forma =
+    formaVisibilisSprechbullae(
+      button
+    );
+
+  sprechbulla.appendChild(
+    elementum(
+      "strong",
+      "lectorium-bulla-forma",
+      forma
+    )
+  );
+
+  sprechbulla.appendChild(
+    elementum(
+      "p",
+      "lectorium-bulla-nota",
+      "Formas principales insere."
+    )
+  );
+
+  const lemma =
+    addeCampumUerbiInline({
+      titulus:
+        "Lemma / Praesens 1. sg.",
+
+      placeholder:
+        "condo"
+    });
+
+  const infinitivus =
+    addeCampumUerbiInline({
+      titulus:
+        "Infinitiuus praesentis",
+
+      placeholder:
+        "condere"
+    });
+
+  const perfectum =
+    addeCampumUerbiInline({
+      titulus:
+        "Perfectum 1. sg.",
+
+      placeholder:
+        "condidi:"
+    });
+
+  const supinum =
+    addeCampumUerbiInline({
+      titulus:
+        "Supinum",
+
+      placeholder:
+        "conditum"
+    });
+
+  sprechbulla.appendChild(
+    lemma.label
+  );
+
+  sprechbulla.appendChild(
+    infinitivus.label
+  );
+
+  sprechbulla.appendChild(
+    perfectum.label
+  );
+
+  sprechbulla.appendChild(
+    supinum.label
+  );
+
+  const actiones =
+    elementum(
+      "div",
+      "lectorium-bulla-actiones"
+    );
+
+  const perge =
+    addeActionem(
+      "perge",
+      () => {
+        sprechbulla.dataset
+          .lemma =
+          lemma.input.value.trim();
+
+        sprechbulla.dataset
+          .infinitivus =
+          infinitivus
+            .input
+            .value
+            .trim();
+
+        sprechbulla.dataset
+          .perfectum =
+          perfectum
+            .input
+            .value
+            .trim();
+
+        sprechbulla.dataset
+          .supinum =
+          supinum
+            .input
+            .value
+            .trim();
+
+        sprechbulla.appendChild(
+          elementum(
+            "p",
+            "lectorium-bulla-nota",
+            "Formae acceptae sunt. Servatio mox addetur."
+          )
+        );
+
+        rePositiona(
+          button
+        );
+      },
+
+      "lectorium-bulla-actio lectorium-bulla-actio-principalis"
+    );
+
+  perge.disabled =
+    true;
+
+  function syncPerge() {
+    perge.disabled =
+      !(
+        lemma.input.value.trim() &&
+        infinitivus
+          .input
+          .value
+          .trim() &&
+        perfectum
+          .input
+          .value
+          .trim() &&
+        supinum
+          .input
+          .value
+          .trim()
+      );
+
+    rePositiona(
+      button
+    );
+  }
+
+  [
+    lemma.input,
+    infinitivus.input,
+    perfectum.input,
+    supinum.input
+  ].forEach(input => {
+    input.addEventListener(
+      "input",
+      syncPerge
+    );
+  });
+
+  actiones.appendChild(
+    perge
+  );
+
+  sprechbulla.appendChild(
+    actiones
+  );
+
+  lemma.input.focus();
+
+  rePositiona(
+    button
+  );
+}
+
 function reddeUocesUerbiInline(
   button,
   coniugatio
@@ -820,17 +1053,14 @@ function reddeUocesUerbiInline(
       'input[name="lectoriumSchemaUocis"]'
     )
     .forEach(input => {
-      input.addEventListener(
+            input.addEventListener(
         "change",
-        () => {
-          sprechbulla.dataset
-            .schemaUocis =
-            input.value;
-
-          rePositiona(
-            button
-          );
-        }
+        () =>
+          reddeLeitformasUerbiInline(
+            button,
+            coniugatio,
+            input.value
+          )
       );
     });
 
