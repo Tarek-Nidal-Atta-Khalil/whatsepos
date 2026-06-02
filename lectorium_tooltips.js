@@ -1,5 +1,6 @@
 import {
   coniugationesUerbi,
+  schemataUocis,
   reddeElectionem
 } from "./uerbum_formularium.js";
 
@@ -792,15 +793,67 @@ function reddeConiugationemUerbiInline(
     )
   );
 
-  sprechbulla.appendChild(
+  const electioConiugationis =
     reddeElectionem({
       nomen:
         "lectoriumConiugatio",
 
       optiones:
         coniugationesUerbi
+    });
+
+  sprechbulla.appendChild(
+    electioConiugationis
+  );
+
+  const sectioUocis =
+    elementum(
+      "section",
+      "lectorium-bulla-sectio"
+    );
+
+  sectioUocis.hidden =
+    true;
+
+  sectioUocis.appendChild(
+    elementum(
+      "p",
+      "lectorium-bulla-nota",
+      "Quomodo uoces adhibentur?"
+    )
+  );
+
+  sectioUocis.appendChild(
+    reddeElectionem({
+      nomen:
+        "lectoriumSchemaUocis",
+
+      optiones:
+        schemataUocis
     })
   );
+
+  sprechbulla.appendChild(
+    sectioUocis
+  );
+
+  electioConiugationis
+    .querySelectorAll(
+      'input[name="lectoriumConiugatio"]'
+    )
+    .forEach(input => {
+      input.addEventListener(
+        "change",
+        () => {
+          sectioUocis.hidden =
+            false;
+
+          rePositiona(
+            button
+          );
+        }
+      );
+    });
 
   rePositiona(
     button
