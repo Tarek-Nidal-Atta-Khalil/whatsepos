@@ -1,3 +1,8 @@
+import {
+  coniugationesUerbi,
+  reddeElectionem
+} from "./uerbum_formularium.js";
+
 const sprechbulla =
   document.createElement("aside");
 
@@ -760,6 +765,48 @@ function aperiLemma(
   }
 }
 
+function reddeConiugationemUerbiInline(
+  button
+) {
+  sprechbulla.innerHTML =
+    "";
+
+  const forma =
+    formaVisibilisSprechbullae(
+      button
+    );
+
+  sprechbulla.appendChild(
+    elementum(
+      "strong",
+      "lectorium-bulla-forma",
+      forma
+    )
+  );
+
+  sprechbulla.appendChild(
+    elementum(
+      "p",
+      "lectorium-bulla-nota",
+      "Quae coniugatio est?"
+    )
+  );
+
+  sprechbulla.appendChild(
+    reddeElectionem({
+      nomen:
+        "lectoriumConiugatio",
+
+      optiones:
+        coniugationesUerbi
+    })
+  );
+
+  rePositiona(
+    button
+  );
+}
+
 function reddeAddeUerbumInline(
   button
 ) {
@@ -830,17 +877,11 @@ function reddeAddeUerbumInline(
   actiones.appendChild(
     addeActionem(
       "uerbum",
-      () => {
-        sprechbulla.appendChild(
-          elementum(
-            "p",
-            "lectorium-bulla-nota",
-            "Nunc coniugatio eligenda erit."
-          )
-        );
+      () =>
+        reddeConiugationemUerbiInline(
+          button
+        ),
 
-        rePositiona(button);
-      },
       "lectorium-bulla-actio lectorium-bulla-actio-principalis"
     )
   );
