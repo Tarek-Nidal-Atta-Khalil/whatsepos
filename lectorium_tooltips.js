@@ -948,46 +948,111 @@ function reddeLeitformasUerbiInline(
       "lectorium-bulla-actiones"
     );
 
+  const status =
+    elementum(
+      "p",
+      "lectorium-bulla-nota"
+    );
+
   const perge =
     addeActionem(
-      "perge",
-      () => {
-        sprechbulla.dataset
-          .lemma =
+      "servare",
+      async () => {
+        const lemmaInput =
           lemma.input.value.trim();
 
-        sprechbulla.dataset
-          .infinitivus =
+        const infinitivusInput =
           infinitivus
             .input
             .value
             .trim();
 
-        sprechbulla.dataset
-          .perfectum =
+        const perfectumInput =
           perfectum
             .input
             .value
             .trim();
 
-        sprechbulla.dataset
-          .supinum =
+        const supinumInput =
           supinum
             .input
             .value
             .trim();
 
-        sprechbulla.appendChild(
-          elementum(
-            "p",
-            "lectorium-bulla-nota",
-            "Formae acceptae sunt. Servatio mox addetur."
-          )
-        );
+        perge.disabled =
+          true;
+
+        status.className =
+          "lectorium-bulla-nota";
+
+        status.textContent =
+          "servatur...";
 
         rePositiona(
           button
         );
+
+        try {
+          if (
+            typeof window
+              .servaVerbumExFormularium !==
+            "function"
+          ) {
+            throw new Error(
+              "Formularium uerbi nondum praesto est."
+            );
+          }
+
+          await window
+            .servaVerbumExFormularium({
+              lemmaInput,
+              coniugatio,
+              schemaUocis,
+              infinitivusInput,
+              perfectumInput,
+              supinumInput
+            });
+
+          formaeOmnes =
+            await legeOmnia(
+              "formae",
+              [
+                "id",
+                "forma",
+                "lemma",
+                "lexeme_id",
+                "pars_orationis",
+                "genus",
+                "numerus",
+                "casus",
+                "persona",
+                "tempus",
+                "modus",
+                "vox",
+                "syllabae",
+                "longae"
+              ].join(", ")
+            );
+
+          constitueIndices();
+
+          reddeSprechbulam(
+            button
+          );
+        } catch (error) {
+          status.className =
+            "lectorium-bulla-error";
+
+          status.textContent =
+            error.message ||
+            "Verbum servari non potest.";
+
+          syncPerge();
+
+          rePositiona(
+            button
+          );
+        }
       },
 
       "lectorium-bulla-actio lectorium-bulla-actio-principalis"
@@ -1039,8 +1104,12 @@ function reddeLeitformasUerbiInline(
     actiones
   );
 
-  lemma.input.focus();
+  sprechbulla.appendChild(
+    status
+  );
 
+  lemma.input.focus();
+  
   rePositiona(
     button
   );
