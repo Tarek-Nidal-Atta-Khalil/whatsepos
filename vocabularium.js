@@ -2255,6 +2255,72 @@ function generaVerbumA({
   };
 }
 
+window.servaVerbumExFormularium =
+  async function ({
+    lemmaInput,
+    coniugatio,
+    schemaUocis,
+    infinitivusInput,
+    perfectumInput,
+    supinumInput
+  }) {
+    if (
+      !window.whatseposSupabase
+    ) {
+      throw new Error(
+        "Supabase nondum legi potest."
+      );
+    }
+
+    if (
+      coniugatio !== "a"
+    ) {
+      throw new Error(
+        "Nunc tantum uerba a-coniugationis servari possunt."
+      );
+    }
+
+    if (
+      ![
+        "utraque",
+        "activum_tantum",
+        "passivum_tantum"
+      ].includes(
+        schemaUocis
+      )
+    ) {
+      throw new Error(
+        "Nunc tantum uerba actiua et passiua regularia servari possunt. Deponentia et semideponentia mox addentur."
+      );
+    }
+
+    const paradigma =
+      generaVerbumA({
+        lemmaInput,
+        infinitivusInput,
+        perfectumInput,
+        supinumInput,
+        uoces:
+          schemaUocis
+      });
+
+    const {
+      error
+    } =
+      await window
+        .whatseposSupabase
+        .from("formae")
+        .insert(
+          paradigma.formae
+        );
+
+    if (error) {
+      throw error;
+    }
+
+    return paradigma;
+  };
+
 function syncDeclinationesSubstantivi() {
   const genus =
     document.getElementById('addeGenus')?.value;
