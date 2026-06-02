@@ -2255,6 +2255,1507 @@ function generaVerbumA({
   };
 }
 
+const definitionesConiugationumRegularium = {
+  a: {
+    titulus:
+      "a-coniugationis",
+
+    exemplum:
+      "-a:re",
+
+    infinitivusPattern:
+      /āre$/i,
+
+    infinitivusActiuus:
+      "āre",
+
+    infinitivusPassiuus:
+      "ārī",
+
+    praesIndAct:
+      [
+        "ō",
+        "ās",
+        "at",
+        "āmus",
+        "ātis",
+        "ant"
+      ],
+
+    praesIndPass:
+      [
+        "or",
+        "āris",
+        "ātur",
+        "āmur",
+        "āminī",
+        "antur"
+      ],
+
+    imperfIndAct:
+      [
+        "ābam",
+        "ābās",
+        "ābat",
+        "ābāmus",
+        "ābātis",
+        "ābant"
+      ],
+
+    imperfIndPass:
+      [
+        "ābar",
+        "ābāris",
+        "ābātur",
+        "ābāmur",
+        "ābāminī",
+        "ābantur"
+      ],
+
+    futIndAct:
+      [
+        "ābō",
+        "ābis",
+        "ābit",
+        "ābimus",
+        "ābitis",
+        "ābunt"
+      ],
+
+    futIndPass:
+      [
+        "ābor",
+        "āberis",
+        "ābitur",
+        "ābimur",
+        "ābiminī",
+        "ābuntur"
+      ],
+
+    praesConiAct:
+      [
+        "em",
+        "ēs",
+        "et",
+        "ēmus",
+        "ētis",
+        "ent"
+      ],
+
+    praesConiPass:
+      [
+        "er",
+        "ēris",
+        "ētur",
+        "ēmur",
+        "ēminī",
+        "entur"
+      ],
+
+    impPraesAct:
+      [
+        null,
+        "ā",
+        null,
+        null,
+        "āte",
+        null
+      ],
+
+    impPraesPass:
+      [
+        null,
+        "āre",
+        null,
+        null,
+        "āminī",
+        null
+      ],
+
+    impFutAct:
+      [
+        null,
+        "ātō",
+        "ātō",
+        null,
+        "ātōte",
+        "antō"
+      ],
+
+    impFutPass:
+      [
+        null,
+        "ātor",
+        "ātor",
+        null,
+        null,
+        "antor"
+      ],
+
+    participiumPraesens:
+      "āns",
+
+    gerundivum:
+      "andus"
+  },
+
+  e: {
+    titulus:
+      "e-coniugationis",
+
+    exemplum:
+      "-e:re",
+
+    infinitivusPattern:
+      /ēre$/i,
+
+    infinitivusActiuus:
+      "ēre",
+
+    infinitivusPassiuus:
+      "ērī",
+
+    praesIndAct:
+      [
+        "eō",
+        "ēs",
+        "et",
+        "ēmus",
+        "ētis",
+        "ent"
+      ],
+
+    praesIndPass:
+      [
+        "eor",
+        "ēris",
+        "ētur",
+        "ēmur",
+        "ēminī",
+        "entur"
+      ],
+
+    imperfIndAct:
+      [
+        "ēbam",
+        "ēbās",
+        "ēbat",
+        "ēbāmus",
+        "ēbātis",
+        "ēbant"
+      ],
+
+    imperfIndPass:
+      [
+        "ēbar",
+        "ēbāris",
+        "ēbātur",
+        "ēbāmur",
+        "ēbāminī",
+        "ēbantur"
+      ],
+
+    futIndAct:
+      [
+        "ēbō",
+        "ēbis",
+        "ēbit",
+        "ēbimus",
+        "ēbitis",
+        "ēbunt"
+      ],
+
+    futIndPass:
+      [
+        "ēbor",
+        "ēberis",
+        "ēbitur",
+        "ēbimur",
+        "ēbiminī",
+        "ēbuntur"
+      ],
+
+    praesConiAct:
+      [
+        "eam",
+        "eās",
+        "eat",
+        "eāmus",
+        "eātis",
+        "eant"
+      ],
+
+    praesConiPass:
+      [
+        "ear",
+        "eāris",
+        "eātur",
+        "eāmur",
+        "eāminī",
+        "eantur"
+      ],
+
+    impPraesAct:
+      [
+        null,
+        "ē",
+        null,
+        null,
+        "ēte",
+        null
+      ],
+
+    impPraesPass:
+      [
+        null,
+        "ēre",
+        null,
+        null,
+        "ēminī",
+        null
+      ],
+
+    impFutAct:
+      [
+        null,
+        "ētō",
+        "ētō",
+        null,
+        "ētōte",
+        "entō"
+      ],
+
+    impFutPass:
+      [
+        null,
+        "ētor",
+        "ētor",
+        null,
+        null,
+        "entor"
+      ],
+
+    participiumPraesens:
+      "ēns",
+
+    gerundivum:
+      "endus"
+  },
+
+  consonantica: {
+    titulus:
+      "coniugationis consonanticae",
+
+    exemplum:
+      "-ere",
+
+    infinitivusPattern:
+      /ere$/i,
+
+    infinitivusActiuus:
+      "ere",
+
+    infinitivusPassiuus:
+      "ī",
+
+    praesIndAct:
+      [
+        "ō",
+        "is",
+        "it",
+        "imus",
+        "itis",
+        "unt"
+      ],
+
+    praesIndPass:
+      [
+        "or",
+        "eris",
+        "itur",
+        "imur",
+        "iminī",
+        "untur"
+      ],
+
+    imperfIndAct:
+      [
+        "ēbam",
+        "ēbās",
+        "ēbat",
+        "ēbāmus",
+        "ēbātis",
+        "ēbant"
+      ],
+
+    imperfIndPass:
+      [
+        "ēbar",
+        "ēbāris",
+        "ēbātur",
+        "ēbāmur",
+        "ēbāminī",
+        "ēbantur"
+      ],
+
+    futIndAct:
+      [
+        "am",
+        "ēs",
+        "et",
+        "ēmus",
+        "ētis",
+        "ent"
+      ],
+
+    futIndPass:
+      [
+        "ar",
+        "ēris",
+        "ētur",
+        "ēmur",
+        "ēminī",
+        "entur"
+      ],
+
+    praesConiAct:
+      [
+        "am",
+        "ās",
+        "at",
+        "āmus",
+        "ātis",
+        "ant"
+      ],
+
+    praesConiPass:
+      [
+        "ar",
+        "āris",
+        "ātur",
+        "āmur",
+        "āminī",
+        "antur"
+      ],
+
+    impPraesAct:
+      [
+        null,
+        "e",
+        null,
+        null,
+        "ite",
+        null
+      ],
+
+    impPraesPass:
+      [
+        null,
+        "ere",
+        null,
+        null,
+        "iminī",
+        null
+      ],
+
+    impFutAct:
+      [
+        null,
+        "itō",
+        "itō",
+        null,
+        "itōte",
+        "untō"
+      ],
+
+    impFutPass:
+      [
+        null,
+        "itor",
+        "itor",
+        null,
+        null,
+        "untor"
+      ],
+
+    participiumPraesens:
+      "ēns",
+
+    gerundivum:
+      "endus"
+  },
+
+  mixta: {
+    titulus:
+      "coniugationis mixtae",
+
+    exemplum:
+      "-ere",
+
+    infinitivusPattern:
+      /ere$/i,
+
+    infinitivusActiuus:
+      "ere",
+
+    infinitivusPassiuus:
+      "ī",
+
+    praesIndAct:
+      [
+        "iō",
+        "is",
+        "it",
+        "imus",
+        "itis",
+        "iunt"
+      ],
+
+    praesIndPass:
+      [
+        "ior",
+        "eris",
+        "itur",
+        "imur",
+        "iminī",
+        "iuntur"
+      ],
+
+    imperfIndAct:
+      [
+        "iēbam",
+        "iēbās",
+        "iēbat",
+        "iēbāmus",
+        "iēbātis",
+        "iēbant"
+      ],
+
+    imperfIndPass:
+      [
+        "iēbar",
+        "iēbāris",
+        "iēbātur",
+        "iēbāmur",
+        "iēbāminī",
+        "iēbantur"
+      ],
+
+    futIndAct:
+      [
+        "iam",
+        "iēs",
+        "iet",
+        "iēmus",
+        "iētis",
+        "ient"
+      ],
+
+    futIndPass:
+      [
+        "iar",
+        "iēris",
+        "iētur",
+        "iēmur",
+        "iēminī",
+        "ientur"
+      ],
+
+    praesConiAct:
+      [
+        "iam",
+        "iās",
+        "iat",
+        "iāmus",
+        "iātis",
+        "iant"
+      ],
+
+    praesConiPass:
+      [
+        "iar",
+        "iāris",
+        "iātur",
+        "iāmur",
+        "iāminī",
+        "iantur"
+      ],
+
+    impPraesAct:
+      [
+        null,
+        "e",
+        null,
+        null,
+        "ite",
+        null
+      ],
+
+    impPraesPass:
+      [
+        null,
+        "ere",
+        null,
+        null,
+        "iminī",
+        null
+      ],
+
+    impFutAct:
+      [
+        null,
+        "itō",
+        "itō",
+        null,
+        "itōte",
+        "iuntō"
+      ],
+
+    impFutPass:
+      [
+        null,
+        "itor",
+        "itor",
+        null,
+        null,
+        "iuntor"
+      ],
+
+    participiumPraesens:
+      "iēns",
+
+    gerundivum:
+      "iendus"
+  },
+
+  i: {
+    titulus:
+      "i-coniugationis",
+
+    exemplum:
+      "-i:re",
+
+    infinitivusPattern:
+      /īre$/i,
+
+    infinitivusActiuus:
+      "īre",
+
+    infinitivusPassiuus:
+      "īrī",
+
+    praesIndAct:
+      [
+        "iō",
+        "īs",
+        "it",
+        "īmus",
+        "ītis",
+        "iunt"
+      ],
+
+    praesIndPass:
+      [
+        "ior",
+        "īris",
+        "ītur",
+        "īmur",
+        "īminī",
+        "iuntur"
+      ],
+
+    imperfIndAct:
+      [
+        "iēbam",
+        "iēbās",
+        "iēbat",
+        "iēbāmus",
+        "iēbātis",
+        "iēbant"
+      ],
+
+    imperfIndPass:
+      [
+        "iēbar",
+        "iēbāris",
+        "iēbātur",
+        "iēbāmur",
+        "iēbāminī",
+        "iēbantur"
+      ],
+
+    futIndAct:
+      [
+        "iam",
+        "iēs",
+        "iet",
+        "iēmus",
+        "iētis",
+        "ient"
+      ],
+
+    futIndPass:
+      [
+        "iar",
+        "iēris",
+        "iētur",
+        "iēmur",
+        "iēminī",
+        "ientur"
+      ],
+
+    praesConiAct:
+      [
+        "iam",
+        "iās",
+        "iat",
+        "iāmus",
+        "iātis",
+        "iant"
+      ],
+
+    praesConiPass:
+      [
+        "iar",
+        "iāris",
+        "iātur",
+        "iāmur",
+        "iāminī",
+        "iantur"
+      ],
+
+    impPraesAct:
+      [
+        null,
+        "ī",
+        null,
+        null,
+        "īte",
+        null
+      ],
+
+    impPraesPass:
+      [
+        null,
+        "īre",
+        null,
+        null,
+        "īminī",
+        null
+      ],
+
+    impFutAct:
+      [
+        null,
+        "ītō",
+        "ītō",
+        null,
+        "ītōte",
+        "iuntō"
+      ],
+
+    impFutPass:
+      [
+        null,
+        "ītor",
+        "ītor",
+        null,
+        null,
+        "iuntor"
+      ],
+
+    participiumPraesens:
+      "iēns",
+
+    gerundivum:
+      "iendus"
+  }
+};
+
+
+function adiungeRadicem(
+  radix,
+  suffixa
+) {
+  return suffixa.map(
+    suffixum =>
+      suffixum === null
+        ? null
+        : radix + suffixum
+  );
+}
+
+
+function generaVerbumRegulare({
+  lemmaInput,
+  coniugatio,
+  infinitivusInput,
+  perfectumInput,
+  supinumInput,
+  uoces
+}) {
+  const lemmaMacris =
+    exColonibusMacra(
+      lemmaInput
+    ).trim();
+
+  const lemmaNudum =
+    sineMacris(
+      lemmaMacris
+    );
+
+  const lexemeId =
+    crypto.randomUUID();
+
+  const infinitivus =
+    exColonibusMacra(
+      infinitivusInput
+    ).trim();
+
+  const perfectum =
+    exColonibusMacra(
+      perfectumInput
+    ).trim();
+
+  const supinum =
+    exColonibusMacra(
+      supinumInput
+    ).trim();
+
+  const definitio =
+    definitionesConiugationumRegularium[
+      coniugatio
+    ];
+
+  if (!definitio) {
+    throw new Error(
+      "Coniugatio regularis eligenda est."
+    );
+  }
+
+  if (
+    !definitio
+      .infinitivusPattern
+      .test(
+        infinitivus
+      )
+  ) {
+    throw new Error(
+      `Infinitivus ${
+        definitio.titulus
+      } in ${
+        definitio.exemplum
+      } desinere debet.`
+    );
+  }
+
+  if (
+    !/ī$/i.test(
+      perfectum
+    )
+  ) {
+    throw new Error(
+      "Perfectum in -i: desinere debet."
+    );
+  }
+
+  if (
+    !/um$/i.test(
+      supinum
+    )
+  ) {
+    throw new Error(
+      "Supinum in -um desinere debet."
+    );
+  }
+
+  const radixPraesentis =
+    infinitivus.replace(
+      definitio
+        .infinitivusPattern,
+      ""
+    );
+
+  const infinitivusActiuus =
+    radixPraesentis +
+    definitio
+      .infinitivusActiuus;
+
+  const infinitivusPassiuus =
+    radixPraesentis +
+    definitio
+      .infinitivusPassiuus;
+
+  const basisInfinitivi =
+    infinitivusActiuus
+      .slice(
+        0,
+        -1
+      );
+
+  const stemmaPerfecti =
+    perfectum.replace(
+      /ī$/i,
+      ""
+    );
+
+  const stemmaSupini =
+    supinum.replace(
+      /um$/i,
+      ""
+    );
+
+  const formae =
+    [];
+
+  const personae = [
+    [
+      "1",
+      "sg"
+    ],
+    [
+      "2",
+      "sg"
+    ],
+    [
+      "3",
+      "sg"
+    ],
+    [
+      "1",
+      "pl"
+    ],
+    [
+      "2",
+      "pl"
+    ],
+    [
+      "3",
+      "pl"
+    ]
+  ];
+
+  const add = ({
+    formaMacris,
+    pars =
+      "verbum",
+    persona =
+      null,
+    numerus =
+      null,
+    tempus =
+      null,
+    modus =
+      null,
+    vox =
+      null
+  }) => {
+    formae.push(
+      recordumVerbi({
+        formaMacris,
+        lemmaNudum,
+        lexemeId,
+        pars,
+        persona,
+        numerus,
+        tempus,
+        modus,
+        vox
+      })
+    );
+  };
+
+  const addSeries = (
+    series,
+    tempus,
+    modus,
+    vox
+  ) => {
+    series.forEach(
+      (
+        formaMacris,
+        index
+      ) => {
+        if (
+          !formaMacris
+        ) {
+          return;
+        }
+
+        add({
+          formaMacris,
+          persona:
+            personae[
+              index
+            ][0],
+
+          numerus:
+            personae[
+              index
+            ][1],
+
+          tempus,
+          modus,
+          vox
+        });
+      }
+    );
+  };
+
+  const cumRadice =
+    suffixa =>
+      adiungeRadicem(
+        radixPraesentis,
+        suffixa
+      );
+
+  const habetActiuum =
+    uoces ===
+      "utraque" ||
+    uoces ===
+      "activum_tantum";
+
+  const habetPassiuum =
+    uoces ===
+      "utraque" ||
+    uoces ===
+      "passivum_tantum";
+
+  if (
+    habetActiuum
+  ) {
+    addSeries(
+      cumRadice(
+        definitio
+          .praesIndAct
+      ),
+      "praes",
+      "ind",
+      "act"
+    );
+
+    addSeries(
+      cumRadice(
+        definitio
+          .imperfIndAct
+      ),
+      "imperf",
+      "ind",
+      "act"
+    );
+
+    addSeries(
+      cumRadice(
+        definitio
+          .futIndAct
+      ),
+      "fut",
+      "ind",
+      "act"
+    );
+
+    addSeries(
+      [
+        perfectum,
+        stemmaPerfecti +
+          "istī",
+        stemmaPerfecti +
+          "it",
+        stemmaPerfecti +
+          "imus",
+        stemmaPerfecti +
+          "istis",
+        stemmaPerfecti +
+          "ērunt"
+      ],
+      "perf",
+      "ind",
+      "act"
+    );
+
+    addSeries(
+      [
+        stemmaPerfecti +
+          "eram",
+        stemmaPerfecti +
+          "erās",
+        stemmaPerfecti +
+          "erat",
+        stemmaPerfecti +
+          "erāmus",
+        stemmaPerfecti +
+          "erātis",
+        stemmaPerfecti +
+          "erant"
+      ],
+      "plqpf",
+      "ind",
+      "act"
+    );
+
+    addSeries(
+      [
+        stemmaPerfecti +
+          "erō",
+        stemmaPerfecti +
+          "eris",
+        stemmaPerfecti +
+          "erit",
+        stemmaPerfecti +
+          "erimus",
+        stemmaPerfecti +
+          "eritis",
+        stemmaPerfecti +
+          "erint"
+      ],
+      "futperf",
+      "ind",
+      "act"
+    );
+
+    addSeries(
+      cumRadice(
+        definitio
+          .praesConiAct
+      ),
+      "praes",
+      "coni",
+      "act"
+    );
+
+    addSeries(
+      adiungeRadicem(
+        basisInfinitivi,
+        [
+          "em",
+          "ēs",
+          "et",
+          "ēmus",
+          "ētis",
+          "ent"
+        ]
+      ),
+      "imperf",
+      "coni",
+      "act"
+    );
+
+    addSeries(
+      [
+        stemmaPerfecti +
+          "erim",
+        stemmaPerfecti +
+          "erīs",
+        stemmaPerfecti +
+          "erit",
+        stemmaPerfecti +
+          "erīmus",
+        stemmaPerfecti +
+          "erītis",
+        stemmaPerfecti +
+          "erint"
+      ],
+      "perf",
+      "coni",
+      "act"
+    );
+
+    addSeries(
+      [
+        stemmaPerfecti +
+          "issem",
+        stemmaPerfecti +
+          "issēs",
+        stemmaPerfecti +
+          "isset",
+        stemmaPerfecti +
+          "issēmus",
+        stemmaPerfecti +
+          "issētis",
+        stemmaPerfecti +
+          "issent"
+      ],
+      "plqpf",
+      "coni",
+      "act"
+    );
+
+    addSeries(
+      cumRadice(
+        definitio
+          .impPraesAct
+      ),
+      "praes",
+      "imp",
+      "act"
+    );
+
+    addSeries(
+      cumRadice(
+        definitio
+          .impFutAct
+      ),
+      "fut",
+      "imp",
+      "act"
+    );
+
+    add({
+      formaMacris:
+        infinitivusActiuus,
+
+      pars:
+        "infinitivus",
+
+      tempus:
+        "praes",
+
+      vox:
+        "act"
+    });
+
+    add({
+      formaMacris:
+        stemmaPerfecti +
+        "isse",
+
+      pars:
+        "infinitivus",
+
+      tempus:
+        "perf",
+
+      vox:
+        "act"
+    });
+
+    add({
+      formaMacris:
+        stemmaSupini +
+        "ūrus esse",
+
+      pars:
+        "infinitivus",
+
+      tempus:
+        "fut",
+
+      vox:
+        "act"
+    });
+
+    add({
+      formaMacris:
+        radixPraesentis +
+        definitio
+          .participiumPraesens,
+
+      pars:
+        "participium",
+
+      tempus:
+        "praes",
+
+      vox:
+        "act"
+    });
+
+    add({
+      formaMacris:
+        stemmaSupini +
+        "ūrus",
+
+      pars:
+        "participium",
+
+      tempus:
+        "fut",
+
+      vox:
+        "act"
+    });
+  }
+
+  if (
+    habetPassiuum
+  ) {
+    addSeries(
+      cumRadice(
+        definitio
+          .praesIndPass
+      ),
+      "praes",
+      "ind",
+      "pass"
+    );
+
+    addSeries(
+      cumRadice(
+        definitio
+          .imperfIndPass
+      ),
+      "imperf",
+      "ind",
+      "pass"
+    );
+
+    addSeries(
+      cumRadice(
+        definitio
+          .futIndPass
+      ),
+      "fut",
+      "ind",
+      "pass"
+    );
+
+    const auxiliaPerfecti = [
+      [
+        "sum",
+        "es",
+        "est",
+        "sumus",
+        "estis",
+        "sunt"
+      ],
+      [
+        "eram",
+        "erās",
+        "erat",
+        "erāmus",
+        "erātis",
+        "erant"
+      ],
+      [
+        "erō",
+        "eris",
+        "erit",
+        "erimus",
+        "eritis",
+        "erunt"
+      ]
+    ];
+
+    auxiliaPerfecti.forEach(
+      (
+        auxilia,
+        index
+      ) => {
+        const tempora = [
+          "perf",
+          "plqpf",
+          "futperf"
+        ];
+
+        addSeries(
+          auxilia.map(
+            (
+              auxilium,
+              i
+            ) =>
+              stemmaSupini +
+              (
+                i < 3
+                  ? "us "
+                  : "ī "
+              ) +
+              auxilium
+          ),
+
+          tempora[
+            index
+          ],
+
+          "ind",
+          "pass"
+        );
+      }
+    );
+
+    addSeries(
+      cumRadice(
+        definitio
+          .praesConiPass
+      ),
+      "praes",
+      "coni",
+      "pass"
+    );
+
+    addSeries(
+      adiungeRadicem(
+        basisInfinitivi,
+        [
+          "er",
+          "ēris",
+          "ētur",
+          "ēmur",
+          "ēminī",
+          "entur"
+        ]
+      ),
+      "imperf",
+      "coni",
+      "pass"
+    );
+
+    addSeries(
+      [
+        stemmaSupini +
+          "us sim",
+        stemmaSupini +
+          "us sīs",
+        stemmaSupini +
+          "us sit",
+        stemmaSupini +
+          "ī sīmus",
+        stemmaSupini +
+          "ī sītis",
+        stemmaSupini +
+          "ī sint"
+      ],
+      "perf",
+      "coni",
+      "pass"
+    );
+
+    addSeries(
+      [
+        stemmaSupini +
+          "us essem",
+        stemmaSupini +
+          "us essēs",
+        stemmaSupini +
+          "us esset",
+        stemmaSupini +
+          "ī essēmus",
+        stemmaSupini +
+          "ī essētis",
+        stemmaSupini +
+          "ī essent"
+      ],
+      "plqpf",
+      "coni",
+      "pass"
+    );
+
+    addSeries(
+      cumRadice(
+        definitio
+          .impPraesPass
+      ),
+      "praes",
+      "imp",
+      "pass"
+    );
+
+    addSeries(
+      cumRadice(
+        definitio
+          .impFutPass
+      ),
+      "fut",
+      "imp",
+      "pass"
+    );
+
+    add({
+      formaMacris:
+        infinitivusPassiuus,
+
+      pars:
+        "infinitivus",
+
+      tempus:
+        "praes",
+
+      vox:
+        "pass"
+    });
+
+    add({
+      formaMacris:
+        stemmaSupini +
+        "us esse",
+
+      pars:
+        "infinitivus",
+
+      tempus:
+        "perf",
+
+      vox:
+        "pass"
+    });
+
+    add({
+      formaMacris:
+        stemmaSupini +
+        "um īrī",
+
+      pars:
+        "infinitivus",
+
+      tempus:
+        "fut",
+
+      vox:
+        "pass"
+    });
+
+    add({
+      formaMacris:
+        stemmaSupini +
+        "us",
+
+      pars:
+        "participium",
+
+      tempus:
+        "perf",
+
+      vox:
+        "pass"
+    });
+
+    add({
+      formaMacris:
+        radixPraesentis +
+        definitio
+          .gerundivum,
+
+      pars:
+        "gerundivum",
+
+      vox:
+        "pass"
+    });
+  }
+
+  add({
+    formaMacris:
+      supinum,
+
+    pars:
+      "supinum_i"
+  });
+
+  add({
+    formaMacris:
+      stemmaSupini +
+      "ū",
+
+    pars:
+      "supinum_ii"
+  });
+
+  return {
+    lemmaNudum,
+    lexemeId,
+    formae
+  };
+}
+
 window.servaVerbumExFormularium =
   async function ({
     lemmaInput,
@@ -2273,14 +3774,6 @@ window.servaVerbumExFormularium =
     }
 
     if (
-      coniugatio !== "a"
-    ) {
-      throw new Error(
-        "Nunc tantum uerba a-coniugationis servari possunt."
-      );
-    }
-
-    if (
       ![
         "utraque",
         "activum_tantum",
@@ -2295,8 +3788,9 @@ window.servaVerbumExFormularium =
     }
 
     const paradigma =
-      generaVerbumA({
+      generaVerbumRegulare({
         lemmaInput,
+        coniugatio,
         infinitivusInput,
         perfectumInput,
         supinumInput,
@@ -2935,10 +4429,6 @@ async function speichereAddeFormular() {
     const supinum =
       document.getElementById('addeSupinum')?.value.trim() || '';
 
-    if (coniugatio !== 'a') {
-      statusAdde('Nunc tantum uerba a-coniugationis servari possunt.');
-      return;
-    }
 if (
   ![
     'utraque',
@@ -2956,13 +4446,22 @@ if (
 let paradigma;
 
 try {
-  paradigma = generaVerbumA({
-    lemmaInput,
-    infinitivusInput: infinitivus,
-    perfectumInput: perfectum,
-    supinumInput: supinum,
-    uoces: schemaUocis
-  });
+    paradigma =
+    generaVerbumRegulare({
+      lemmaInput,
+      coniugatio,
+      infinitivusInput:
+        infinitivus,
+
+      perfectumInput:
+        perfectum,
+
+      supinumInput:
+        supinum,
+
+      uoces:
+        schemaUocis
+    });
   
     } catch (error) {
       statusAdde(error.message);
