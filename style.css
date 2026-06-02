@@ -408,7 +408,7 @@ html body .lemma-card .diphthongus::before {
   max-height: min(560px, calc(100vh - 24px));
   overflow-y: auto;
   box-sizing: border-box;
-  padding: 16px;
+  padding: 16px 42px 16px 16px;
   border: 1px solid #ddd6fe;
   border-radius: 18px;
   background: #ffffff;
@@ -418,6 +418,29 @@ html body .lemma-card .diphthongus::before {
 
 .lectorium-sprechbulla[hidden] {
   display: none;
+}
+
+.lectorium-bulla-claude {
+  position: absolute;
+  top: 9px;
+  right: 10px;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #6b7280;
+  font-size: 23px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.lectorium-bulla-claude:hover,
+.lectorium-bulla-claude:focus {
+  outline: none;
+  background: #f3f4f6;
+  color: #111827;
 }
 
 .lectorium-bulla-forma {
