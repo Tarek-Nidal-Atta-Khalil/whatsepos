@@ -14,7 +14,7 @@ sprechbulla.className =
   "lectorium-sprechbulla";
 
 sprechbulla.hidden =
-  true;
+  false;
 
 document.body.appendChild(
   sprechbulla
@@ -77,7 +77,7 @@ function vacuaSprechbulam() {
 
   claude.setAttribute(
     "aria-label",
-    "Sprechblase schließen"
+    "Marginalie leeren"
   );
 
   claude.addEventListener(
@@ -2044,10 +2044,13 @@ function reddeSprechbulam(
   );
 }
 
-
 function claudeSprechbulam() {
-  sprechbulla.hidden =
-    true;
+  /*
+   * Das Kreuz leert nur den Inhalt.
+   * Die Marginalie selbst bleibt als
+   * weiße rechte Seitenfläche sichtbar.
+   */
+  sprechbulla.replaceChildren();
 
   verbumActuale =
     null;
@@ -2060,8 +2063,9 @@ function claudeSprechbulam() {
 
   sprechbulla.style.maxHeight =
     "";
-}
 
+  retineSprechbulam();
+}
 
 function programmaClausuram() {
   clearTimeout(
@@ -2092,16 +2096,30 @@ function retineSprechbulam() {
 window
   .monstraLectoriumSprechbulam =
   async function (
-    button
+    button,
+    {
+      fixare = false
+    } = {}
   ) {
+    /*
+     * Mouseover darf einen bereits
+     * fixierten Eintrag nicht ersetzen.
+     * Ein ausdrücklicher Wortklick darf
+     * dagegen jederzeit zu einem anderen
+     * Lemma wechseln.
+     */
     if (
       sprechbullaFixata &&
-      !sprechbulla.hidden
+      !fixare
     ) {
       return;
     }
 
-    retineSprechbulam();
+    if (fixare) {
+      fixaSprechbulam();
+    } else {
+      retineSprechbulam();
+    }
 
     if (
       verbumActuale !==
@@ -2210,63 +2228,28 @@ document.addEventListener(
 document.addEventListener(
   "click",
   event => {
-      const iterClick =
-      typeof event.composedPath ===
-        "function"
-        ? event.composedPath()
-        : [];
-
-    if (
-      iterClick.includes(
-        sprechbulla
-      ) ||
-      sprechbulla.contains(
-        event.target
-      )
-    ) {
-      return;
-    }
-
-    if (
-      event.target.closest?.(
-        '#vocabulariumQuaere, input[type="search"]'
-      )
-    ) {
-      return;
-    }
-
     const verbum =
       event.target.closest?.(
         ".lectorium-verbum"
       );
 
-    if (
-      sprechbulla.hidden &&
-      !verbum
-    ) {
+    /*
+     * Klicks auf freie Stellen der Seite
+     * verändern die Marginalie nicht.
+     * Nur ein Wortklick wechselt und
+     * fixiert den angezeigten Eintrag.
+     */
+    if (!verbum) {
       return;
     }
 
-    claudeSprechbulam();
-
-    if (verbum) {
-      window
-        .monstraLectoriumSprechbulam(
-          verbum
-        );
-    }
-  }
-);
-
-document.addEventListener(
-  "keydown",
-  event => {
-    if (
-      event.key ===
-      "Escape"
-    ) {
-      claudeSprechbulam();
-    }
+    window
+      .monstraLectoriumSprechbulam(
+        verbum,
+        {
+          fixare: true
+        }
+      );
   }
 );
 
