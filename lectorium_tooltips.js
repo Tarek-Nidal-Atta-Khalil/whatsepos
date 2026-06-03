@@ -1381,7 +1381,6 @@ function addeActionem(
   return button;
 }
 
-
 function positionaSprechbulam(
   button
 ) {
@@ -1392,99 +1391,20 @@ function positionaSprechbulam(
     return;
   }
 
-  const rect =
-    button
-      .getBoundingClientRect();
-
-  const margo =
-    12;
-
-  const intervallum =
-    8;
-
-  const spatiumInfra =
-    Math.max(
-      80,
-      window.innerHeight -
-        rect.bottom -
-        intervallum -
-        margo
-    );
-
-  const spatiumSupra =
-    Math.max(
-      80,
-      rect.top -
-        intervallum -
-        margo
-    );
-
-  if (
-    !positioVerticalisSprechbullae
-  ) {
-    positioVerticalisSprechbullae =
-      (
-        spatiumInfra >= 240 ||
-        spatiumInfra >=
-          spatiumSupra
-      )
-        ? "infra"
-        : "supra";
-  }
-
-  const spatiumDisponibile =
-    positioVerticalisSprechbullae ===
-    "supra"
-      ? spatiumSupra
-      : spatiumInfra;
-
-  sprechbulla.style.maxHeight =
-    `${spatiumDisponibile}px`;
-
-  let left =
-    rect.left;
-
-  left =
-    Math.min(
-      left,
-      window.innerWidth -
-        sprechbulla.offsetWidth -
-        margo
-    );
-
-  left =
-    Math.max(
-      margo,
-      left
-    );
-
-  let top;
-
-  if (
-    positioVerticalisSprechbullae ===
-    "supra"
-  ) {
-    top =
-      rect.top -
-      sprechbulla.offsetHeight -
-      intervallum;
-  } else {
-    top =
-      rect.bottom +
-      intervallum;
-  }
-
-  top =
-    Math.max(
-      margo,
-      top
-    );
-
+  /*
+   * Die frühere Sprechblase wurde jeweils
+   * neben dem überfahrenen Wort positioniert.
+   * Als Marginalie erhält sie ihre Lage nun
+   * ausschließlich aus style.css.
+   */
   sprechbulla.style.left =
-    `${left}px`;
+    "";
 
   sprechbulla.style.top =
-    `${top}px`;
+    "";
+
+  sprechbulla.style.maxHeight =
+    "";
 }
 
 
@@ -2267,25 +2187,6 @@ document.addEventListener(
   }
 );
 
-
-document.addEventListener(
-  "mouseout",
-  event => {
-    const button =
-      event.target.closest
-        ?.(
-          ".lectorium-verbum"
-        );
-
-    if (!button) {
-      return;
-    }
-
-    programmaClausuram();
-  }
-);
-
-
 document.addEventListener(
   "focusin",
   event => {
@@ -2379,18 +2280,6 @@ sprechbulla.addEventListener(
   "change",
   fixaSprechbulam
 );
-
-sprechbulla.addEventListener(
-  "mouseenter",
-  retineSprechbulam
-);
-
-
-sprechbulla.addEventListener(
-  "mouseleave",
-  programmaClausuram
-);
-
 
 window.addEventListener(
   "scroll",
