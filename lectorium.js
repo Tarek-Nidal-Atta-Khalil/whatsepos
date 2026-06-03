@@ -815,11 +815,9 @@ function reddeVersum({
       "lectorium-verbum";
 
     button.textContent =
-      formaSignataProLocoLectorii({
-        versusId: id,
-        ordoVerbi,
+      formaSignataLectorii(
         token
-      });
+      );
 
     button.dataset.versusId =
       id || "";
