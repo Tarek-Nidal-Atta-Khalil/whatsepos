@@ -16,10 +16,11 @@ sprechbulla.className =
 sprechbulla.hidden =
   false;
 
-document.body.appendChild(
-  sprechbulla
-);
-
+document
+  .getElementById("lectorium")
+  .appendChild(
+    sprechbulla
+  );
 
 let supabaseLectorii =
   null;
