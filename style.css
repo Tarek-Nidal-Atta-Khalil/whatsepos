@@ -314,7 +314,15 @@ html body .lemma-card .diphthongus::before {
 #lectorium {
   width: calc(100vw - 48px);
   margin-left: calc(50% - 50vw + 24px);
+
+  /*
+   * Links bleibt Platz für das geöffnete
+   * Toggle-Menü. Rechts bleibt weiterhin
+   * Platz für die Marginalie.
+   */
+  padding-left: 240px;
   padding-right: calc(25vw + 24px);
+
   box-sizing: border-box;
 }
 
@@ -435,6 +443,7 @@ html body .lemma-card .diphthongus::before {
   #lectorium {
     width: auto;
     margin-left: 0;
+    padding-left: 0;
     padding-right: 0;
   }
 
