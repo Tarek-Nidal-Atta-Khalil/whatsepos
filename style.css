@@ -306,6 +306,18 @@ html body .lemma-card .diphthongus::before {
   box-shadow:0 4px 18px rgba(107,114,128,.10);
 }
 
+/*
+ * Lectorium: Der Lesetext nimmt die linken
+ * drei Viertel des Fensters ein. Das rechte
+ * Viertel bleibt für die Marginalie frei.
+ */
+#lectorium {
+  width: calc(100vw - 48px);
+  margin-left: calc(50% - 50vw + 24px);
+  padding-right: calc(25vw + 24px);
+  box-sizing: border-box;
+}
+
 .lectorium-card {
   width: min(100%, 980px);
   margin: 0 auto 48px;
@@ -403,17 +415,41 @@ html body .lemma-card .diphthongus::before {
 
 .lectorium-sprechbulla {
   position: fixed;
+  top: 100px;
+  right: 0;
+  bottom: 24px;
   z-index: 1600;
-  width: min(360px, calc(100vw - 24px));
-  max-height: min(560px, calc(100vh - 24px));
+  width: 25vw;
   overflow-y: auto;
   box-sizing: border-box;
-  padding: 16px 42px 16px 16px;
+  padding: 20px 42px 20px 20px;
   border: 1px solid #ddd6fe;
-  border-radius: 18px;
+  border-right: none;
+  border-radius: 24px 0 0 24px;
   background: #ffffff;
-  box-shadow: 0 16px 38px rgba(0, 0, 0, .18);
+  box-shadow: -12px 0 30px rgba(0, 0, 0, .12);
   text-align: left;
+}
+
+@media (max-width: 900px) {
+  #lectorium {
+    width: auto;
+    margin-left: 0;
+    padding-right: 0;
+  }
+
+  .lectorium-sprechbulla {
+    top: auto;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: auto;
+    max-height: 46vh;
+    border-right: 1px solid #ddd6fe;
+    border-bottom: none;
+    border-radius: 24px 24px 0 0;
+    box-shadow: 0 -12px 30px rgba(0, 0, 0, .12);
+  }
 }
 
 .lectorium-sprechbulla[hidden] {
