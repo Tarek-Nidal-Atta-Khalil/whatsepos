@@ -327,7 +327,7 @@ html body .lemma-card .diphthongus::before {
 }
 
 .lectorium-card {
-  width: min(100%, 980px);
+  width: min(100%, 900px);
   margin: 0 auto 48px;
   padding: 34px 42px 42px;
   border-radius: 28px;
