@@ -4846,6 +4846,15 @@ window.zeigeTab = async function(tabName) {
   }
 
   if (tabName === 'vocabularium') {
+  if (
+    addeUerbumContextus.modus ===
+    'lectorium'
+  ) {
+    schliesseAddeUerbum({
+      onCancelAusfuehren: false
+    });
+  }
+    
     if (row && addePanel.hidden) row.style.display = 'flex';
 
     if (lemmaListaRahmen && addePanel.hidden) {
