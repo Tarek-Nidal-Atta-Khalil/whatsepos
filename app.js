@@ -471,26 +471,88 @@ async function ladeDictionariumMetricum(optiones = {}) {
   }
 
   dictionariumPromissum = (async function () {
-    const { data, error } = await supabase
-      .from("formae")
-      .select("id, forma, lemma, pars_orationis, syllabae, longae, genus, numerus, casus, gradus, persona, tempus, modus, vox, notae")
-      .not("syllabae", "is", null)
-      .order("forma", { ascending: true })
-      .limit(5000);
+    const resultata = [];
+    const amplitudo = 1000;
 
-    if (error) {
-      if (suggestionesMetricaeLista) {
-        suggestionesMetricaeLista.innerHTML = "";
-        const div = document.createElement("div");
-        div.className = "suggestio-item suggestio-vacua";
-        div.textContent = "Dictionarium nondum legi potest.";
-        suggestionesMetricaeLista.appendChild(div);
+    let initium = 0;
+
+    while (true) {
+      const {
+        data,
+        error
+      } = await supabase
+        .from("formae")
+        .select(
+          "id, forma, lemma, pars_orationis, syllabae, longae, genus, numerus, casus, gradus, persona, tempus, modus, vox, notae"
+        )
+        .not(
+          "syllabae",
+          "is",
+          null
+        )
+        .order(
+          "forma",
+          {
+            ascending: true
+          }
+        )
+        .range(
+          initium,
+          initium +
+            amplitudo -
+            1
+        );
+
+      if (error) {
+        if (
+          suggestionesMetricaeLista
+        ) {
+          suggestionesMetricaeLista
+            .innerHTML = "";
+
+          const div =
+            document.createElement(
+              "div"
+            );
+
+          div.className =
+            "suggestio-item suggestio-vacua";
+
+          div.textContent =
+            "Dictionarium nondum legi potest.";
+
+          suggestionesMetricaeLista
+            .appendChild(
+              div
+            );
+        }
+
+        dictionariumIamTentatum =
+          false;
+
+        return;
       }
-      dictionariumIamTentatum = false;
-      return;
+
+      const pagina =
+        data || [];
+
+      resultata.push(
+        ...pagina
+      );
+
+      if (
+        pagina.length <
+        amplitudo
+      ) {
+        break;
+      }
+
+      initium +=
+        amplitudo;
     }
 
-    dictionariumMetricum = data || [];
+    dictionariumMetricum =
+      resultata;
     window.dictionariumMetricum = dictionariumMetricum;
     setzeFormaeMetricas(dictionariumMetricum);
     dictionariumIamTentatum = true;
