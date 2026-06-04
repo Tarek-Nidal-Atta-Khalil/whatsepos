@@ -601,7 +601,7 @@ function formaSignataLectorii(
 
   if (!recorda.length) {
     return orthographiaLectorii(
-      originale.toLowerCase()
+      originale
     );
   }
 
@@ -638,13 +638,16 @@ function formaSignataLectorii(
     1
   ) {
     return orthographiaLectorii(
-      originale.toLowerCase()
+      originale
     );
   }
 
-  return [
-    ...formaeSignatae
-  ][0];
+  return applicaMacraTextuiLectorii(
+    originale,
+    [
+      ...formaeSignatae
+    ][0]
+  );
 }
 
 window.orthographiaLectorii =
