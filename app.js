@@ -83,11 +83,153 @@ const arbeitsbereich = document.getElementById("arbeitsbereich");
 const aktuellerTitel = document.getElementById("aktuellerTitel");
 const scriptoriumAuctor =
   document.getElementById("scriptoriumAuctor");
+const hexameterArbeitsbereich =
+  document.getElementById("hexameterArbeitsbereich");
+const hexameterSlots =
+  document.getElementById("hexameterSlots");
 
 let dictionariumMetricum = [];
 let dictionariumIamTentatum = false;
 let dictionariumPromissum = null;
 window.dictionariumMetricum = dictionariumMetricum;
+
+const schemaDactylicum = [
+  { typus: "longa", finisPedis: false },
+  { typus: "brevis", finisPedis: false },
+  { typus: "brevis", finisPedis: true },
+
+  { typus: "longa", finisPedis: false },
+  { typus: "brevis", finisPedis: false },
+  { typus: "brevis", finisPedis: true },
+
+  { typus: "longa", finisPedis: false },
+  { typus: "brevis", finisPedis: false },
+  { typus: "brevis", finisPedis: true },
+
+  { typus: "longa", finisPedis: false },
+  { typus: "brevis", finisPedis: false },
+  { typus: "brevis", finisPedis: true },
+
+  { typus: "longa", finisPedis: false },
+  { typus: "brevis", finisPedis: false },
+  { typus: "brevis", finisPedis: true },
+
+  { typus: "longa", finisPedis: false },
+  { typus: "anceps", finisPedis: true }
+];
+
+const numerusMaximusSilbarum =
+  schemaDactylicum.length;
+
+let campusUltimusValidus = "";
+
+function signumSchematis(typus) {
+  if (typus === "longa") return "¯";
+  if (typus === "brevis") return "˘";
+  return "x";
+}
+
+function syllabaeCampi(textus) {
+  const analyse = erstelleAnalysezeile(
+    textus || ""
+  );
+
+  return analyse.elemente || [];
+}
+
+function campusIntraLimen(textus) {
+  return (
+    syllabaeCampi(textus).length <=
+    numerusMaximusSilbarum
+  );
+}
+
+function reddeHexameterSlots() {
+  if (!hexameterSlots) return;
+
+  hexameterSlots.innerHTML = "";
+
+  const syllabae =
+    syllabaeCampi(
+      campus.value.trim()
+    );
+
+  schemaDactylicum.forEach(function (
+    slotInfo,
+    index
+  ) {
+    const item =
+      document.createElement("div");
+
+    item.className =
+      "hexameter-slot-item";
+
+    if (slotInfo.finisPedis) {
+      item.classList.add(
+        "hexameter-slot-item--finis-pedis"
+      );
+    }
+
+    const signum =
+      document.createElement("div");
+
+    signum.className =
+      "hexameter-slot-signum";
+
+    signum.textContent =
+      signumSchematis(slotInfo.typus);
+
+    const slot =
+      document.createElement("div");
+
+    slot.className =
+      "hexameter-slot";
+
+    const syllaba =
+      syllabae[index];
+
+    if (syllaba) {
+      slot.classList.add(
+        "hexameter-slot--plena"
+      );
+
+      slot.textContent =
+        syllaba.textusSignatus;
+
+      slot.dataset.quantitas =
+        syllaba.quantitas || "";
+    } else {
+      slot.classList.add(
+        "hexameter-slot--vacua"
+      );
+
+      if (
+        index === syllabae.length &&
+        syllabae.length <
+          numerusMaximusSilbarum
+      ) {
+        slot.classList.add(
+          "hexameter-slot--activa"
+        );
+      }
+
+      slot.innerHTML = "&nbsp;";
+    }
+
+    item.appendChild(signum);
+    item.appendChild(slot);
+    hexameterSlots.appendChild(item);
+  });
+}
+
+if (hexameterArbeitsbereich) {
+  hexameterArbeitsbereich.addEventListener(
+    "click",
+    function () {
+      campus.focus();
+    }
+  );
+}
 
 window.starteNeuesGedicht = function () {
   scriptoriumStart.style.display = "none";
@@ -96,6 +238,10 @@ window.starteNeuesGedicht = function () {
 
   titelEingabe.value = "";
   titelEingabe.focus();
+
+  campus.value = "";
+  campusUltimusValidus = "";
+  reddeHexameterSlots();
 };
 
 titelEingabe.addEventListener("keydown", async function (event) {
@@ -172,13 +318,29 @@ let suggestionesMetricaeTimer = null;
 campus.addEventListener("input", async function () {
   await ladeDictionariumMetricum();
 
+  if (
+    !campusIntraLimen(
+      campus.value.trim()
+    )
+  ) {
+    campus.value =
+      campusUltimusValidus;
+  } else {
+    campusUltimusValidus =
+      campus.value;
+  }
+
   aktualisiereHexameterVorschau();
+  reddeHexameterSlots();
 
-  clearTimeout(suggestionesMetricaeTimer);
+  clearTimeout(
+    suggestionesMetricaeTimer
+  );
 
-  suggestionesMetricaeTimer = setTimeout(function () {
-    aktualisiereSuggestionesMetricas();
-  }, 120);
+  suggestionesMetricaeTimer =
+    setTimeout(function () {
+      aktualisiereSuggestionesMetricas();
+    }, 120);
 });
 
 function textusCumSuggestione(forma) {
@@ -293,12 +455,31 @@ function aktualisiereSuggestionesMetricas() {
     button.textContent = item.forma;
     button.title = item.notae || item.lemma || "";
 
-    button.onclick = function () {
-      campus.value = textusCumSuggestione(item.forma) + " ";
-      campus.focus();
-      aktualisiereHexameterVorschau();
-      aktualisiereSuggestionesMetricas();
-    };
+      button.onclick = function () {
+        const novusTextus =
+          textusCumSuggestione(
+            item.forma
+          ) + " ";
+
+        if (
+          !campusIntraLimen(
+            novusTextus.trim()
+          )
+        ) {
+          return;
+        }
+
+        campus.value =
+          novusTextus;
+
+        campusUltimusValidus =
+          campus.value;
+
+        campus.focus();
+        aktualisiereHexameterVorschau();
+        reddeHexameterSlots();
+        aktualisiereSuggestionesMetricas();
+      };
 
     suggestionesMetricaeLista.appendChild(button);
   });
@@ -569,6 +750,8 @@ async function fuegeVersHinzu() {
   aktuellesGedicht.textus = neuerText;
   zeigeGedicht(neuerText);
   campus.value = "";
+  campusUltimusValidus = "";
+  reddeHexameterSlots();
   aktualisiereHexameterVorschau();
   aktualisiereSuggestionesMetricas();
   setStatus("");
@@ -678,6 +861,10 @@ function oeffneGedicht(gedicht) {
   zeigeTab("hexameter");
   setStatus("");
   campus.focus();
+
+  campus.value = "";
+  campusUltimusValidus = "";
+  reddeHexameterSlots();
 }
 
 window.loescheAktuellesGedicht = async function() {
@@ -854,6 +1041,8 @@ async function pruefeSitzung() {
     await aktualisiereMenuButton();
     zeigeTab("login");
   }
+
+  reddeHexameterSlots();
 }
 
 function setStatus(text) {
