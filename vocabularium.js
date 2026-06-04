@@ -3880,17 +3880,29 @@ function syncDeclinationesSubstantivi() {
   }
 }
 
-function aperiLemma(lemma, lexemeId = '') {
+function aperiLemma(
+  lemma,
+  lexemeId = ''
+) {
   if (lexemeId) {
-    await agePostServatum(
-      paradigma
-    );
-    
+    window.location.href =
+      `lemma.html?lexeme_id=${
+        encodeURIComponent(
+          lexemeId
+        )
+      }`;
+
     return;
   }
+
   if (lemma) {
-    window.location.href = `lemma.html?lemma=${encodeURIComponent(lemma)}`;
-  } 
+    window.location.href =
+      `lemma.html?lemma=${
+        encodeURIComponent(
+          lemma
+        )
+      }`;
+  }
 }
 
 function statusAdde(textus) {
