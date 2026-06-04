@@ -124,6 +124,7 @@ const numerusMaximusSilbarum =
 let campusUltimusValidus = "";
 let suggestioTracta = null;
 let suggestioNuperTracta = false;
+let imagoSuggestionisTractae = null;
 
 function signumSchematis(
   typus
@@ -830,6 +831,92 @@ window.reloadDictionariumMetricum = async function() {
   await ladeDictionariumMetricum({ erzwingen: true });
 };
 
+function creaImaginemSuggestionisTractae(
+  forma
+) {
+  const imago =
+    document.createElement(
+      "div"
+    );
+
+  imago.className =
+    "suggestio-drag-imago";
+
+  const analyse =
+    erstelleAnalysezeile(
+      forma
+    );
+
+  const elementa =
+    analyse.elemente || [];
+
+  if (
+    elementa.length === 0
+  ) {
+    const syllaba =
+      document.createElement(
+        "span"
+      );
+
+    syllaba.className =
+      "suggestio-drag-syllaba";
+
+    syllaba.textContent =
+      forma;
+
+    imago.appendChild(
+      syllaba
+    );
+  } else {
+    elementa.forEach(
+      function (
+        elementum
+      ) {
+        const syllaba =
+          document.createElement(
+            "span"
+          );
+
+        syllaba.className =
+          "suggestio-drag-syllaba";
+
+        syllaba.textContent =
+          elementum
+            .textusSignatus;
+
+        syllaba.dataset.quantitas =
+          elementum
+            .quantitas ||
+          "";
+
+        imago.appendChild(
+          syllaba
+        );
+      }
+    );
+  }
+
+  document.body.appendChild(
+    imago
+  );
+
+  return imago;
+}
+
+function deleImaginemSuggestionisTractae() {
+  if (
+    !imagoSuggestionisTractae
+  ) {
+    return;
+  }
+
+  imagoSuggestionisTractae
+    .remove();
+
+  imagoSuggestionisTractae =
+    null;
+}
+
 function aktualisiereSuggestionesMetricas() {
   if (!suggestionesMetricaeLista) return;
 
@@ -904,11 +991,25 @@ suggestiones.forEach(function(item) {
         event.dataTransfer
           .effectAllowed =
             "copy";
-
+      
         event.dataTransfer
           .setData(
             "text/plain",
             item.forma
+          );
+      
+        deleImaginemSuggestionisTractae();
+      
+        imagoSuggestionisTractae =
+          creaImaginemSuggestionisTractae(
+            item.forma
+          );
+      
+        event.dataTransfer
+          .setDragImage(
+            imagoSuggestionisTractae,
+            18,
+            18
           );
       }
     }
@@ -920,6 +1021,8 @@ suggestiones.forEach(function(item) {
       button.classList.remove(
         "suggestio-button--tracta"
       );
+
+      deleImaginemSuggestionisTractae();
 
       hexameterArbeitsbereich
         ?.classList.remove(
