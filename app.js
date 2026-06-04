@@ -156,6 +156,164 @@ function campusIntraLimen(textus) {
   );
 }
 
+function syllabaePerPedes(
+  syllabae
+) {
+  const pedes = [];
+  let pes = [];
+
+  (syllabae || []).forEach(
+    function (
+      syllaba,
+      index
+    ) {
+      pes.push(syllaba);
+
+      if (
+        syllaba.finisPedis ||
+        index ===
+          syllabae.length - 1
+      ) {
+        pedes.push(pes);
+        pes = [];
+      }
+    }
+  );
+
+  if (pes.length) {
+    pedes.push(pes);
+  }
+
+  return pedes;
+}
+
+function creaSlotumVisualem({
+  typus,
+  syllaba = null,
+  span = 1,
+  finisPedis = false,
+  contractus = false
+}) {
+  return {
+    typus,
+    syllaba,
+    span,
+    finisPedis,
+    contractus,
+    activa: false
+  };
+}
+
+function slotaVisualiaHexametri(
+  syllabae
+) {
+  const pedes =
+    syllabaePerPedes(
+      syllabae
+    );
+
+  const visualia = [];
+
+  for (
+    let pesIndex = 0;
+    pesIndex < 6;
+    pesIndex += 1
+  ) {
+    const pes =
+      pedes[pesIndex] || [];
+
+    const estUltimusPes =
+      pesIndex === 5;
+
+    if (estUltimusPes) {
+      visualia.push(
+        creaSlotumVisualem({
+          typus: "longa",
+          syllaba:
+            pes[0] || null
+        })
+      );
+
+      visualia.push(
+        creaSlotumVisualem({
+          typus: "x",
+          syllaba:
+            pes[1] || null,
+          finisPedis: true
+        })
+      );
+
+      continue;
+    }
+
+    const prima =
+      pes[0] || null;
+
+    const secunda =
+      pes[1] || null;
+
+    const tertia =
+      pes[2] || null;
+
+    visualia.push(
+      creaSlotumVisualem({
+        typus: "longa",
+        syllaba: prima
+      })
+    );
+
+    const contrahitur =
+      Boolean(secunda) &&
+      (
+        pes.length === 2 ||
+        secunda.finisPedis ===
+          true ||
+        secunda.quantitas ===
+          "longa"
+      );
+
+    if (contrahitur) {
+      visualia.push(
+        creaSlotumVisualem({
+          typus: "longa",
+          syllaba: secunda,
+          span: 2,
+          finisPedis: true,
+          contractus: true
+        })
+      );
+    } else {
+      visualia.push(
+        creaSlotumVisualem({
+          typus: "brevis",
+          syllaba: secunda
+        })
+      );
+
+      visualia.push(
+        creaSlotumVisualem({
+          typus: "brevis",
+          syllaba: tertia,
+          finisPedis: true
+        })
+      );
+    }
+  }
+
+  const indexPrimiVacui =
+    visualia.findIndex(
+      slotum => !slotum.syllaba
+    );
+
+  if (indexPrimiVacui >= 0) {
+    visualia[
+      indexPrimiVacui
+    ].activa = true;
+  }
+
+  return visualia;
+}
+
 function reddeHexameterSlots() {
   if (!hexameterSlots) return;
 
@@ -166,82 +324,103 @@ function reddeHexameterSlots() {
       campus.value.trim()
     );
 
-  schemaDactylicum.forEach(function (
-    slotInfo,
-    index
-  ) {
-    const item =
-      document.createElement("div");
-
-    item.className =
-      "hexameter-slot-item";
-
-    if (slotInfo.finisPedis) {
-      item.classList.add(
-        "hexameter-slot-item--finis-pedis"
-      );
-    }
-
-    const syllaba =
-      syllabae[index];
-
-    const signum =
-      document.createElement("div");
-
-    signum.className =
-      "hexameter-slot-signum";
-
-    signum.classList.add(
-      syllaba
-        ? "hexameter-slot-signum--repertum"
-        : "hexameter-slot-signum--exspectatum"
+  const slotaVisualia =
+    slotaVisualiaHexametri(
+      syllabae
     );
 
-    signum.textContent =
-      signumSchematis(
-        syllaba
-          ? syllaba.quantitas
-          : slotInfo.typus
-      );
+  slotaVisualia.forEach(
+    function (slotInfo) {
+      const item =
+        document.createElement(
+          "div"
+        );
 
-    const slot =
-      document.createElement("div");
+      item.className =
+        "hexameter-slot-item";
 
-    slot.className =
-      "hexameter-slot";
-
-    if (syllaba) {
-      slot.classList.add(
-        "hexameter-slot--plena"
-      );
-
-      slot.textContent =
-        syllaba.textusSignatus;
-
-      slot.dataset.quantitas =
-        syllaba.quantitas || "";
-    } else {
-      slot.classList.add(
-        "hexameter-slot--vacua"
-      );
-
-      if (
-        index === syllabae.length &&
-        syllabae.length <
-          numerusMaximusSilbarum
-      ) {
-        slot.classList.add(
-          "hexameter-slot--activa"
+      if (slotInfo.finisPedis) {
+        item.classList.add(
+          "hexameter-slot-item--finis-pedis"
         );
       }
 
-      slot.innerHTML = "&nbsp;";
-    }
+      if (slotInfo.span > 1) {
+        item.classList.add(
+          "hexameter-slot-item--span-2"
+        );
+      }
 
-    item.appendChild(signum);
-    item.appendChild(slot);
-    hexameterSlots.appendChild(item);
-  });
+      const signum =
+        document.createElement(
+          "div"
+        );
+
+      signum.className =
+        "hexameter-slot-signum";
+
+      signum.classList.add(
+        slotInfo.syllaba
+          ? "hexameter-slot-signum--repertum"
+          : "hexameter-slot-signum--exspectatum"
+      );
+
+      signum.textContent =
+        signumSchematis(
+          slotInfo.syllaba
+            ? slotInfo.syllaba
+                .quantitas
+            : slotInfo.typus
+        );
+
+      const slot =
+        document.createElement(
+          "div"
+        );
+
+      slot.className =
+        "hexameter-slot";
+
+      if (slotInfo.contractus) {
+        slot.classList.add(
+          "hexameter-slot--contractus"
+        );
+      }
+
+      if (slotInfo.syllaba) {
+        slot.classList.add(
+          "hexameter-slot--plena"
+        );
+
+        slot.textContent =
+          slotInfo.syllaba
+            .textusSignatus;
+
+        slot.dataset.quantitas =
+          slotInfo.syllaba
+            .quantitas || "";
+      } else {
+        slot.classList.add(
+          "hexameter-slot--vacua"
+        );
+
+        if (slotInfo.activa) {
+          slot.classList.add(
+            "hexameter-slot--activa"
+          );
+        }
+
+        slot.innerHTML = "&nbsp;";
+      }
+
+      item.appendChild(signum);
+      item.appendChild(slot);
+
+      hexameterSlots.appendChild(
+        item
+      );
+    }
+  );
 }
 
 if (hexameterArbeitsbereich) {
