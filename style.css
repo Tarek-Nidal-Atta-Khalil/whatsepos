@@ -229,6 +229,16 @@ body > h1 {
   user-select: none;
 }
 
+.hexameter-slot-signum--repertum {
+  color: #334155;
+  font-weight: 700;
+}
+
+.hexameter-slot-signum--exspectatum {
+  color: #94a3b8;
+  font-weight: 400;
+}
+
 .hexameter-slot {
   width: 100%;
   min-height: 58px;
