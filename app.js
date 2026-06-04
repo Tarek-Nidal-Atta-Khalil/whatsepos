@@ -125,6 +125,7 @@ let campusUltimusValidus = "";
 let suggestioTracta = null;
 let suggestioNuperTracta = false;
 let imagoSuggestionisTractae = null;
+let positioInsertionisTractae = null;
 
 function signumSchematis(
   typus
@@ -426,6 +427,199 @@ function reddeHexameterSlots() {
   );
 }
 
+function positionemInsertionisExAbscissa(
+  clientX
+) {
+  const textus =
+    campus.value;
+
+  if (!textus) {
+    return 0;
+  }
+
+  const rect =
+    campus.getBoundingClientRect();
+
+  const stilus =
+    window.getComputedStyle(
+      campus
+    );
+
+  const tabula =
+    positionemInsertionisExAbscissa
+      .tabula ||
+    document.createElement(
+      "canvas"
+    );
+
+  positionemInsertionisExAbscissa
+    .tabula =
+      tabula;
+
+  const contextus =
+    tabula.getContext(
+      "2d"
+    );
+
+  if (!contextus) {
+    return textus.length;
+  }
+
+  contextus.font = [
+    stilus.fontStyle,
+    stilus.fontWeight,
+    stilus.fontSize,
+    stilus.fontFamily
+  ].join(" ");
+
+  const latitudeTextus =
+    contextus.measureText(
+      textus
+    ).width;
+
+  const paddingSinistrum =
+    parseFloat(
+      stilus.paddingLeft
+    ) || 0;
+
+  const paddingDextrum =
+    parseFloat(
+      stilus.paddingRight
+    ) || 0;
+
+  const latitudeInterior =
+    rect.width -
+    paddingSinistrum -
+    paddingDextrum;
+
+  let initiumTextus =
+    rect.left +
+    paddingSinistrum -
+    campus.scrollLeft;
+
+  if (
+    stilus.textAlign ===
+    "center"
+  ) {
+    initiumTextus +=
+      Math.max(
+        0,
+        (
+          latitudeInterior -
+          latitudeTextus
+        ) / 2
+      );
+  }
+
+  if (
+    stilus.textAlign ===
+    "right"
+  ) {
+    initiumTextus +=
+      Math.max(
+        0,
+        latitudeInterior -
+        latitudeTextus
+      );
+  }
+
+  const abscissa =
+    clientX -
+    initiumTextus;
+
+  let positioProxima = 0;
+
+  if (
+    abscissa >=
+    latitudeTextus
+  ) {
+    positioProxima =
+      textus.length;
+  } else if (
+    abscissa > 0
+  ) {
+    let latitudePraecedens =
+      0;
+
+    for (
+      let index = 1;
+      index <= textus.length;
+      index += 1
+    ) {
+      const latitude =
+        contextus.measureText(
+          textus.slice(
+            0,
+            index
+          )
+        ).width;
+
+      if (
+        latitude >=
+        abscissa
+      ) {
+        positioProxima =
+          (
+            abscissa -
+            latitudePraecedens
+          ) <=
+          (
+            latitude -
+            abscissa
+          )
+            ? index - 1
+            : index;
+
+        break;
+      }
+
+      latitudePraecedens =
+        latitude;
+    }
+  }
+
+  const limitesVerborum =
+    [
+      0,
+      textus.length
+    ];
+
+  for (
+    const spatium of
+    textus.matchAll(
+      /\s+/g
+    )
+  ) {
+    limitesVerborum.push(
+      spatium.index,
+      spatium.index +
+        spatium[0].length
+    );
+  }
+
+  return limitesVerborum
+    .reduce(
+      function (
+        optimus,
+        positio
+      ) {
+        return (
+          Math.abs(
+            positio -
+            positioProxima
+          ) <
+          Math.abs(
+            optimus -
+            positioProxima
+          )
+        )
+          ? positio
+          : optimus;
+      },
+      limitesVerborum[0]
+    );
+}
+
 if (hexameterArbeitsbereich) {
   hexameterArbeitsbereich.addEventListener(
     "click",
@@ -440,6 +634,16 @@ if (hexameterArbeitsbereich) {
       if (!suggestioTracta) return;
 
       event.preventDefault();
+
+      positioInsertionisTractae =
+        positionemInsertionisExAbscissa(
+          event.clientX
+        );
+      
+      campus.setSelectionRange(
+        positioInsertionisTractae,
+        positioInsertionisTractae
+      );
 
       if (event.dataTransfer) {
         event.dataTransfer.dropEffect =
@@ -480,12 +684,24 @@ if (hexameterArbeitsbereich) {
         "hexameter-arbeitsbereich--drop-activus"
       );
 
+            const positioInsertionis =
+        Number.isInteger(
+          positioInsertionisTractae
+        )
+          ? positioInsertionisTractae
+          : positionemInsertionisExAbscissa(
+              event.clientX
+            );
+      
       insereVerbumInCampum(
         suggestioTracta,
-        campus.value.length
+        positioInsertionis
       );
-
+      
       suggestioTracta = null;
+      
+      positioInsertionisTractae =
+        null;
     }
   );
 }
@@ -1030,6 +1246,8 @@ suggestiones.forEach(function(item) {
         );
 
       suggestioTracta = null;
+
+      positioInsertionisTractae = null;
 
       suggestioNuperTracta =
         true;
