@@ -212,10 +212,15 @@ body > h1 {
 }
 
 .hexameter-slot-item {
+  min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
+}
+
+.hexameter-slot-item--span-2 {
+  grid-column: span 2;
 }
 
 .hexameter-slot-item--finis-pedis {
@@ -237,6 +242,10 @@ body > h1 {
 .hexameter-slot-signum--exspectatum {
   color: #94a3b8;
   font-weight: 400;
+}
+
+.hexameter-slot--contractus {
+  width: 100%;
 }
 
 .hexameter-slot {
