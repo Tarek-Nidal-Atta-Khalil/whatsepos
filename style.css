@@ -648,3 +648,10 @@ html body .lemma-card .diphthongus::before {
 .adde-uerbum-actions button {
   width: 100%;
 }
+
+.lectorium-verbum:hover,
+.lectorium-verbum:focus {
+  outline: none;
+  background: #ede9fe;
+  color: #5b21b6;
+}
