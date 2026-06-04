@@ -1256,7 +1256,7 @@ function reddeAddeUerbumInline(
   button
 ) {
   fixaSprechbulam();
-  
+
   vacuaSprechbulam();
 
   const forma =
@@ -1264,94 +1264,71 @@ function reddeAddeUerbumInline(
       button
     );
 
-  sprechbulla.appendChild(
-    elementum(
-      "strong",
-      "lectorium-bulla-forma",
-      forma
-    )
-  );
-
-  sprechbulla.appendChild(
-    elementum(
-      "p",
-      "lectorium-bulla-nota",
-      "Quae pars orationis est?"
-    )
-  );
-
-  const actiones =
-    elementum(
-      "div",
-      "lectorium-bulla-actiones"
+  if (
+    !window
+      .whatseposAddeUerbum
+      ?.aperi
+  ) {
+    sprechbulla.appendChild(
+      elementum(
+        'p',
+        'lectorium-bulla-error',
+        'Formularium commune nondum praesto est.'
+      )
     );
 
-  actiones.appendChild(
-    addeActionem(
-      "substantiuum",
-      () => {
-        sprechbulla.appendChild(
-          elementum(
-            "p",
-            "lectorium-bulla-nota",
-            "Formularium substantivi mox addetur."
-          )
-        );
+    rePositiona(button);
 
-        rePositiona(button);
-      }
-    )
-  );
+    return;
+  }
 
-  actiones.appendChild(
-    addeActionem(
-      "adiectiuum",
-      () => {
-        sprechbulla.appendChild(
-          elementum(
-            "p",
-            "lectorium-bulla-nota",
-            "Formularium adiectivi mox addetur."
-          )
-        );
+  window
+    .whatseposAddeUerbum
+    .aperi({
+      radix:
+        sprechbulla,
 
-        rePositiona(button);
-      }
-    )
-  );
+      formaInitialis:
+        forma,
 
-  actiones.appendChild(
-    addeActionem(
-      "uerbum",
-      () =>
-        reddeConiugationemUerbiInline(
-          button
-        ),
+      modus:
+        'lectorium',
 
-      "lectorium-bulla-actio lectorium-bulla-actio-principalis"
-    )
-  );
+      onCancel:
+        () => {
+          claudeSprechbulam();
+        },
 
-  actiones.appendChild(
-    addeActionem(
-      "alia pars orationis",
-      () => {
-        sprechbulla.appendChild(
-          elementum(
-            "p",
-            "lectorium-bulla-nota",
-            "Formularium aliarum partium orationis mox addetur."
-          )
-        );
+      onServatum:
+        async () => {
+          formaeOmnes =
+            await legeOmnia(
+              'formae',
+              [
+                'id',
+                'forma',
+                'lemma',
+                'lexeme_id',
+                'pars_orationis',
+                'genus',
+                'numerus',
+                'casus',
+                'persona',
+                'tempus',
+                'modus',
+                'vox',
+                'syllabae',
+                'longae'
+              ].join(', ')
+            );
 
-        rePositiona(button);
-      }
-    )
-  );
+          constitueIndices();
 
-  sprechbulla.appendChild(
-    actiones
-  );
+          reddeSprechbulam(
+            button
+          );
+        }
+    });
 
   rePositiona(
     button
