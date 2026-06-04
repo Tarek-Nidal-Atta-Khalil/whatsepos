@@ -440,6 +440,11 @@ if (hexameterArbeitsbereich) {
 
       event.preventDefault();
 
+      if (event.dataTransfer) {
+        event.dataTransfer.dropEffect =
+          "copy";
+      }
+
       hexameterArbeitsbereich.classList.add(
         "hexameter-arbeitsbereich--drop-activus"
       );
