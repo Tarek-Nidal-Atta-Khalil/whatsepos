@@ -222,6 +222,22 @@ let lemmataOmnia = [];
 let lemmataPromissum = null;
 let addeExUrlIamApertum = false;
 
+let addeUerbumContextus = {
+  modus: 'vocabularium',
+  radix: vocabulariumTab,
+  onServatum: null,
+  onCancel: null
+};
+
+function resetAddeUerbumContextum() {
+  addeUerbumContextus = {
+    modus: 'vocabularium',
+    radix: vocabulariumTab,
+    onServatum: null,
+    onCancel: null
+  };
+}
+
 const addePanel = document.createElement('section');
 addePanel.id = 'addeUerbumPanel';
 addePanel.className = 'adde-uerbum-panel';
@@ -3866,7 +3882,10 @@ function syncDeclinationesSubstantivi() {
 
 function aperiLemma(lemma, lexemeId = '') {
   if (lexemeId) {
-    window.location.href = `lemma.html?lexeme_id=${encodeURIComponent(lexemeId)}`;
+    await agePostServatum(
+      paradigma
+    );
+    
     return;
   }
   if (lemma) {
@@ -4077,70 +4096,253 @@ function resetDependentiaSubstantivi() {
   if (numerusTyp) numerusTyp.value = '';
 }
 
-function aperiAddeUerbum(lemmaPraeplenum = '') {
+function aperiAddeUerbum(
+  lemmaPraeplenum = '',
+  {
+    radix = vocabulariumTab,
+    modus = 'vocabularium',
+    onServatum = null,
+    onCancel = null
+  } = {}
+) {
+  addeUerbumContextus = {
+    modus,
+    radix,
+    onServatum,
+    onCancel
+  };
 
-  if (row) row.style.display = 'none';
-  if (eventus) eventus.style.display = 'none';
-  if (status) status.style.display = 'none';
-  if (lemmaListaRahmen) lemmaListaRahmen.style.display = 'none';
+  if (
+    radix &&
+    addePanel.parentElement !== radix
+  ) {
+    radix.appendChild(addePanel);
+  }
+
+  addePanel.classList.toggle(
+    'adde-uerbum-panel--lectorium',
+    modus === 'lectorium'
+  );
+
+  if (modus === 'vocabularium') {
+    if (row) row.style.display = 'none';
+    if (eventus) eventus.style.display = 'none';
+    if (status) status.style.display = 'none';
+
+    if (lemmaListaRahmen) {
+      lemmaListaRahmen.style.display = 'none';
+    }
+  }
 
   addePanel.hidden = false;
 
-  document.getElementById('addeLemma').value = lemmaPraeplenum || '';
+  document.getElementById('addeLemma').value =
+    lemmaPraeplenum || '';
+
   document.getElementById('addePars').value = '';
   document.getElementById('addeGenus').value = '';
   document.getElementById('addeDeclinatio').value = '';
   document.getElementById('addeGenitivus').value = '';
   document.getElementById('addeNumerusTyp').value = '';
 
-  document.getElementById('addeAdiectivumFemininum').value = '';
-  document.getElementById('addeAdiectivumNeutrum').value = '';
-  document.getElementById('addeAdiectivumDeclinatio').value = '';
+  document.getElementById(
+    'addeAdiectivumFemininum'
+  ).value = '';
 
-  document.getElementById('addeConiunctioTypus').value = '';
-  document.getElementById('addeConiunctioEnclitica').value = '';
+  document.getElementById(
+    'addeAdiectivumNeutrum'
+  ).value = '';
 
-  document.getElementById('addeAdpositioTypus').value = '';
-  document.getElementById('addeAdpositioFormaeVariae').value = '';
-  
+  document.getElementById(
+    'addeAdiectivumDeclinatio'
+  ).value = '';
+
+  document.getElementById(
+    'addeConiunctioTypus'
+  ).value = '';
+
+  document.getElementById(
+    'addeConiunctioEnclitica'
+  ).value = '';
+
+  document.getElementById(
+    'addeAdpositioTypus'
+  ).value = '';
+
+  document.getElementById(
+    'addeAdpositioFormaeVariae'
+  ).value = '';
+
   document
-    .querySelectorAll('input[name="addeAdpositioCasus"]')
+    .querySelectorAll(
+      'input[name="addeAdpositioCasus"]'
+    )
     .forEach(input => {
       input.checked = false;
     });
-  
-  document.getElementById('addeConiugatio').value = '';
 
-document
-  .querySelectorAll(
-    'input[name="addeUoxSchema"]'
-  )
-  .forEach(input => {
-    input.checked = false;
-  });
+  document.getElementById(
+    'addeConiugatio'
+  ).value = '';
 
-document.getElementById('addeImpersonale').checked = false;
+  document
+    .querySelectorAll(
+      'input[name="addeUoxSchema"]'
+    )
+    .forEach(input => {
+      input.checked = false;
+    });
 
-document.getElementById('addeInfinitivus').value = '';
-document.getElementById('addePerfectum').value = '';
-document.getElementById('addeSupinum').value = '';
+  document.getElementById(
+    'addeImpersonale'
+  ).checked = false;
+
+  document.getElementById(
+    'addeInfinitivus'
+  ).value = '';
+
+  document.getElementById(
+    'addePerfectum'
+  ).value = '';
+
+  document.getElementById(
+    'addeSupinum'
+  ).value = '';
 
   syncAddeForm();
   statusAdde('');
-  document.getElementById('addeLemma').focus();
+
+  document
+    .getElementById('addeLemma')
+    .focus();
 }
 
-function schliesseAddeUerbum() {
+function schliesseAddeUerbum({
+  onCancelAusfuehren = true
+} = {}) {
+  const contextus =
+    addeUerbumContextus;
+
   addePanel.hidden = true;
 
-  if (row) row.style.display = 'flex';
-  if (eventus) eventus.style.display = '';
-  if (status) status.style.display = '';
-  if (lemmaListaRahmen) lemmaListaRahmen.style.display = '';
+  addePanel.classList.remove(
+    'adde-uerbum-panel--lectorium'
+  );
 
-  reddeLemmaListam();
+  if (
+    vocabulariumTab &&
+    addePanel.parentElement !==
+      vocabulariumTab
+  ) {
+    vocabulariumTab.appendChild(
+      addePanel
+    );
+  }
 
-  input?.focus();
+  if (
+    contextus.modus ===
+    'vocabularium'
+  ) {
+    if (row) {
+      row.style.display = 'flex';
+    }
+
+    if (eventus) {
+      eventus.style.display = '';
+    }
+
+    if (status) {
+      status.style.display = '';
+    }
+
+    if (lemmaListaRahmen) {
+      lemmaListaRahmen.style.display = '';
+    }
+
+    reddeLemmaListam();
+    input?.focus();
+  }
+
+  resetAddeUerbumContextum();
+
+  if (
+    onCancelAusfuehren &&
+    typeof contextus.onCancel ===
+      'function'
+  ) {
+    contextus.onCancel();
+  }
+}
+
+window.whatseposAddeUerbum = {
+  aperi({
+    radix,
+    formaInitialis = '',
+    modus = 'vocabularium',
+    onServatum = null,
+    onCancel = null
+  } = {}) {
+    aperiAddeUerbum(
+      formaInitialis,
+      {
+        radix,
+        modus,
+        onServatum,
+        onCancel
+      }
+    );
+  },
+
+  claude() {
+    schliesseAddeUerbum();
+  }
+};
+
+async function agePostServatum(
+  paradigma
+) {
+  const contextus =
+    addeUerbumContextus;
+
+  if (
+    contextus.modus ===
+      'lectorium' &&
+    typeof contextus.onServatum ===
+      'function'
+  ) {
+    schliesseAddeUerbum({
+      onCancelAusfuehren: false
+    });
+
+    await contextus.onServatum(
+      paradigma
+    );
+
+    return;
+  }
+
+  const lexemeId =
+    paradigma?.lexemeId ||
+    '';
+
+  const lemmaNudum =
+    paradigma?.lemmaNudum ||
+    '';
+
+  if (lexemeId) {
+    window.location.href =
+      `lemma.html?lexeme_id=${
+        encodeURIComponent(
+          lexemeId
+        )
+      }`;
+
+    return;
+  }
+
+  aperiNouumLemma(
+    lemmaNudum
+  );
 }
 
 function erzeugeAddeSuggestio(lemmaNeu) { const b = document.createElement('button'); b.type='button'; b.className='vocabularium-suggestio is-selected'; b.dataset.action='adde'; b.dataset.lemma=lemmaNeu; b.style.cssText='display:block;width:100%;text-align:left;padding:14px 18px;border:none;background:white;cursor:pointer;border-bottom:1px solid #eee'; b.innerHTML=`<strong>${lemmaNeu}</strong> <span style="color:#6b7280">adde ut nouum headword</span>`; b.addEventListener('mousedown', e => { e.preventDefault(); aperiAddeUerbum(lemmaNeu); }); suggestiones.appendChild(b); suggestiones.style.display='block'; suggestioSelectaIndex=0; }
@@ -4346,11 +4548,12 @@ async function speichereAddeFormular() {
       return;
     }
 
-    window.location.href =
-      `lemma.html?lexeme_id=${encodeURIComponent(lexemeId)}`;
-
+    await agePostServatum(
+      paradigma
+    );
+    
     return;
-  }
+      }
   
   if (pars === 'adpositio') {
   const typus =
@@ -4396,11 +4599,12 @@ async function speichereAddeFormular() {
     return;
   }
 
-  window.location.href =
-    `lemma.html?lexeme_id=${encodeURIComponent(lexemeId)}`;
-
+  await agePostServatum(
+    paradigma
+  );
+  
   return;
-}
+  }
   
   if (pars === 'verbum') {
     const coniugatio =
@@ -4480,11 +4684,11 @@ try {
       return;
     }
 
-    window.location.href =
-    `lemma.html?lexeme_id=${encodeURIComponent(lexemeId)}`;
-
+    await agePostServatum(
+      paradigma
+    );
+    
     return;
-  }
   
       if (pars === 'substantivum') {
     const declinatio =
@@ -4555,7 +4759,11 @@ try {
       return;
     }
 
-    aperiNouumLemma(lemmaNudum);
+    await agePostServatum({
+      lemmaNudum,
+      formae
+    });
+    
     return;
   }
 
@@ -4607,7 +4815,11 @@ try {
       return;
     }
 
-    aperiNouumLemma(lemmaNudum);
+    await agePostServatum({
+      lemmaNudum,
+      formae
+    });
+    
     return;
   }
 
