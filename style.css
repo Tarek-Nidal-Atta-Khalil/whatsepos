@@ -606,3 +606,45 @@ html body .lemma-card .diphthongus::before {
   margin: 0;
   text-align: left;
 }
+
+.adde-uerbum-panel--lectorium {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+}
+
+.adde-uerbum-panel--lectorium
+.adde-form-head {
+  padding: 16px;
+  margin-bottom: 10px;
+  border-top-width: 6px;
+}
+
+.adde-uerbum-panel--lectorium
+.adde-form-head h2 {
+  font-size: 24px;
+}
+
+.adde-uerbum-panel--lectorium
+.adde-form-card {
+  padding: 14px 16px;
+  margin-bottom: 10px;
+}
+
+.adde-uerbum-panel--lectorium
+.adde-uerbum-field input,
+.adde-uerbum-panel--lectorium
+.adde-uerbum-field select {
+  font-size: 17px;
+}
+
+.adde-uerbum-panel--lectorium
+.adde-uerbum-actions {
+  flex-direction: column-reverse;
+}
+
+.adde-uerbum-panel--lectorium
+.adde-uerbum-actions button {
+  width: 100%;
+}
