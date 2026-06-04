@@ -122,6 +122,8 @@ const numerusMaximusSilbarum =
   schemaDactylicum.length;
 
 let campusUltimusValidus = "";
+let suggestioTracta = null;
+let suggestioNuperTracta = false;
 
 function signumSchematis(
   typus
@@ -428,6 +430,56 @@ if (hexameterArbeitsbereich) {
     "click",
     function () {
       campus.focus();
+    }
+  );
+
+  hexameterArbeitsbereich.addEventListener(
+    "dragover",
+    function (event) {
+      if (!suggestioTracta) return;
+
+      event.preventDefault();
+
+      hexameterArbeitsbereich.classList.add(
+        "hexameter-arbeitsbereich--drop-activus"
+      );
+    }
+  );
+
+  hexameterArbeitsbereich.addEventListener(
+    "dragleave",
+    function (event) {
+      if (
+        hexameterArbeitsbereich.contains(
+          event.relatedTarget
+        )
+      ) {
+        return;
+      }
+
+      hexameterArbeitsbereich.classList.remove(
+        "hexameter-arbeitsbereich--drop-activus"
+      );
+    }
+  );
+
+  hexameterArbeitsbereich.addEventListener(
+    "drop",
+    function (event) {
+      if (!suggestioTracta) return;
+
+      event.preventDefault();
+
+      hexameterArbeitsbereich.classList.remove(
+        "hexameter-arbeitsbereich--drop-activus"
+      );
+
+      insereVerbumInCampum(
+        suggestioTracta,
+        campus.value.length
+      );
+
+      suggestioTracta = null;
     }
   );
 }
@@ -810,21 +862,97 @@ function aktualisiereSuggestionesMetricas() {
     return;
   }
 
-  suggestiones.forEach(function(item) {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "suggestio-item suggestio-button";
-    button.textContent = item.forma;
-    button.title = item.notae || item.lemma || "";
+suggestiones.forEach(function(item) {
+  const button =
+    document.createElement(
+      "button"
+    );
 
-        button.onclick = function () {
-        insereVerbumInCampum(
-          item.forma
+  button.type = "button";
+
+  button.className =
+    "suggestio-item suggestio-button";
+
+  button.textContent =
+    item.forma;
+
+  button.title =
+    item.notae ||
+    item.lemma ||
+    "";
+
+  button.draggable = true;
+
+  button.addEventListener(
+    "dragstart",
+    function (event) {
+      suggestioTracta =
+        item.forma;
+
+      button.classList.add(
+        "suggestio-button--tracta"
+      );
+
+      if (
+        event.dataTransfer
+      ) {
+        event.dataTransfer
+          .effectAllowed =
+            "copy";
+
+        event.dataTransfer
+          .setData(
+            "text/plain",
+            item.forma
+          );
+      }
+    }
+  );
+
+  button.addEventListener(
+    "dragend",
+    function () {
+      button.classList.remove(
+        "suggestio-button--tracta"
+      );
+
+      hexameterArbeitsbereich
+        ?.classList.remove(
+          "hexameter-arbeitsbereich--drop-activus"
         );
-      };
 
-    suggestionesMetricaeLista.appendChild(button);
-  });
+      suggestioTracta = null;
+
+      suggestioNuperTracta =
+        true;
+
+      setTimeout(
+        function () {
+          suggestioNuperTracta =
+            false;
+        },
+        0
+      );
+    }
+  );
+
+  button.onclick = function () {
+    if (
+      suggestioNuperTracta
+    ) {
+      return;
+    }
+
+    insereVerbumInCampum(
+      item.forma
+    );
+  };
+
+  suggestionesMetricaeLista
+    .appendChild(
+      button
+    );
+});
 }
 
 function aktualisiereHexameterVorschau() {
