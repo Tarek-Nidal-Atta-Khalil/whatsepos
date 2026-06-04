@@ -81,6 +81,8 @@ const titelEingabeBereich = document.getElementById("titelEingabeBereich");
 const titelEingabe = document.getElementById("titelEingabe");
 const arbeitsbereich = document.getElementById("arbeitsbereich");
 const aktuellerTitel = document.getElementById("aktuellerTitel");
+const scriptoriumAuctor =
+  document.getElementById("scriptoriumAuctor");
 
 let dictionariumMetricum = [];
 let dictionariumIamTentatum = false;
@@ -351,8 +353,23 @@ function zeigeGedicht(textus) {
       div.classList.add("ausgewaehlt");
     }
 
-    const span = document.createElement("span");
-    span.textContent = vers;
+    const numerusSpan =
+      document.createElement("span");
+
+    numerusSpan.className =
+      "scriptorium-versus-numerus";
+
+    numerusSpan.textContent =
+      String(index + 1);
+
+    const textusSpan =
+      document.createElement("span");
+
+    textusSpan.className =
+      "scriptorium-versus-textus";
+
+    textusSpan.textContent =
+      vers;
 
     div.onclick = function () {
       if (ausgewaehlteVerse.has(index)) {
@@ -370,7 +387,13 @@ function zeigeGedicht(textus) {
       bearbeiteVers(index, vers);
     };
 
-    div.appendChild(span);
+    div.appendChild(
+      numerusSpan
+    );
+
+    div.appendChild(
+      textusSpan
+    );
     nuntii.appendChild(div);
   });
 
@@ -430,7 +453,17 @@ function bearbeiteVers(index, alterVers) {
   zeile.onclick = null;
   zeile.ondblclick = null;
 
-  const input = document.createElement("input");
+  const numerusSpan =
+    document.createElement("span");
+
+  numerusSpan.className =
+    "scriptorium-versus-numerus";
+
+  numerusSpan.textContent =
+    String(index + 1);
+
+  const input =
+    document.createElement("input");
   input.className = "vers-editor";
   input.value = alterVers;
 
@@ -442,7 +475,13 @@ function bearbeiteVers(index, alterVers) {
     event.stopPropagation();
   });
 
-  zeile.appendChild(input);
+  zeile.appendChild(
+    numerusSpan
+  );
+
+  zeile.appendChild(
+    input
+  );
   passeVersEditorBreiteAn(input);
   input.focus();
 
@@ -752,11 +791,20 @@ window.ausloggen = async function() {
   setStatus("");
 };
 
+function setzeScriptoriumAuctorem(username = "") {
+  if (!scriptoriumAuctor) return;
+
+  scriptoriumAuctor.textContent =
+    username || "";
+}
+
 async function aktualisiereMenuButton() {
-  const button = document.getElementById("menuButton");
+  const button =
+    document.getElementById("menuButton");
 
   if (!aktuellerUser) {
     button.textContent = "☰ Menü";
+    setzeScriptoriumAuctorem("");
     return;
   }
 
@@ -768,10 +816,16 @@ async function aktualisiereMenuButton() {
 
   if (error || !data) {
     button.textContent = "☰ Menü";
+    setzeScriptoriumAuctorem("");
     return;
   }
 
-  button.textContent = "☰ " + data.username;
+  button.textContent =
+    "☰ " + data.username;
+
+  setzeScriptoriumAuctorem(
+    data.username
+  );
 }
 
 async function pruefeSitzung() {
