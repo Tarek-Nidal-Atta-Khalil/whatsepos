@@ -4882,7 +4882,11 @@ window.zeigeTab = async function(tabName) {
     if (row) row.style.display = 'none';
     if (lemmaListaRahmen) lemmaListaRahmen.style.display = 'none';
 
-    addePanel.hidden = true;
+    if (!addePanel.hidden) {
+      schliesseAddeUerbum({
+        onCancelAusfuehren: false
+      });
+    }
 
     if (scriptoriumTitulus) {
       scriptoriumTitulus.textContent = 'Scriptorium';
