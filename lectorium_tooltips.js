@@ -1587,7 +1587,29 @@ function reddeSprechbulam(
 
 function claudeSprechbulam() {
   /*
-   * Das Kreuz leert nur den Inhalt.
+   * Wenn das gemeinsame adde-uerbum-Formular
+   * gerade in der Marginalie liegt, muss es
+   * zunächst ordentlich geschlossen und zurück
+   * ins Uocabularium verschoben werden.
+   */
+  if (
+    sprechbulla.querySelector(
+      '#addeUerbumPanel'
+    ) &&
+    typeof window
+      .whatseposAddeUerbum
+      ?.claude ===
+      'function'
+  ) {
+    window
+      .whatseposAddeUerbum
+      .claude();
+
+    return;
+  }
+
+  /*
+   * Sonst leert das Kreuz nur den Inhalt.
    * Die Marginalie selbst bleibt als
    * weiße rechte Seitenfläche sichtbar.
    */
@@ -1597,13 +1619,13 @@ function claudeSprechbulam() {
     null;
 
   positioVerticalisSprechbullae =
-    "";
+    '';
 
   sprechbullaFixata =
     false;
 
   sprechbulla.style.maxHeight =
-    "";
+    '';
 
   retineSprechbulam();
 }
