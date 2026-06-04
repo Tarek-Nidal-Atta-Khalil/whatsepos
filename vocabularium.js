@@ -4578,16 +4578,19 @@ async function speichereAddeFormular() {
     return;
   }
 
-  const {
-    lemmaNudum,
-    lexemeId,
-    formae
-  } = generaAdpositionem({
+  const paradigma =
+  generaAdpositionem({
     lemmaInput,
     typus,
     casus,
     formaeVariaeInput
   });
+
+  const {
+    lemmaNudum,
+    lexemeId,
+    formae
+  } = paradigma;
 
   const { error } =
     await window.whatseposSupabase
@@ -4689,6 +4692,7 @@ try {
     );
     
     return;
+    }
   
       if (pars === 'substantivum') {
     const declinatio =
@@ -4828,7 +4832,10 @@ try {
   const record = recordumFormae({ formaMacris: lemmaMacris, lemmaNudum, pars, genus:null, numerus:null, casus:null });
   const { error } = await window.whatseposSupabase.from('formae').insert([record]);
   if (error) { statusAdde(error.message); return; }
-  aperiNouumLemma(lemmaNudum);
+  await agePostServatum({
+    lemmaNudum,
+    formae: [record]
+  });
 }
 
 const zeigeTabOriginal = window.zeigeTab;
