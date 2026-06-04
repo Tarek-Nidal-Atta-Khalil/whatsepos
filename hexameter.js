@@ -278,18 +278,23 @@ function quantitasAusSiglo(siglum) {
   return null;
 }
 
-function longaeIndizes(forma) {
-  if (Array.isArray(forma?.longae)) {
-    return forma.longae
-      .map(x => Number(x))
-      .filter(x => Number.isInteger(x) && x >= 0);
+function longaeIndizes(
+  forma
+) {
+  if (
+    !Array.isArray(
+      forma?.longae
+    )
+  ) {
+    return [];
   }
 
-  return String(forma?.quantitates || "")
-    .toUpperCase()
-    .split("")
-    .map((siglum, index) => siglum === "L" ? index : null)
-    .filter(index => index !== null);
+  return forma.longae
+    .map(Number)
+    .filter(index =>
+      Number.isInteger(index) &&
+      index >= 0
+    );
 }
 
 function partesFormae(forma) {
