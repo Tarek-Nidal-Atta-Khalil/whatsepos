@@ -37,6 +37,28 @@ let lociIndex =
 let verbumActuale =
   null;
 
+function setzeVerbumActuale(
+  button = null
+) {
+  if (
+    verbumActuale &&
+    verbumActuale !== button
+  ) {
+    verbumActuale.classList.remove(
+      'lectorium-verbum--actuale'
+    );
+  }
+
+  verbumActuale =
+    button;
+
+  if (verbumActuale) {
+    verbumActuale.classList.add(
+      'lectorium-verbum--actuale'
+    );
+  }
+}
+
 let timerClaudendi =
   null;
 
@@ -1410,8 +1432,9 @@ function reddeSprechbulam(
     return;
   }
 
-  verbumActuale =
-    button;
+  setzeVerbumActuale(
+    button
+  );
 
   vacuaSprechbulam();
 
@@ -1609,8 +1632,7 @@ function claudeSprechbulam() {
    */
   sprechbulla.replaceChildren();
 
-  verbumActuale =
-    null;
+  setzeVerbumActuale();
 
   positioVerticalisSprechbullae =
     '';
@@ -1690,8 +1712,9 @@ window
         "";
     }
 
-    verbumActuale =
-      button;
+    setzeVerbumActuale(
+      button
+    );
 
     sprechbulla.hidden =
       false;
