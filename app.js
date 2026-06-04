@@ -348,6 +348,105 @@ function textusCumSuggestione(forma) {
   return basis === "" ? forma : basis + " " + forma;
 }
 
+function insereVerbumInCampum(
+  forma,
+  position = null
+) {
+  const verbum =
+    String(forma || "").trim();
+
+  if (!verbum) return false;
+
+  const textus =
+    campus.value;
+
+  const initium =
+    Number.isInteger(position)
+      ? position
+      : (
+          Number.isInteger(
+            campus.selectionStart
+          )
+            ? campus.selectionStart
+            : textus.length
+        );
+
+  const finis =
+    Number.isInteger(position)
+      ? position
+      : (
+          Number.isInteger(
+            campus.selectionEnd
+          )
+            ? campus.selectionEnd
+            : initium
+        );
+
+  const parsSinistra =
+    textus.slice(0, initium);
+
+  const parsDextera =
+    textus.slice(finis);
+
+  const spatiumSinistrum =
+    parsSinistra &&
+    !/\s$/.test(parsSinistra)
+      ? " "
+      : "";
+
+  const spatiumDextrum =
+    parsDextera &&
+    !/^\s/.test(parsDextera)
+      ? " "
+      : "";
+
+  const insertio =
+    spatiumSinistrum +
+    verbum +
+    spatiumDextrum;
+
+  const novusTextus =
+    parsSinistra +
+    insertio +
+    parsDextera;
+
+  if (
+    !campusIntraLimen(
+      novusTextus.trim()
+    )
+  ) {
+    return false;
+  }
+
+  campus.value =
+    novusTextus;
+
+  campusUltimusValidus =
+    campus.value;
+
+  const novaPositio =
+    parsSinistra.length +
+    insertio.length;
+
+  campus.focus();
+
+  campus.setSelectionRange(
+    novaPositio,
+    novaPositio
+  );
+
+  campus.dispatchEvent(
+    new Event(
+      "input",
+      {
+        bubbles: true
+      }
+    )
+  );
+
+  return true;
+}
+
 function suggestioMetricePossibilis(forma) {
   try {
     const analyse = erstelleAnalysezeile(textusCumSuggestione(forma));
@@ -455,30 +554,10 @@ function aktualisiereSuggestionesMetricas() {
     button.textContent = item.forma;
     button.title = item.notae || item.lemma || "";
 
-      button.onclick = function () {
-        const novusTextus =
-          textusCumSuggestione(
-            item.forma
-          ) + " ";
-
-        if (
-          !campusIntraLimen(
-            novusTextus.trim()
-          )
-        ) {
-          return;
-        }
-
-        campus.value =
-          novusTextus;
-
-        campusUltimusValidus =
-          campus.value;
-
-        campus.focus();
-        aktualisiereHexameterVorschau();
-        reddeHexameterSlots();
-        aktualisiereSuggestionesMetricas();
+        button.onclick = function () {
+        insereVerbumInCampum(
+          item.forma
+        );
       };
 
     suggestionesMetricaeLista.appendChild(button);
