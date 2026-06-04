@@ -170,6 +170,106 @@ body > h1 {
 
 #poemArea {
   min-height: calc(100vh - 180px);
+  padding-bottom: 30vh;
+  box-sizing: border-box;
+}
+
+#hexameterArbeitsbereich {
+  position: fixed;
+  left: 0;
+  right: 340px;
+  bottom: 0;
+
+  height: 25vh;
+  min-height: 220px;
+
+  padding: 20px 28px 24px;
+  box-sizing: border-box;
+
+  border-top: 1px solid #e5e7eb;
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 -10px 28px rgba(0, 0, 0, 0.08);
+
+  z-index: 940;
+}
+
+#hexameterSlots {
+  height: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+
+  display: grid;
+  grid-template-columns: repeat(17, minmax(42px, 1fr));
+  gap: 10px;
+  align-items: end;
+}
+
+.hexameter-slot-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.hexameter-slot-item--finis-pedis {
+  margin-right: 12px;
+}
+
+.hexameter-slot-signum {
+  font-size: 28px;
+  line-height: 1;
+  color: #64748b;
+  user-select: none;
+}
+
+.hexameter-slot {
+  width: 100%;
+  min-height: 58px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 8px 6px;
+  box-sizing: border-box;
+
+  border: 2px dashed #cbd5e1;
+  border-radius: 14px;
+  background: #ffffff;
+
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 22px;
+  line-height: 1.2;
+  text-align: center;
+
+  color: #111827;
+}
+
+.hexameter-slot--vacua {
+  color: #cbd5e1;
+}
+
+.hexameter-slot--activa {
+  border-style: solid;
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 4px rgba(147, 197, 253, 0.18);
+}
+
+.hexameter-slot--plena {
+  border-style: solid;
+  border-color: #cbd5e1;
+}
+
+.hexameter-slot[data-quantitas="longa"] {
+  background: #eff6ff;
+}
+
+.hexameter-slot[data-quantitas="brevis"] {
+  background: #f8fafc;
+}
+
+.hexameter-slot[data-quantitas="ambigua"] {
+  background: #faf5ff;
 }
 
 .scriptorium-card {
@@ -272,62 +372,14 @@ body > h1 {
   text-align: center;
 }
 
-#campus {
-  position: fixed;
-  bottom: 32px;
-  left: 50%;
-  transform: translateX(-50%);
-
-  width:
-    min(
-      40vw,
-      calc(100vw - 390px)
-    );
-
-  max-width: 620px;
-  min-width: 360px;
-  height: 54px;
-  resize: none;
-
-  text-align: center;
-  font-size: 22px;
-  line-height: 30px;
-
-  padding: 10px 22px;
-  border:
-    2px solid #d1d5db;
-  border-radius: 999px;
-
-  background: white;
-  box-shadow:
-    0 8px 24px
-    rgba(0, 0, 0, .12);
-
-  outline: none;
-  z-index: 950;
-}
-
+#campus,
 #hexameterVorschau {
   position: fixed;
-  bottom: 98px;
-  left: 50%;
-  transform: translateX(-50%);
-
-  width:
-    min(
-      76vw,
-      calc(100vw - 390px)
-    );
-
-  min-height: 36px;
-
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-
-  white-space: nowrap;
-  overflow-x: auto;
-  z-index: 950;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .verbum-ok,
@@ -482,6 +534,27 @@ html body .lemma-card .diphthongus::before {
   .scriptorium-versus-textus,
   .vers-editor {
     font-size: 20px;
+  }
+
+    #hexameterArbeitsbereich {
+    right: 0;
+    bottom: 180px;
+    height: 200px;
+    min-height: 200px;
+  }
+
+  #hexameterSlots {
+    grid-template-columns: repeat(17, minmax(32px, 1fr));
+    gap: 6px;
+  }
+
+  .hexameter-slot-signum {
+    font-size: 22px;
+  }
+
+  .hexameter-slot {
+    min-height: 48px;
+    font-size: 18px;
   }
 }
 
