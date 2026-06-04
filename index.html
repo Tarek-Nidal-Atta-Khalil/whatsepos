@@ -78,14 +78,35 @@
       </div>
 
       <div id="arbeitsbereich" style="display: none;">
-        <h2 id="aktuellerTitel"></h2>
-
         <div id="scriptoriumLayout">
-          <div id="poemArea">
-            <div id="nuntii"></div>
-            <div id="hexameterVorschau" aria-live="polite"></div>
-            <textarea id="campus" rows="1" placeholder="Versum scribe et Enter preme..."></textarea>
-          </div>
+          <main id="poemArea">
+            <section class="scriptorium-card">
+              <header class="scriptorium-header">
+                <p
+                  id="scriptoriumAuctor"
+                  class="scriptorium-auctor"
+                ></p>
+
+                <h2 id="aktuellerTitel"></h2>
+              </header>
+
+              <div
+                id="nuntii"
+                class="scriptorium-versus"
+              ></div>
+            </section>
+
+            <div
+              id="hexameterVorschau"
+              aria-live="polite"
+            ></div>
+
+            <textarea
+              id="campus"
+              rows="1"
+              placeholder="Versum scribe et Enter preme..."
+            ></textarea>
+          </main>
 
           <aside id="suggestionesMetricae">
             <h3>Suggestiones</h3>
