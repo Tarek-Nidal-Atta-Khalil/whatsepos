@@ -1,9 +1,3 @@
-import {
-  coniugationesUerbi,
-  schemataUocis,
-  reddeElectionem
-} from "./uerbum_formularium.js";
-
 const sprechbulla =
   document.createElement("aside");
 
