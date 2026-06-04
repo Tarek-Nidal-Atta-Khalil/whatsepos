@@ -123,9 +123,21 @@ const numerusMaximusSilbarum =
 
 let campusUltimusValidus = "";
 
-function signumSchematis(typus) {
-  if (typus === "longa") return "¯";
-  if (typus === "brevis") return "˘";
+function signumSchematis(
+  typus
+) {
+  if (typus === "longa") {
+    return "¯";
+  }
+
+  if (typus === "brevis") {
+    return "˘";
+  }
+
+  if (typus === "ambigua") {
+    return "?";
+  }
+
   return "x";
 }
 
@@ -170,23 +182,33 @@ function reddeHexameterSlots() {
       );
     }
 
+    const syllaba =
+      syllabae[index];
+
     const signum =
       document.createElement("div");
 
     signum.className =
       "hexameter-slot-signum";
 
+    signum.classList.add(
+      syllaba
+        ? "hexameter-slot-signum--repertum"
+        : "hexameter-slot-signum--exspectatum"
+    );
+
     signum.textContent =
-      signumSchematis(slotInfo.typus);
+      signumSchematis(
+        syllaba
+          ? syllaba.quantitas
+          : slotInfo.typus
+      );
 
     const slot =
       document.createElement("div");
 
     slot.className =
       "hexameter-slot";
-
-    const syllaba =
-      syllabae[index];
 
     if (syllaba) {
       slot.classList.add(
