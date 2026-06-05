@@ -301,10 +301,14 @@ addePanel.innerHTML = `
   </div>
   <div class="adde-form-card" id="addeGenitivCard" hidden>
     <div class="adde-uerbum-field">
-      <label for="addeGenitivus">Genitivus singularis / Stammform</label>
-      <input id="addeGenitivus" type="text" placeholder="litoris, corporis, nominis">
+      <label for="addeGenitivus">Genitivus singularis</label>
+      <input
+        id="addeGenitivus"
+        type="text"
+        placeholder="animi:, pueri:, agri:, litoris"
+      >
       <div class="adde-card-help">
-        Nötig vor allem für die 3. Deklination und unklare Stämme.
+        Nötig bei maskulinen Substantiven der o-Deklination und bei Substantiven mit nicht unmittelbar erkennbarem Stamm.
       </div>
     </div>
   </div>
@@ -1730,6 +1734,218 @@ function generaSubstantivumONeutrum({
     add('acc', 'pl', stemma + 'a');
     add('abl', 'pl', stemma + 'īs');
     add('voc', 'pl', stemma + 'a');
+  }
+
+  return {
+    lemmaNudum,
+    formae
+  };
+}
+
+function generaSubstantivumOMasculinum({
+  lemmaInput,
+  genitivusInput,
+  numerusTyp
+}) {
+  const lemmaMacris =
+    exColonibusMacra(
+      lemmaInput
+    ).trim();
+
+  const genitivusMacris =
+    exColonibusMacra(
+      genitivusInput
+    ).trim();
+
+  if (!lemmaMacris) {
+    throw new Error(
+      'Nominativus singularis inserendus est.'
+    );
+  }
+
+  if (
+    !/(?:us|er)$/i.test(
+      lemmaMacris
+    )
+  ) {
+    throw new Error(
+      'Nominativus singularis substantivi masculini o-declinationis in -us aut -er desinere debet.'
+    );
+  }
+
+  if (
+    !/ī$/i.test(
+      genitivusMacris
+    )
+  ) {
+    throw new Error(
+      'Genitivus singularis substantivi masculini o-declinationis in -i: desinere debet.'
+    );
+  }
+
+  if (
+    numerusTyp ===
+    'plurale_tantum'
+  ) {
+    throw new Error(
+      'Substantiva masculina o-declinationis pluralia tantum hoc formulario nondum generari possunt.'
+    );
+  }
+
+  const lemmaNudum =
+    sineMacris(
+      lemmaMacris
+    );
+
+  const stemma =
+    genitivusMacris.replace(
+      /ī$/i,
+      ''
+    );
+
+  if (
+    /us$/i.test(
+      lemmaMacris
+    )
+  ) {
+    const stemmaExNominativo =
+      lemmaMacris.replace(
+        /us$/i,
+        ''
+      );
+
+    if (
+      clavisQuaestionis(
+        stemma
+      ) !==
+      clavisQuaestionis(
+        stemmaExNominativo
+      )
+    ) {
+      throw new Error(
+        'Nominativus et genitivus substantivi in -us idem stemma habere debent.'
+      );
+    }
+  }
+
+  const genus =
+    'm';
+
+  const formae =
+    [];
+
+  const add = (
+    casus,
+    numerus,
+    formaMacris
+  ) => {
+    formae.push(
+      recordumFormae({
+        formaMacris,
+        lemmaNudum,
+        pars:
+          'substantivum',
+        genus,
+        numerus,
+        casus
+      })
+    );
+  };
+
+  const vocativusSingularis =
+    /ius$/i.test(
+      lemmaMacris
+    )
+      ? stemma.slice(
+          0,
+          -1
+        ) + 'ī'
+      : /us$/i.test(
+          lemmaMacris
+        )
+        ? stemma + 'e'
+        : lemmaMacris;
+
+  if (
+    numerusTyp !==
+    'plurale_tantum'
+  ) {
+    add(
+      'nom',
+      'sg',
+      lemmaMacris
+    );
+
+    add(
+      'gen',
+      'sg',
+      genitivusMacris
+    );
+
+    add(
+      'dat',
+      'sg',
+      stemma + 'ō'
+    );
+
+    add(
+      'acc',
+      'sg',
+      stemma + 'um'
+    );
+
+    add(
+      'abl',
+      'sg',
+      stemma + 'ō'
+    );
+
+    add(
+      'voc',
+      'sg',
+      vocativusSingularis
+    );
+  }
+
+  if (
+    numerusTyp !==
+    'singulare_tantum'
+  ) {
+    add(
+      'nom',
+      'pl',
+      stemma + 'ī'
+    );
+
+    add(
+      'gen',
+      'pl',
+      stemma + 'ōrum'
+    );
+
+    add(
+      'dat',
+      'pl',
+      stemma + 'īs'
+    );
+
+    add(
+      'acc',
+      'pl',
+      stemma + 'ōs'
+    );
+
+    add(
+      'abl',
+      'pl',
+      stemma + 'īs'
+    );
+
+    add(
+      'voc',
+      'pl',
+      stemma + 'ī'
+    );
   }
 
   return {
@@ -3862,9 +4078,16 @@ function syncDeclinationesSubstantivi() {
     declinatio.value = '';
   }
 
-  const oIncompatibilis =
-    Boolean(genus) &&
-    genus !== 'n';
+    const oIncompatibilis =
+    Boolean(
+      genus
+    ) &&
+    ![
+      'm',
+      'n'
+    ].includes(
+      genus
+    );
 
   optioO.disabled =
     oIncompatibilis;
@@ -3947,11 +4170,35 @@ function syncAddeForm() {
   document.getElementById('addeNumerusTypCard').hidden =
     pars !== 'substantivum' || !genus || !declinatio;
 
-  document.getElementById('addeGenitivCard').hidden =
-    pars !== 'substantivum' ||
-    !genus ||
-    !declinatio ||
-    !['consonantica', 'i', 'mixta', 'u', 'e', 'graeca', 'irregularis'].includes(declinatio);
+    const genitivusNecessarius =
+    (
+      declinatio ===
+        'o' &&
+      genus ===
+        'm'
+    ) ||
+    [
+      'consonantica',
+      'i',
+      'mixta',
+      'u',
+      'e',
+      'graeca',
+      'irregularis'
+    ].includes(
+      declinatio
+    );
+
+  document
+    .getElementById(
+      'addeGenitivCard'
+    )
+    .hidden =
+      pars !==
+        'substantivum' ||
+      !genus ||
+      !declinatio ||
+      !genitivusNecessarius;
 
     const femininumAdiectivi =
     document.getElementById('addeAdiectivumFemininum')?.value.trim() || '';
@@ -4039,17 +4286,21 @@ document
 
   let potestServari = Boolean(lemma && pars);
 
-  if (pars === 'substantivum') {
-    potestServari = Boolean(
-      lemma &&
-      genus &&
-      declinatio &&
-      numerusTyp &&
-      (
-        declinatio !== 'consonantica' ||
-        genitivus
-      )
-    );
+   if (
+    pars ===
+    'substantivum'
+  ) {
+    potestServari =
+      Boolean(
+        lemma &&
+        genus &&
+        declinatio &&
+        numerusTyp &&
+        (
+          !genitivusNecessarius ||
+          genitivus
+        )
+      );
   }
 
     if (pars === 'adiectivum') {
@@ -4722,7 +4973,10 @@ try {
     let paradigma;
 
     try {
-      if (declinatio === 'a') {
+            if (
+        declinatio ===
+        'a'
+      ) {
         paradigma =
           generaSubstantivumA({
             lemmaInput,
@@ -4730,8 +4984,22 @@ try {
             numerusTyp
           });
       } else if (
-        declinatio === 'o' &&
-        genus === 'n'
+        declinatio ===
+          'o' &&
+        genus ===
+          'm'
+      ) {
+        paradigma =
+          generaSubstantivumOMasculinum({
+            lemmaInput,
+            genitivusInput,
+            numerusTyp
+          });
+      } else if (
+        declinatio ===
+          'o' &&
+        genus ===
+          'n'
       ) {
         paradigma =
           generaSubstantivumONeutrum({
@@ -4750,7 +5018,7 @@ try {
           });
       } else {
         statusAdde(
-          'Nunc tantum substantiva a-declinationis, substantiva neutra o-declinationis et substantiva neutra consonantica tertiae declinationis servari possunt.'
+          'Nunc substantiva a-declinationis, substantiva masculina et neutra o-declinationis atque substantiva neutra consonantica tertiae declinationis servari possunt.'
         );
 
         return;
