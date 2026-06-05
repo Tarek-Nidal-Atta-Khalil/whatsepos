@@ -557,9 +557,9 @@ addePanel.innerHTML = `
   <p id="addeStatus" class="adde-uerbum-status"></p>
 `;
 
-document
-  .getElementById(
-    "addeUoxSchema"
+addePanel
+  .querySelector(
+    "#addeUoxSchema"
   )
   ?.appendChild(
     reddeElectionem({
