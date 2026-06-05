@@ -1004,6 +1004,13 @@ window.ladeLectorium =
           await legeVersusAeneidos();
 
           reddeVersus(versus);
+
+          document.dispatchEvent(
+            new CustomEvent(
+              "lectorium:versus-redacti"
+            )
+          );
+
           lectoriumIamLectum =
             true;
         } catch (error) {
