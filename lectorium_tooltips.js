@@ -1584,6 +1584,18 @@ function reddeSprechbulam(
     return;
   }
 
+    if (
+    candidati.length === 1 &&
+    candidati[0].recorda.length === 1
+  ) {
+    servaFormam(
+      candidati[0].recorda[0],
+      button
+    );
+
+    return;
+  }
+
   if (
     candidati.length === 1
   ) {
@@ -1593,7 +1605,7 @@ function reddeSprechbulam(
         {
           servare: true,
           titulus:
-            "lectio automatice proposita"
+            "Plures formae grammaticae possibilia sunt."
         }
       )
     );
@@ -1616,7 +1628,6 @@ function reddeSprechbulam(
 
     return;
   }
-
   sprechbulla.appendChild(
     elementum(
       "p",
@@ -2000,38 +2011,19 @@ async function servaLectionesUniuocas() {
   );
 }
 
-
-const lectoriumAutoAssign =
-  document.getElementById(
-    "lectoriumAutoAssign"
-  );
-
-lectoriumAutoAssign
-  ?.addEventListener(
-    "click",
-    async () => {
-      lectoriumAutoAssign.disabled =
-        true;
-
-      statusAutoLectorii(
-        "Lectiones uniuocae seruantur..."
+document.addEventListener(
+  "lectorium:versus-redacti",
+  async () => {
+    try {
+      await servaLectionesUniuocas();
+    } catch (error) {
+      console.error(
+        "Lectiones uniuocae automatice servari non possunt.",
+        error
       );
-
-      try {
-        await servaLectionesUniuocas();
-      } catch (error) {
-        console.error(error);
-
-        statusAutoLectorii(
-          error.message ||
-          "Lectiones automatice seruari non possunt."
-        );
-      } finally {
-        lectoriumAutoAssign.disabled =
-          false;
-      }
     }
-  );
+  }
+);
 
 document.addEventListener(
   "mouseover",
