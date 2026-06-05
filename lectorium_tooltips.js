@@ -1023,42 +1023,95 @@ function reddeCandidatum(
     );
   }
 
-  candidatus.recorda.forEach(
-  recordum => {
+  const recordumUnicum =
+    servare &&
+    candidatus.recorda.length === 1
+      ? candidatus.recorda[0]
+      : null;
+
+  if (recordumUnicum) {
     const analysis =
       brevisAnalysis(
-        recordum
+        recordumUnicum
       );
-
-    if (!analysis) {
-      return;
-    }
-
-    if (servare) {
-      card.appendChild(
-        addeActionem(
-          analysis,
-          () =>
-            servaFormam(
-              recordum,
-              verbumActuale
-            ),
-          "lectorium-bulla-analysis lectorium-bulla-analysis-optio"
-        )
-      );
-
-      return;
-    }
 
     card.appendChild(
       elementum(
-        "span",
-        "lectorium-bulla-analysis",
-        analysis
+        "p",
+        "lectorium-bulla-nota",
+        "forma unica praeelecta"
       )
     );
+
+    if (analysis) {
+      card.appendChild(
+        elementum(
+          "span",
+          "lectorium-bulla-analysis",
+          analysis
+        )
+      );
+    }
+
+    const actionesFormae =
+      elementum(
+        "div",
+        "lectorium-bulla-actiones"
+      );
+
+    actionesFormae.appendChild(
+      addeActionem(
+        "lectionem servare",
+        () =>
+          servaFormam(
+            recordumUnicum,
+            verbumActuale
+          ),
+        "lectorium-bulla-actio lectorium-bulla-actio-principalis"
+      )
+    );
+
+    card.appendChild(
+      actionesFormae
+    );
+  } else {
+    candidatus.recorda.forEach(
+      recordum => {
+        const analysis =
+          brevisAnalysis(
+            recordum
+          );
+
+        if (!analysis) {
+          return;
+        }
+
+        if (servare) {
+          card.appendChild(
+            addeActionem(
+              analysis,
+              () =>
+                servaFormam(
+                  recordum,
+                  verbumActuale
+                ),
+              "lectorium-bulla-analysis lectorium-bulla-analysis-optio"
+            )
+          );
+
+          return;
+        }
+
+        card.appendChild(
+          elementum(
+            "span",
+            "lectorium-bulla-analysis",
+            analysis
+          )
+        );
+      }
+    );
   }
-);
   
   if (
     descriptio.encliticum
@@ -1764,6 +1817,221 @@ window
     }
   };
 
+function statusAutoLectorii(
+  textus
+) {
+  const status =
+    document.getElementById(
+      "lectoriumStatus"
+    );
+
+  if (!status) {
+    return;
+  }
+
+  status.textContent =
+    textus || "";
+}
+
+
+async function servaLectionesUniuocas() {
+  await initialisiere();
+
+  const uerba = [
+    ...document.querySelectorAll(
+      "#lectoriumVersus .lectorium-verbum"
+    )
+  ];
+
+  if (!uerba.length) {
+    statusAutoLectorii(
+      "Nulla uerba in lectorio inuenta sunt."
+    );
+
+    return;
+  }
+
+  const payloads = [];
+
+  let iamSeruata = 0;
+  let ambigua = 0;
+  let ignota = 0;
+
+  uerba.forEach(
+    button => {
+      /*
+       * Bereits gespeicherte Zuordnungen,
+       * insbesondere manuelle Korrekturen,
+       * bleiben unverändert.
+       */
+      if (
+        lociIndex.has(
+          clavisLoci(
+            button
+          )
+        )
+      ) {
+        iamSeruata += 1;
+
+        return;
+      }
+
+      const candidati =
+        candidatiProForma(
+          button.dataset.forma ||
+          ""
+        );
+
+      if (!candidati.length) {
+        ignota += 1;
+
+        return;
+      }
+
+      /*
+       * Automatisch speichern wir nur,
+       * wenn sowohl das Lemma als auch
+       * die konkrete grammatische Form
+       * eindeutig sind.
+       */
+      if (
+        candidati.length !== 1 ||
+        candidati[0].recorda.length !== 1
+      ) {
+        ambigua += 1;
+
+        return;
+      }
+
+      const recordum =
+        candidati[0].recorda[0];
+
+      payloads.push({
+        versus_id:
+          button.dataset.versusId,
+
+        ordo_verbi:
+          Number(
+            button.dataset.ordoVerbi
+          ),
+
+        forma_textus:
+          button.dataset.forma,
+
+        lexeme_id:
+          recordum.lexeme_id ||
+          null,
+
+        forma_id:
+          recordum.id ||
+          null,
+
+        lemma:
+          recordum.lemma ||
+          null,
+
+        pars_orationis:
+          recordum.pars_orationis ||
+          null,
+
+        correctio_manuala:
+          false
+      });
+    }
+  );
+
+  if (payloads.length) {
+    const {
+      data,
+      error
+    } =
+      await supabaseLectorii
+        .from(
+          "lectiones_loci"
+        )
+        .upsert(
+          payloads,
+          {
+            onConflict:
+              "versus_id,ordo_verbi"
+          }
+        )
+        .select(
+          [
+            "id",
+            "versus_id",
+            "ordo_verbi",
+            "forma_textus",
+            "lexeme_id",
+            "forma_id",
+            "lemma",
+            "pars_orationis",
+            "correctio_manuala"
+          ].join(", ")
+        );
+
+    if (error) {
+      throw error;
+    }
+
+    (
+      data ||
+      []
+    ).forEach(
+      locus => {
+        lociIndex.set(
+          [
+            locus.versus_id,
+            locus.ordo_verbi
+          ].join("|"),
+          locus
+        );
+      }
+    );
+  }
+
+  statusAutoLectorii(
+    [
+      `${payloads.length} lectiones uniuocae seruatae sunt.`,
+      `${iamSeruata} iam seruatae erant.`,
+      `${ambigua} ambiguae manent.`,
+      `${ignota} nondum in uocabulario inuentae sunt.`
+    ].join(" ")
+  );
+}
+
+
+const lectoriumAutoAssign =
+  document.getElementById(
+    "lectoriumAutoAssign"
+  );
+
+lectoriumAutoAssign
+  ?.addEventListener(
+    "click",
+    async () => {
+      lectoriumAutoAssign.disabled =
+        true;
+
+      statusAutoLectorii(
+        "Lectiones uniuocae seruantur..."
+      );
+
+      try {
+        await servaLectionesUniuocas();
+      } catch (error) {
+        console.error(error);
+
+        statusAutoLectorii(
+          error.message ||
+          "Lectiones automatice seruari non possunt."
+        );
+      } finally {
+        lectoriumAutoAssign.disabled =
+          false;
+      }
+    }
+  );
 
 document.addEventListener(
   "mouseover",
