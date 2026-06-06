@@ -84,6 +84,21 @@ const suggestionesRenova =
     "suggestionesRenova"
   );
 
+const scriptoriumMarginalia =
+  document.getElementById(
+    "scriptoriumMarginalia"
+  );
+
+const scriptoriumMarginaliaToggle =
+  document.getElementById(
+    "scriptoriumMarginaliaToggle"
+  );
+
+const scriptoriumMarginaliaCorpus =
+  document.getElementById(
+    "scriptoriumMarginaliaCorpus"
+  );
+
 const meineTexteListe =
   document.getElementById(
     "meineTexteListe"
@@ -1664,6 +1679,194 @@ function misceFortuito(
   return mixta;
 }
 
+function reddeLemmaInMarginalia(
+  item
+) {
+  if (
+    !scriptoriumMarginaliaCorpus ||
+    !item
+  ) {
+    return;
+  }
+
+  scriptoriumMarginaliaCorpus
+    .innerHTML =
+      "";
+
+  const titulus =
+    document.createElement(
+      "h4"
+    );
+
+  titulus.className =
+    "scriptorium-marginalia-lemma";
+
+  titulus.textContent =
+    item.lemma ||
+    item.forma ||
+    "—";
+
+  const pars =
+    document.createElement(
+      "p"
+    );
+
+  pars.className =
+    "scriptorium-marginalia-pars";
+
+  pars.textContent =
+    item.pars_orationis ||
+    "pars orationis incerta";
+
+  const notae =
+    document.createElement(
+      "dl"
+    );
+
+  notae.className =
+    "scriptorium-marginalia-notae";
+
+  [
+    [
+      "Forma",
+      item.forma
+    ],
+    [
+      "Genus",
+      item.genus
+    ],
+    [
+      "Numerus",
+      item.numerus
+    ],
+    [
+      "Casus",
+      item.casus
+    ],
+    [
+      "Persona",
+      item.persona
+    ],
+    [
+      "Tempus",
+      item.tempus
+    ],
+    [
+      "Modus",
+      item.modus
+    ],
+    [
+      "Vox",
+      item.vox
+    ],
+    [
+      "Notae",
+      item.notae
+    ]
+  ]
+    .filter(
+      (
+        [
+          _titulus,
+          valor
+        ]
+      ) =>
+        valor !==
+          null &&
+        valor !==
+          undefined &&
+        String(
+          valor
+        ).trim() !==
+          ""
+    )
+    .forEach(
+      (
+        [
+          titulusNotae,
+          valor
+        ]
+      ) => {
+        const dt =
+          document.createElement(
+            "dt"
+          );
+
+        dt.textContent =
+          titulusNotae;
+
+        const dd =
+          document.createElement(
+            "dd"
+          );
+
+        dd.textContent =
+          String(
+            valor
+          );
+
+        notae.appendChild(
+          dt
+        );
+
+        notae.appendChild(
+          dd
+        );
+      }
+    );
+
+  scriptoriumMarginaliaCorpus
+    .appendChild(
+      titulus
+    );
+
+  scriptoriumMarginaliaCorpus
+    .appendChild(
+      pars
+    );
+
+  scriptoriumMarginaliaCorpus
+    .appendChild(
+      notae
+    );
+
+  if (
+    item.lexeme_id ||
+    item.lemma
+  ) {
+    const nexus =
+      document.createElement(
+        "a"
+      );
+
+    nexus.className =
+      "scriptorium-marginalia-plenum";
+
+    nexus.textContent =
+      "totum lemma aperire";
+
+    nexus.href =
+      item.lexeme_id
+        ? (
+            "lemma.html?lexeme_id=" +
+            encodeURIComponent(
+              item.lexeme_id
+            )
+          )
+        : (
+            "lemma.html?lemma=" +
+            encodeURIComponent(
+              item.lemma
+            )
+          );
+
+    scriptoriumMarginaliaCorpus
+      .appendChild(
+        nexus
+      );
+  }
+}
+
 function aktualisiereSuggestionesMetricas() {
   if (!suggestionesMetricaeLista) return;
 
@@ -1797,13 +2000,30 @@ suggestiones.forEach(function(item) {
   button.textContent =
     item.forma;
 
-  button.title =
+    button.title =
     item.notae ||
     item.lemma ||
     "";
 
-  button.draggable = true;
+  button.addEventListener(
+    "mouseenter",
+    function () {
+      reddeLemmaInMarginalia(
+        item
+      );
+    }
+  );
 
+  button.addEventListener(
+    "focus",
+    function () {
+      reddeLemmaInMarginalia(
+        item
+      );
+    }
+  );
+
+  button.draggable = true;
   button.addEventListener(
     "dragstart",
     function (event) {
@@ -1902,6 +2122,52 @@ suggestionesRenova
       aktualisiereSuggestionesMetricas();
 
       campus.focus();
+    }
+  );
+
+scriptoriumMarginaliaToggle
+  ?.addEventListener(
+    "click",
+    function () {
+      if (
+        !scriptoriumMarginalia
+      ) {
+        return;
+      }
+
+      const clausa =
+        scriptoriumMarginalia
+          .classList
+          .toggle(
+            "scriptorium-marginalia--clausa"
+          );
+
+      scriptoriumMarginalia
+        .setAttribute(
+          "aria-expanded",
+          String(
+            !clausa
+          )
+        );
+
+      scriptoriumMarginaliaToggle
+        .textContent =
+          clausa
+            ? "‹"
+            : "›";
+
+      scriptoriumMarginaliaToggle
+        .title =
+          clausa
+            ? "Marginaliam aperire"
+            : "Marginaliam claudere";
+
+      scriptoriumMarginaliaToggle
+        .setAttribute(
+          "aria-label",
+          scriptoriumMarginaliaToggle
+            .title
+        );
     }
   );
 
