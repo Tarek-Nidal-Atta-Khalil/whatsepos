@@ -468,6 +468,56 @@ function eligePrimumSlotumLiberum() {
     0;
 }
 
+function eligeSlotumLiberumPostVerbum(
+  indexPostVerbum
+) {
+  const occupata =
+    occupatioVersusInOpere();
+
+  /*
+   * Gewöhnlicher Fall:
+   * rechts unmittelbar hinter dem gerade
+   * eingesetzten Wort weiterschreiben.
+   */
+  for (
+    let index =
+      indexPostVerbum;
+    index <
+      occupata.length;
+    index +=
+      1
+  ) {
+    if (
+      !occupata[
+        index
+      ]
+    ) {
+      indexSlotusSelecti =
+        index;
+
+      positioInsertionisSelectae =
+        null;
+
+      campus.disabled =
+        false;
+
+      return;
+    }
+  }
+
+    /*
+   * Normalerweise wird rechts hinter dem
+   * gerade gesetzten Wort weitergeschrieben.
+   *
+   * Erst wenn rechts kein freier Platz mehr
+   * übrig ist, springt die Auswahl zur
+   * ersten verbleibenden Lücke links zurück.
+   */
+  eligeSlotumLiberumPostVerbum(
+    temptamen.indexPostVerbum
+  );
+}
+
 function textusLinearisVersusInOpere() {
   return verbaVersusInOpere
     .slice()
