@@ -406,6 +406,15 @@ body > h1 {
   color: #cbd5e1;
 }
 
+.hexameter-slot--selectabilis {
+  cursor: pointer;
+}
+
+.hexameter-slot--selectabilis:hover {
+  border-color: #93c5fd;
+  background: #eff6ff;
+}
+
 .hexameter-slot--activa {
   border-style: solid;
   border-color: #93c5fd;
