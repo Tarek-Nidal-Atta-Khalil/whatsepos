@@ -1772,14 +1772,16 @@ function reddeHexameterSlots() {
               occupatio
                 ?.span ||
               1
-            ) > 1,
+            ) >
+            1,
           potestEsseLonga:
             slotum.typus ===
               "brevis" &&
             indexSlotus >
               0 &&
             schemaDactylicum[
-              indexSlotus - 1
+              indexSlotus -
+              1
             ]?.typus ===
               "longa"
         };
@@ -1789,10 +1791,12 @@ function reddeHexameterSlots() {
   normalizaSlotumSelectum();
 
   for (
-    let indexSlotus = 0;
+    let indexSlotus =
+      0;
     indexSlotus <
       schemaDactylicum.length;
-    indexSlotus += 1
+    indexSlotus +=
+      1
   ) {
     const occupatio =
       occupata[
@@ -1800,9 +1804,9 @@ function reddeHexameterSlots() {
       ];
 
     /*
-     * Zweite Hälfte einer
-     * zweispaltigen langen Silbe
-     * nicht eigens rendern.
+     * Die zweite Hälfte einer langen
+     * spondeischen Silbe wird weiterhin
+     * nicht eigens gerendert.
      */
     if (
       occupatio
@@ -1811,18 +1815,26 @@ function reddeHexameterSlots() {
       continue;
     }
 
-    /*
-     * Bereits innerhalb eines Wortes:
-     * nur die erste Silbe des Wortes
-     * rendert die ganze Wortkarte.
-     */
-    if (
-      occupatio &&
-      occupatio.indexPartis >
-        0
-    ) {
-      continue;
-    }
+    const slotInfo =
+      schemaDactylicum[
+        indexSlotus
+      ];
+
+    const span =
+      occupatio
+        ?.span ||
+      1;
+
+    const indexFinis =
+      indexSlotus +
+      span -
+      1;
+
+    const finisPedis =
+      schemaDactylicum[
+        indexFinis
+      ]?.finisPedis ||
+      false;
 
     const item =
       document.createElement(
@@ -1833,57 +1845,76 @@ function reddeHexameterSlots() {
       "hexameter-slot-item";
 
     /*
-     * Fall A: leerer Slot wie bisher.
+     * Jeder sichtbare Silbenplatz bleibt
+     * ausdrücklich an seiner bisherigen
+     * metrischen Rasterposition.
      */
-    if (!occupatio) {
-      const slotInfo =
-        schemaDactylicum[
-          indexSlotus
-        ];
+    item.style.gridColumn =
+      `${indexSlotus + 1} / span ${span}`;
 
-      item.style.gridColumn =
-        `${indexSlotus + 1} / span 1`;
+    if (
+      finisPedis
+    ) {
+      item.classList.add(
+        "hexameter-slot-item--finis-pedis"
+      );
+    }
 
-      if (
-        slotInfo.finisPedis
-      ) {
-        item.classList.add(
-          "hexameter-slot-item--finis-pedis"
-        );
-      }
+    if (
+      span >
+      1
+    ) {
+      item.classList.add(
+        "hexameter-slot-item--span-2"
+      );
+    }
 
-      const signum =
-        document.createElement(
-          "div"
-        );
+    const signum =
+      document.createElement(
+        "div"
+      );
 
-      signum.className =
-        "hexameter-slot-signum hexameter-slot-signum--exspectatum";
+    signum.className =
+      "hexameter-slot-signum";
 
-      signum.textContent =
-        signumSchematis(
-          slotInfo.typus
-        );
+    signum.classList.add(
+      occupatio
+        ? "hexameter-slot-signum--repertum"
+        : "hexameter-slot-signum--exspectatum"
+    );
 
-      const slot =
-        document.createElement(
-          "div"
-        );
+    signum.textContent =
+      signumSchematis(
+        occupatio
+          ?.syllaba
+          ?.quantitas ||
+        slotInfo.typus
+      );
 
-      slot.className =
-        "hexameter-slot hexameter-slot--vacua hexameter-slot--selectabilis";
+    const slot =
+      document.createElement(
+        "div"
+      );
 
-      if (
-        indexSlotus ===
-        indexSlotusSelecti
-      ) {
-        slot.classList.add(
-          "hexameter-slot--activa"
-        );
-      }
+    slot.className =
+      "hexameter-slot";
 
-      slot.innerHTML =
-        "&nbsp;";
+    if (
+      span >
+      1
+    ) {
+      slot.classList.add(
+        "hexameter-slot--contractus"
+      );
+    }
+
+    if (
+      !occupatio
+    ) {
+      slot.classList.add(
+        "hexameter-slot--vacua",
+        "hexameter-slot--selectabilis"
+      );
 
       slot.addEventListener(
         "click",
@@ -1904,194 +1935,95 @@ function reddeHexameterSlots() {
           aktualisiereSuggestionesMetricas();
         }
       );
-
-      item.appendChild(
-        signum
-      );
-
-      item.appendChild(
-        slot
-      );
-
-      hexameterSlots.appendChild(
-        item
-      );
-
-      continue;
     }
-
-    /*
-     * Fall B: ganze Wortkarte.
-     */
-    const modelum =
-      modelumVerbiCompacti(
-        occupatio
-      );
-
-    item.classList.add(
-      "hexameter-slot-item--verbum-compactum"
-    );
-
-    item.style.gridColumn =
-      `${indexSlotus + 1} / span ${modelum.totalSpan}`;
-
-    const indexFinisVerbi =
-      indexSlotus +
-      modelum.totalSpan -
-      1;
 
     if (
-      schemaDactylicum[
-        indexFinisVerbi
-      ]?.finisPedis
+      indexSlotus ===
+      indexSlotusSelecti
     ) {
-      item.classList.add(
-        "hexameter-slot-item--finis-pedis"
+      slot.classList.add(
+        "hexameter-slot--activa"
       );
     }
-
-    const signaOrdo =
-      document.createElement(
-        "div"
-      );
-
-    signaOrdo.className =
-      "hexameter-slot-signa-ordo";
-
-    signaOrdo.style.gridTemplateColumns =
-      `repeat(${modelum.totalSpan}, minmax(0, 1fr))`;
-
-    const verbumCard =
-      document.createElement(
-        "div"
-      );
-
-    verbumCard.className =
-      "hexameter-verbum-card";
-
-    verbumCard.style.gridTemplateColumns =
-      `repeat(${modelum.totalSpan}, minmax(0, 1fr))`;
 
     if (
       occupatio
-        .verbum
-        .id ===
-      idVerbiInOpereSelecti
     ) {
-      verbumCard.classList.add(
-        "hexameter-verbum-card--selectum"
+      slot.classList.add(
+        "hexameter-slot--plena"
       );
-    }
 
-    modelum.compartimenta
-      .forEach(
+      if (
+        occupatio
+          .verbum
+          .id ===
+        idVerbiInOpereSelecti
+      ) {
+        slot.classList.add(
+          "hexameter-slot--verbum-selectum"
+        );
+      }
+
+      /*
+       * Die Silbenkarten bleiben getrennte
+       * Rasterelemente. Klassen verbinden
+       * sie anschließend lediglich optisch.
+       */
+      if (
+        occupatio.indexPartis >
+        0
+      ) {
+        slot.classList.add(
+          "hexameter-slot--coniunctus-sinistrorsum"
+        );
+      }
+
+      if (
+        occupatio.indexPartis <
+        occupatio.numerusPartium -
+          1
+      ) {
+        slot.classList.add(
+          "hexameter-slot--coniunctus-dextrorsum"
+        );
+      }
+
+      slot.textContent =
+        textusSyllabaeCumLimitibus(
+          occupatio
+        );
+
+      slot.dataset.quantitas =
+        occupatio
+          .syllaba
+          .quantitas ||
+        "";
+
+      slot.addEventListener(
+        "click",
         function (
-          compartimentum,
-          indexCompartimenti
+          event
         ) {
-          const signum =
-            document.createElement(
-              "div"
-            );
+          event.stopPropagation();
 
-          signum.className =
-            "hexameter-slot-signum hexameter-slot-signum--repertum";
-
-          signum.textContent =
-            signumSchematis(
-              compartimentum.quantitas ||
-              schemaDactylicum[
-                compartimentum.indexSlotus
-              ]?.typus
-            );
-
-          signum.style.gridColumn =
-            `span ${compartimentum.span}`;
-
-                    const indexFinisCompartimenti =
-            compartimentum.indexSlotus +
-            compartimentum.span -
-            1;
-
-          const estFinisPedisInternus =
-            schemaDactylicum[
-              indexFinisCompartimenti
-            ]?.finisPedis &&
-            indexCompartimenti <
-              modelum.compartimenta.length -
-              1;
-
-          if (
-            estFinisPedisInternus
-          ) {
-            signum.classList.add(
-              "hexameter-slot-signum--finis-pedis-internus"
-            );
-          }
-
-          signaOrdo.appendChild(
-            signum
-          );
-
-          const pars =
-            document.createElement(
-              "div"
-            );
-
-          pars.className =
-            "hexameter-verbum-compartimentum";
-
-          if (
-            indexCompartimenti >
-            0
-          ) {
-            pars.classList.add(
-              "hexameter-verbum-compartimentum--non-primum"
-            );
-          }
-
-          pars.dataset.quantitas =
-            compartimentum.quantitas;
-
-          /*
-           * Das Kompartiment bleibt über
-           * genau den metrischen Slots,
-           * welche die Silbe tatsächlich
-           * belegt.
-           */
-          pars.style.gridColumn =
-            `span ${compartimentum.span}`;
-
-          pars.textContent =
-            compartimentum.textus;
-
-          verbumCard.appendChild(
-            pars
+          eligeVerbumInOpere(
+            occupatio
+              .verbum
+              .id
           );
         }
       );
+    } else {
+      slot.innerHTML =
+        "&nbsp;";
+    }
 
-    verbumCard.addEventListener(
-      "click",
-      function (
-        event
-      ) {
-        event.stopPropagation();
-
-        eligeVerbumInOpere(
-          occupatio
-            .verbum
-            .id
-        );
-      }
+    item.appendChild(
+      signum
     );
 
     item.appendChild(
-      signaOrdo
-    );
-
-    item.appendChild(
-      verbumCard
+      slot
     );
 
     hexameterSlots.appendChild(
