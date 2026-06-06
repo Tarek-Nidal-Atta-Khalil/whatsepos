@@ -479,25 +479,51 @@ body > h1 {
 .hexameter-slot-signa-ordo {
   display: grid;
   align-items: center;
+
+  column-gap:
+    var(
+      --hexameter-grid-gap
+    );
 }
 
 .hexameter-verbum-card {
-  display: flex;
+  display: grid;
   align-items: stretch;
 
-  min-height: var(--hexameter-slot-min-height);
+  column-gap:
+    var(
+      --hexameter-grid-gap
+    );
 
-  border: 2px solid #cbd5e1;
-  border-radius: 16px;
+  min-height:
+    var(
+      --hexameter-slot-min-height
+    );
 
-  background: #eef2f7;
+  border:
+    2px solid
+    #cbd5e1;
+
+  border-radius:
+    16px;
+
+  background:
+    #eef2f7;
 
   box-shadow:
-    0 2px 6px rgba(15, 23, 42, .06);
+    0 2px 6px
+    rgba(
+      15,
+      23,
+      42,
+      .06
+    );
 
-  overflow: hidden;
+  overflow:
+    hidden;
 
-  cursor: pointer;
+  cursor:
+    pointer;
 }
 
 .hexameter-verbum-card--selectum {
@@ -507,6 +533,8 @@ body > h1 {
 
 .hexameter-verbum-compartimentum {
   min-width: 0;
+
+  position: relative;
 
   display: flex;
   align-items: center;
@@ -528,13 +556,40 @@ body > h1 {
   white-space: nowrap;
 }
 
-.hexameter-verbum-compartimentum--non-primum {
-  border-left: 2px solid #cbd5e1;
+.hexameter-verbum-compartimentum--non-primum::before {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  bottom: 0;
+
+  left:
+    calc(
+      var(
+        --hexameter-grid-gap
+      ) /
+      -2
+    );
+
+  width: 2px;
+
+  background:
+    #cbd5e1;
+
+  transform:
+    translateX(
+      -50%
+    );
+
+  pointer-events:
+    none;
 }
 
 .hexameter-verbum-card--selectum
-.hexameter-verbum-compartimentum--non-primum {
-  border-left-color: #93c5fd;
+.hexameter-verbum-compartimentum--non-primum::before {
+  background:
+    #93c5fd;
 }
 
 .versus-in-opere-vacuum {
@@ -629,6 +684,63 @@ body > h1 {
 .hexameter-slot-signum--exspectatum {
   color: #94a3b8;
   font-weight: 400;
+}
+
+.hexameter-slot-signum--finis-pedis-internus {
+  position:
+    relative;
+}
+
+.hexameter-slot-signum--finis-pedis-internus::after {
+  content:
+    "";
+
+  position:
+    absolute;
+
+  top:
+    0;
+
+  right:
+    calc(
+      var(
+        --hexameter-grid-gap
+      ) /
+      -2
+    );
+
+  bottom:
+    calc(
+      -1 *
+      (
+        var(
+          --hexameter-slot-min-height
+        ) +
+        var(
+          --hexameter-slot-gap
+        )
+      )
+    );
+
+  width:
+    2px;
+
+  background:
+    #94a3b8;
+
+  border-radius:
+    999px;
+
+  transform:
+    translateX(
+      50%
+    );
+
+  opacity:
+    .9;
+
+  pointer-events:
+    none;
 }
 
 .hexameter-slot--contractus {
