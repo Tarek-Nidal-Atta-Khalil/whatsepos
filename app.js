@@ -958,7 +958,7 @@ async function ladeDictionariumMetricum(optiones = {}) {
       } = await supabase
         .from("formae")
         .select(
-          "id, forma, lemma, pars_orationis, syllabae, longae, genus, numerus, casus, gradus, persona, tempus, modus, vox, notae"
+          "id, lexeme_id, forma, lemma, pars_orationis, syllabae, longae, genus, numerus, casus, gradus, persona, tempus, modus, vox, notae"
         )
         .not(
           "syllabae",
@@ -1133,6 +1133,40 @@ function deleImaginemSuggestionisTractae() {
     null;
 }
 
+function misceFortuito(
+  elementa
+) {
+  const mixta =
+    [
+      ...elementa
+    ];
+
+  for (
+    let index =
+      mixta.length - 1;
+    index > 0;
+    index -= 1
+  ) {
+    const indexFortuitus =
+      Math.floor(
+        Math.random() *
+        (
+          index + 1
+        )
+      );
+
+    [
+      mixta[index],
+      mixta[indexFortuitus]
+    ] = [
+      mixta[indexFortuitus],
+      mixta[index]
+    ];
+  }
+
+  return mixta;
+}
+
 function aktualisiereSuggestionesMetricas() {
   if (!suggestionesMetricaeLista) return;
 
@@ -1146,65 +1180,94 @@ function aktualisiereSuggestionesMetricas() {
     return;
   }
 
-  const formaeIamVisibiles = new Set();
-  const suggestiones = [];
+  const formaeIamVisibiles =
+    new Set();
 
-    for (
+  const lemmataIamVisibilia =
+    new Set();
+
+  const suggestiones =
+    [];
+
+  const candidati =
+    misceFortuito(
+      dictionariumMetricum
+        .map(
+          item => ({
+            ...item,
+
+            forma:
+              String(
+                item.forma ||
+                ""
+              ).trim()
+          })
+        )
+        .filter(
+          item =>
+            item.forma &&
+            !/\s/.test(
+              item.forma
+            ) &&
+            suggestioMetricePossibilis(
+              item.forma
+            )
+        )
+    );
+
+  for (
     const item of
-    dictionariumMetricum
+    candidati
   ) {
-    const forma =
-      String(
-        item.forma ||
-        ""
-      ).trim();
-
-    if (!forma) {
-      continue;
-    }
+    const clavisLemmae =
+      item.lexeme_id ||
+      [
+        item
+          .pars_orationis ||
+          "",
+        item.lemma ||
+          ""
+      ].join(
+        "|"
+      );
 
     /*
-     * In den Suggestiones sollen nur
-     * einzelne Wörter erscheinen.
-     *
-     * Mehrteilige Formen wie
-     * "acti sunt" oder "acti essent"
-     * bleiben im Vocabularium erhalten,
-     * werden hier aber nicht angeboten.
+     * Dieselbe sichtbare Wortform soll
+     * nicht mehrfach vorgeschlagen
+     * werden, auch wenn sie in mehreren
+     * Datensätzen vorkommt.
      */
     if (
-      /\s/.test(
-        forma
+      formaeIamVisibiles.has(
+        item.forma
       )
     ) {
       continue;
     }
 
+    /*
+     * Aus jedem Lemmaeintrag erscheint
+     * höchstens eine zufällig gewählte
+     * metrisch mögliche Form.
+     */
     if (
-      formaeIamVisibiles.has(
-        forma
+      lemmataIamVisibilia.has(
+        clavisLemmae
       )
     ) {
       continue;
     }
 
     formaeIamVisibiles.add(
-      forma
+      item.forma
     );
 
-    if (
-      !suggestioMetricePossibilis(
-        forma
-      )
-    ) {
-      continue;
-    }
+    lemmataIamVisibilia.add(
+      clavisLemmae
+    );
 
     suggestiones.push(
-      {
-        ...item,
-        forma
-      }
+      item
     );
 
     if (
