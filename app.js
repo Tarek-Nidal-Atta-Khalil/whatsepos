@@ -271,15 +271,54 @@ function limitesInsertionisMetrici(
 function limesInsertionisProSlotu(
   indexSlotus
 ) {
-  return limitesInsertionisMetrici()
-    .find(
-      limes =>
-        limes.indexSlotus ===
-        indexSlotus
-    ) ||
-    null;
-}
+  const limesRealis =
+    limitesInsertionisMetrici()
+      .find(
+        limes =>
+          limes.indexSlotus ===
+          indexSlotus
+      );
 
+  if (
+    limesRealis
+  ) {
+    return {
+      ...limesRealis,
+      futurus:
+        false
+    };
+  }
+
+  const slotum =
+    slotaVisualiaUltima[
+      indexSlotus
+    ];
+
+  /*
+   * Auch ein noch leerer Platz darf als
+   * metrische Suchposition ausgewählt
+   * werden. Da campus.value keine Lücken
+   * darstellen kann, liegt seine reale
+   * Texteingabeposition vorläufig am Ende
+   * des vorhandenen Textes.
+   */
+  if (
+    slotum &&
+    !slotum.syllaba
+  ) {
+    return {
+      indexSlotus,
+
+      positio:
+        campus.value.length,
+
+      futurus:
+        true
+    };
+  }
+
+  return null;
+}
 
 function normalizaSlotumSelectum() {
   const limites =
@@ -298,11 +337,13 @@ function normalizaSlotumSelectum() {
   }
 
   const limesIamSelectus =
-    limites.find(
-      limes =>
-        limes.indexSlotus ===
-        indexSlotusSelecti
-    );
+    Number.isInteger(
+      indexSlotusSelecti
+    )
+      ? limesInsertionisProSlotu(
+          indexSlotusSelecti
+        )
+      : null;
 
   if (
     limesIamSelectus
@@ -1331,6 +1372,29 @@ function suggestioMetricePossibilis(
       )
     ) {
       return false;
+    }
+
+    const limesSelectus =
+      Number.isInteger(
+        indexSlotusSelecti
+      )
+        ? limesInsertionisProSlotu(
+            indexSlotusSelecti
+          )
+        : null;
+
+    /*
+     * Bei einem noch nicht erreichten
+     * leeren Platz genügt vorläufig die
+     * lokale Prüfung der Anfangssilbe.
+     * Die vorangehenden metrischen Plätze
+     * sind schließlich noch unbesetzt.
+     */
+    if (
+      limesSelectus
+        ?.futurus
+    ) {
+      return true;
     }
 
     const analyse =
