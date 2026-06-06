@@ -173,9 +173,9 @@ body > h1 {
    */
   --hexameter-arbeitsbereich-hoehe:
     clamp(
-      320px,
-      36vh,
-      380px
+      390px,
+      44vh,
+      470px
     );
 
   display: block;
@@ -272,10 +272,11 @@ body > h1 {
       1fr
     )
     auto
+    auto
     auto;
 
   gap:
-    16px;
+    10px;
 
   z-index:
     940;
@@ -395,7 +396,7 @@ body > h1 {
   max-width: 100%;
   min-height: 34px;
 
-  margin: 12px auto 10px;
+  margin: 2px auto;
 
   display: flex;
   flex-wrap: wrap;
