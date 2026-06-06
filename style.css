@@ -758,9 +758,12 @@ body > h1 {
   width: var(--hexameter-centro-latitude);
   max-width: 100%;
   min-width: 0;
+  min-height: 48px;
+
   margin: 0 auto;
 
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: visible;
 }
 
 /*
