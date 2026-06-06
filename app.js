@@ -1149,17 +1149,70 @@ function aktualisiereSuggestionesMetricas() {
   const formaeIamVisibiles = new Set();
   const suggestiones = [];
 
-  for (const item of dictionariumMetricum) {
-    if (!item.forma) continue;
-    if (formaeIamVisibiles.has(item.forma)) continue;
+    for (
+    const item of
+    dictionariumMetricum
+  ) {
+    const forma =
+      String(
+        item.forma ||
+        ""
+      ).trim();
 
-    formaeIamVisibiles.add(item.forma);
+    if (!forma) {
+      continue;
+    }
 
-    if (!suggestioMetricePossibilis(item.forma)) continue;
+    /*
+     * In den Suggestiones sollen nur
+     * einzelne Wörter erscheinen.
+     *
+     * Mehrteilige Formen wie
+     * "acti sunt" oder "acti essent"
+     * bleiben im Vocabularium erhalten,
+     * werden hier aber nicht angeboten.
+     */
+    if (
+      /\s/.test(
+        forma
+      )
+    ) {
+      continue;
+    }
 
-    suggestiones.push(item);
+    if (
+      formaeIamVisibiles.has(
+        forma
+      )
+    ) {
+      continue;
+    }
 
-    if (suggestiones.length >= 30) break;
+    formaeIamVisibiles.add(
+      forma
+    );
+
+    if (
+      !suggestioMetricePossibilis(
+        forma
+      )
+    ) {
+      continue;
+    }
+
+    suggestiones.push(
+      {
+        ...item,
+        forma
+      }
+    );
+
+    if (
+      suggestiones.length >=
+      30
+    ) {
+      break;
+    }
   }
 
   if (suggestiones.length === 0) {
