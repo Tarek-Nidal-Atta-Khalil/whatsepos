@@ -1935,6 +1935,21 @@ function reddeHexameterSlots() {
     item.style.gridColumn =
       `${indexSlotus + 1} / span ${modelum.totalSpan}`;
 
+    const indexFinisVerbi =
+      indexSlotus +
+      modelum.totalSpan -
+      1;
+
+    if (
+      schemaDactylicum[
+        indexFinisVerbi
+      ]?.finisPedis
+    ) {
+      item.classList.add(
+        "hexameter-slot-item--finis-pedis"
+      );
+    }
+
     const signaOrdo =
       document.createElement(
         "div"
@@ -1944,7 +1959,7 @@ function reddeHexameterSlots() {
       "hexameter-slot-signa-ordo";
 
     signaOrdo.style.gridTemplateColumns =
-      `repeat(${modelum.compartimenta.length}, minmax(0, 1fr))`;
+      `repeat(${modelum.totalSpan}, minmax(0, 1fr))`;
 
     const verbumCard =
       document.createElement(
@@ -1955,7 +1970,7 @@ function reddeHexameterSlots() {
       "hexameter-verbum-card";
 
     verbumCard.style.gridTemplateColumns =
-      `repeat(${modelum.compartimenta.length}, minmax(0, 1fr))`;
+      `repeat(${modelum.totalSpan}, minmax(0, 1fr))`;
 
     if (
       occupatio
@@ -1990,6 +2005,30 @@ function reddeHexameterSlots() {
               ]?.typus
             );
 
+          signum.style.gridColumn =
+            `span ${compartimentum.span}`;
+
+                    const indexFinisCompartimenti =
+            compartimentum.indexSlotus +
+            compartimentum.span -
+            1;
+
+          const estFinisPedisInternus =
+            schemaDactylicum[
+              indexFinisCompartimenti
+            ]?.finisPedis &&
+            indexCompartimenti <
+              modelum.compartimenta.length -
+              1;
+
+          if (
+            estFinisPedisInternus
+          ) {
+            signum.classList.add(
+              "hexameter-slot-signum--finis-pedis-internus"
+            );
+          }
+
           signaOrdo.appendChild(
             signum
           );
@@ -2015,12 +2054,13 @@ function reddeHexameterSlots() {
             compartimentum.quantitas;
 
           /*
-           * Die Breite richtet sich nach
-           * der metrischen Spannweite der
-           * Silbe innerhalb des Wortes.
+           * Das Kompartiment bleibt über
+           * genau den metrischen Slots,
+           * welche die Silbe tatsächlich
+           * belegt.
            */
-          pars.style.flex =
-            `${compartimentum.span} 1 0`;
+          pars.style.gridColumn =
+            `span ${compartimentum.span}`;
 
           pars.textContent =
             compartimentum.textus;
