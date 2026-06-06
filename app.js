@@ -523,6 +523,208 @@ function eligeSlotumLiberumPostVerbum(
   eligePrimumSlotumLiberum();
 }
 
+function normalizaAdElisionem(
+  textus
+) {
+  return String(
+    textus ||
+    ""
+  )
+    .toLowerCase()
+    .replace(
+      /[āáàâäǎă]/g,
+      "a"
+    )
+    .replace(
+      /[ēéèêëĕ]/g,
+      "e"
+    )
+    .replace(
+      /[īíìîïĭ]/g,
+      "i"
+    )
+    .replace(
+      /[ōóòôöŏ]/g,
+      "o"
+    )
+    .replace(
+      /[ūúùûüŭ]/g,
+      "u"
+    )
+    .replace(
+      /[ȳýỳŷÿ]/g,
+      "y"
+    )
+    .replace(
+      /[^a-z]/g,
+      ""
+    );
+}
+
+function incipitVocaliAutH(
+  forma
+) {
+  const textus =
+    normalizaAdElisionem(
+      forma
+    );
+
+  /*
+   * Initiales i und u können vor einem
+   * weiteren Vokal konsonantisch sein.
+   * Dann lösen sie keine Elision aus.
+   */
+  if (
+    /^i[aeiouy]/.test(
+      textus
+    ) ||
+    /^u[aeiouy]/.test(
+      textus
+    )
+  ) {
+    return false;
+  }
+
+  return /^[aeiouyh]/.test(
+    textus
+  );
+}
+
+function finitElidibiliter(
+  forma
+) {
+  const textus =
+    normalizaAdElisionem(
+      forma
+    );
+
+  return /(?:[aeiouy]m|[aeiouy])$/.test(
+    textus
+  );
+}
+
+function estSlotumBreveNonContrahibile(
+  indexSlotus
+) {
+  const slotum =
+    schemaDactylicum[
+      indexSlotus
+    ];
+
+  if (
+    slotum
+      ?.typus !==
+    "brevis"
+  ) {
+    return false;
+  }
+
+  /*
+   * Die erste der beiden Kürzen eines
+   * Fußes darf durch eine Länge ersetzt
+   * werden: — ˘ ˘  wird dann zu  — —.
+   *
+   * Für die zweite Kürze gilt das nicht.
+   */
+  const estPrimaBrevisPedis =
+    indexSlotus >
+      0 &&
+    schemaDactylicum[
+      indexSlotus -
+      1
+    ]?.typus ===
+      "longa";
+
+  return !estPrimaBrevisPedis;
+}
+
+function occupatioElisionemPostulat(
+  occupatio,
+  indexSlotus
+) {
+  if (
+    !occupatio ||
+    occupatio
+      .continuatio
+  ) {
+    return false;
+  }
+
+  const estUltimaSyllabaVerbi =
+    occupatio
+      .indexPartis ===
+    occupatio
+      .numerusPartium -
+      1;
+
+  if (
+    !estUltimaSyllabaVerbi
+  ) {
+    return false;
+  }
+
+  if (
+    occupatio
+      .syllaba
+      ?.quantitas !==
+    "longa"
+  ) {
+    return false;
+  }
+
+  if (
+    !estSlotumBreveNonContrahibile(
+      indexSlotus
+    )
+  ) {
+    return false;
+  }
+
+  return finitElidibiliter(
+    occupatio
+      .verbum
+      .forma
+  );
+}
+
+function condicioElisionisPraecedentisServatur(
+  forma,
+  indexSlotusInitialis,
+  occupata
+) {
+  if (
+    !Number.isInteger(
+      indexSlotusInitialis
+    ) ||
+    indexSlotusInitialis <=
+      0
+  ) {
+    return true;
+  }
+
+  const indexPraecedens =
+    indexSlotusInitialis -
+    1;
+
+  const occupatioPraecedens =
+    occupata[
+      indexPraecedens
+    ];
+
+  if (
+    !occupatioElisionemPostulat(
+      occupatioPraecedens,
+      indexPraecedens
+    )
+  ) {
+    return true;
+  }
+
+  return incipitVocaliAutH(
+    forma
+  );
+}
+
 function textusSyllabaeCumLimitibus(
   occupatio
 ) {
@@ -787,6 +989,20 @@ function fuegeVerbumInVersumOperis(
 
   const occupata =
     occupatioVersusInOpere();
+
+  if (
+    !condicioElisionisPraecedentisServatur(
+      verbum,
+      indexSlotusSelecti,
+      occupata
+    )
+  ) {
+    setStatus(
+      "Verbum praecedens elisionem postulat: sequens a uocali aut h incipere debet."
+    );
+
+    return false;
+  }
 
   const temptamen =
     tentaPositionemVerbi(
@@ -2128,6 +2344,19 @@ function suggestioMetricePossibilis(
       return false;
     }
 
+    const occupata =
+      occupatioVersusInOpere();
+
+    if (
+      !condicioElisionisPraecedentisServatur(
+        forma,
+        indexSlotusSelecti,
+        occupata
+      )
+    ) {
+      return false;
+    }
+
     if (
       !suggestioInSlotumSelectumCadit(
         forma
@@ -2139,7 +2368,7 @@ function suggestioMetricePossibilis(
     return tentaPositionemVerbi(
       forma,
       indexSlotusSelecti,
-      occupatioVersusInOpere()
+      occupata
     ).bene;
   } catch (
     _fehler
