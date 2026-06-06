@@ -1674,6 +1674,65 @@ function slotaVisualiaHexametri(
   return visualia;
 }
 
+function modelumVerbiCompacti(
+  occupatioInitialis
+) {
+  const verbum =
+    occupatioInitialis?.verbum;
+
+  const partes =
+    verbum?.partes || [];
+
+  const compartimenta =
+    partes.map(
+      function (
+        pars,
+        indexPartis
+      ) {
+        return {
+          textus:
+            textusSyllabaeCumLimitibus(
+              {
+                syllaba:
+                  pars.syllaba,
+                indexPartis,
+                numerusPartium:
+                  partes.length
+              }
+            ),
+          quantitas:
+            pars.syllaba
+              ?.quantitas ||
+            "",
+          span:
+            pars.span || 1,
+          indexSlotus:
+            pars.indexSlotus
+        };
+      }
+    );
+
+  const totalSpan =
+    compartimenta.reduce(
+      function (
+        summa,
+        compartimentum
+      ) {
+        return (
+          summa +
+          compartimentum.span
+        );
+      },
+      0
+    );
+
+  return {
+    verbum,
+    compartimenta,
+    totalSpan
+  };
+}
+
 function reddeHexameterSlots() {
   if (
     !hexameterSlots
@@ -1713,16 +1772,14 @@ function reddeHexameterSlots() {
               occupatio
                 ?.span ||
               1
-            ) >
-            1,
+            ) > 1,
           potestEsseLonga:
             slotum.typus ===
               "brevis" &&
             indexSlotus >
               0 &&
             schemaDactylicum[
-              indexSlotus -
-              1
+              indexSlotus - 1
             ]?.typus ===
               "longa"
         };
@@ -1732,12 +1789,10 @@ function reddeHexameterSlots() {
   normalizaSlotumSelectum();
 
   for (
-    let indexSlotus =
-      0;
+    let indexSlotus = 0;
     indexSlotus <
       schemaDactylicum.length;
-    indexSlotus +=
-      1
+    indexSlotus += 1
   ) {
     const occupatio =
       occupata[
@@ -1745,10 +1800,9 @@ function reddeHexameterSlots() {
       ];
 
     /*
-     * Eine lange zweite Silbe eines
-     * spondeischen Fußes wird nur einmal
-     * dargestellt, nimmt aber zwei
-     * Rasterspalten ein.
+     * Zweite Hälfte einer
+     * zweispaltigen langen Silbe
+     * nicht eigens rendern.
      */
     if (
       occupatio
@@ -1757,26 +1811,18 @@ function reddeHexameterSlots() {
       continue;
     }
 
-    const slotInfo =
-      schemaDactylicum[
-        indexSlotus
-      ];
-
-    const span =
-      occupatio
-        ?.span ||
-      1;
-
-    const indexFinis =
-      indexSlotus +
-      span -
-      1;
-
-    const finisPedis =
-      schemaDactylicum[
-        indexFinis
-      ]?.finisPedis ||
-      false;
+    /*
+     * Bereits innerhalb eines Wortes:
+     * nur die erste Silbe des Wortes
+     * rendert die ganze Wortkarte.
+     */
+    if (
+      occupatio &&
+      occupatio.indexPartis >
+        0
+    ) {
+      continue;
+    }
 
     const item =
       document.createElement(
@@ -1786,69 +1832,58 @@ function reddeHexameterSlots() {
     item.className =
       "hexameter-slot-item";
 
-    if (
-      finisPedis
-    ) {
-      item.classList.add(
-        "hexameter-slot-item--finis-pedis"
-      );
-    }
+    /*
+     * Fall A: leerer Slot wie bisher.
+     */
+    if (!occupatio) {
+      const slotInfo =
+        schemaDactylicum[
+          indexSlotus
+        ];
 
-    if (
-      span >
-      1
-    ) {
-      item.classList.add(
-        "hexameter-slot-item--span-2"
-      );
-    }
+      item.style.gridColumn =
+        `${indexSlotus + 1} / span 1`;
 
-    const signum =
-      document.createElement(
-        "div"
-      );
+      if (
+        slotInfo.finisPedis
+      ) {
+        item.classList.add(
+          "hexameter-slot-item--finis-pedis"
+        );
+      }
 
-    signum.className =
-      "hexameter-slot-signum";
+      const signum =
+        document.createElement(
+          "div"
+        );
 
-    signum.classList.add(
-      occupatio
-        ? "hexameter-slot-signum--repertum"
-        : "hexameter-slot-signum--exspectatum"
-    );
+      signum.className =
+        "hexameter-slot-signum hexameter-slot-signum--exspectatum";
 
-    signum.textContent =
-      signumSchematis(
-        occupatio
-          ?.syllaba
-          ?.quantitas ||
-        slotInfo.typus
-      );
+      signum.textContent =
+        signumSchematis(
+          slotInfo.typus
+        );
 
-    const slot =
-      document.createElement(
-        "div"
-      );
+      const slot =
+        document.createElement(
+          "div"
+        );
 
-    slot.className =
-      "hexameter-slot";
+      slot.className =
+        "hexameter-slot hexameter-slot--vacua hexameter-slot--selectabilis";
 
-    if (
-      span >
-      1
-    ) {
-      slot.classList.add(
-        "hexameter-slot--contractus"
-      );
-    }
+      if (
+        indexSlotus ===
+        indexSlotusSelecti
+      ) {
+        slot.classList.add(
+          "hexameter-slot--activa"
+        );
+      }
 
-    if (
-      !occupatio
-    ) {
-      slot.classList.add(
-        "hexameter-slot--vacua",
-        "hexameter-slot--selectabilis"
-      );
+      slot.innerHTML =
+        "&nbsp;";
 
       slot.addEventListener(
         "click",
@@ -1869,59 +1904,157 @@ function reddeHexameterSlots() {
           aktualisiereSuggestionesMetricas();
         }
       );
+
+      item.appendChild(
+        signum
+      );
+
+      item.appendChild(
+        slot
+      );
+
+      hexameterSlots.appendChild(
+        item
+      );
+
+      continue;
     }
+
+    /*
+     * Fall B: ganze Wortkarte.
+     */
+    const modelum =
+      modelumVerbiCompacti(
+        occupatio
+      );
+
+    item.classList.add(
+      "hexameter-slot-item--verbum-compactum"
+    );
+
+    item.style.gridColumn =
+      `${indexSlotus + 1} / span ${modelum.totalSpan}`;
+
+    const signaOrdo =
+      document.createElement(
+        "div"
+      );
+
+    signaOrdo.className =
+      "hexameter-slot-signa-ordo";
+
+    signaOrdo.style.gridTemplateColumns =
+      `repeat(${modelum.compartimenta.length}, minmax(0, 1fr))`;
+
+    const verbumCard =
+      document.createElement(
+        "div"
+      );
+
+    verbumCard.className =
+      "hexameter-verbum-card";
+
+    verbumCard.style.gridTemplateColumns =
+      `repeat(${modelum.compartimenta.length}, minmax(0, 1fr))`;
 
     if (
-      indexSlotus ===
-      indexSlotusSelecti
+      occupatio
+        .verbum
+        .id ===
+      idVerbiInOpereSelecti
     ) {
-      slot.classList.add(
-        "hexameter-slot--activa"
+      verbumCard.classList.add(
+        "hexameter-verbum-card--selectum"
       );
     }
 
-        if (
-      occupatio
-    ) {
-      slot.classList.add(
-        "hexameter-slot--plena"
+    modelum.compartimenta
+      .forEach(
+        function (
+          compartimentum,
+          indexCompartimenti
+        ) {
+          const signum =
+            document.createElement(
+              "div"
+            );
+
+          signum.className =
+            "hexameter-slot-signum hexameter-slot-signum--repertum";
+
+          signum.textContent =
+            signumSchematis(
+              compartimentum.quantitas ||
+              schemaDactylicum[
+                compartimentum.indexSlotus
+              ]?.typus
+            );
+
+          signaOrdo.appendChild(
+            signum
+          );
+
+          const pars =
+            document.createElement(
+              "div"
+            );
+
+          pars.className =
+            "hexameter-verbum-compartimentum";
+
+          if (
+            indexCompartimenti >
+            0
+          ) {
+            pars.classList.add(
+              "hexameter-verbum-compartimentum--non-primum"
+            );
+          }
+
+          pars.dataset.quantitas =
+            compartimentum.quantitas;
+
+          /*
+           * Die Breite richtet sich nach
+           * der metrischen Spannweite der
+           * Silbe innerhalb des Wortes.
+           */
+          pars.style.flex =
+            `${compartimentum.span} 1 0`;
+
+          pars.textContent =
+            compartimentum.textus;
+
+          verbumCard.appendChild(
+            pars
+          );
+        }
       );
 
-      if (
-        occupatio
-          .verbum
-          .id ===
-        idVerbiInOpereSelecti
+    verbumCard.addEventListener(
+      "click",
+      function (
+        event
       ) {
-        slot.classList.add(
-          "hexameter-slot--verbum-selectum"
+        event.stopPropagation();
+
+        eligeVerbumInOpere(
+          occupatio
+            .verbum
+            .id
         );
       }
-
-      slot.textContent =
-        textusSyllabaeCumLimitibus(
-          occupatio
-        );
-
-      slot.dataset.quantitas =
-        occupatio
-          .syllaba
-          .quantitas ||
-        "";
-    } else {
-      slot.innerHTML =
-        "&nbsp;";
-    }
-
-    item.appendChild(
-      signum
     );
 
     item.appendChild(
-      slot
+      signaOrdo
     );
 
-        hexameterSlots.appendChild(
+    item.appendChild(
+      verbumCard
+    );
+
+    hexameterSlots.appendChild(
       item
     );
   }
