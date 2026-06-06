@@ -771,6 +771,10 @@ body > h1 {
   cursor: pointer;
 }
 
+#verbumInOpereDele[hidden] {
+  display: none;
+}
+
 #campusPurga {
   background: #e5e7eb;
   color: #475569;
