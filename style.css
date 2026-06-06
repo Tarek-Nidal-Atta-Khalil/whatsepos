@@ -618,6 +618,53 @@ body > h1 {
   text-align: left;
   z-index: 900;
 }
+
+.suggestiones-kopf {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.suggestiones-kopf h3 {
+  margin: 0;
+}
+
+.suggestiones-renova {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 34px;
+  height: 34px;
+  margin: 0;
+  padding: 0;
+
+  border: 1px solid #d1d5db;
+  border-radius: 50%;
+
+  background: #ffffff;
+  color: #64748b;
+
+  font-size: 22px;
+  line-height: 1;
+
+  cursor: pointer;
+}
+
+.suggestiones-renova:hover,
+.suggestiones-renova:focus {
+  outline: none;
+  border-color: #93c5fd;
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.suggestiones-renova:active {
+  transform: rotate(45deg);
+}
+
 .suggestio-item { display: block; width: 100%; box-sizing: border-box; padding: 8px 12px; border-radius: 12px; background: #f8fafc; font-size: 18px; }
 
 /* Vocabularium */
