@@ -134,10 +134,32 @@ const numerusMaximusSilbarum =
   schemaDactylicum.length;
 
 let campusUltimusValidus = "";
-let suggestioTracta = null;
-let suggestioNuperTracta = false;
-let imagoSuggestionisTractae = null;
-let positioInsertionisTractae = null;
+
+let suggestioTracta =
+  null;
+
+let suggestioNuperTracta =
+  false;
+
+let imagoSuggestionisTractae =
+  null;
+
+let positioInsertionisTractae =
+  null;
+
+/*
+ * Der ausgewählte metrische Silbenplatz
+ * und die dazugehörige Einfügeposition
+ * innerhalb von campus.value.
+ */
+let indexSlotusSelecti =
+  null;
+
+let positioInsertionisSelectae =
+  null;
+
+let slotaVisualiaUltima =
+  [];
 
 function signumSchematis(
   typus
@@ -170,6 +192,161 @@ function campusIntraLimen(textus) {
     syllabaeCampi(textus).length <=
     numerusMaximusSilbarum
   );
+}
+
+function limitesInsertionisMetrici(
+  textus =
+    campus.value
+) {
+  const limites =
+    [
+      {
+        positio:
+          0,
+
+        indexSlotus:
+          0
+      }
+    ];
+
+  const expressio =
+    /\S+/g;
+
+  let congruentia;
+
+  while (
+    (
+      congruentia =
+        expressio.exec(
+          String(
+            textus ||
+            ""
+          )
+        )
+    )
+  ) {
+    const positio =
+      congruentia.index +
+      congruentia[0].length;
+
+    const parsPraecedens =
+      String(
+        textus ||
+        ""
+      )
+        .slice(
+          0,
+          positio
+        )
+        .trim();
+
+    limites.push({
+      positio,
+
+      indexSlotus:
+        syllabaeCampi(
+          parsPraecedens
+        ).length
+    });
+  }
+
+  /*
+   * Dieselbe metrische Grenze kann durch
+   * Leerzeichen mehrfach vorkommen.
+   * Wir behalten jeweils nur einen Eintrag.
+   */
+  return [
+    ...new Map(
+      limites.map(
+        limes => [
+          limes.indexSlotus,
+          limes
+        ]
+      )
+    ).values()
+  ];
+}
+
+
+function limesInsertionisProSlotu(
+  indexSlotus
+) {
+  return limitesInsertionisMetrici()
+    .find(
+      limes =>
+        limes.indexSlotus ===
+        indexSlotus
+    ) ||
+    null;
+}
+
+
+function normalizaSlotumSelectum() {
+  const limites =
+    limitesInsertionisMetrici();
+
+  if (
+    !limites.length
+  ) {
+    indexSlotusSelecti =
+      0;
+
+    positioInsertionisSelectae =
+      0;
+
+    return;
+  }
+
+  const limesIamSelectus =
+    limites.find(
+      limes =>
+        limes.indexSlotus ===
+        indexSlotusSelecti
+    );
+
+  if (
+    limesIamSelectus
+  ) {
+    positioInsertionisSelectae =
+      limesIamSelectus
+        .positio;
+
+    return;
+  }
+
+  const positioCursoris =
+    Number.isInteger(
+      campus.selectionStart
+    )
+      ? campus.selectionStart
+      : campus.value.length;
+
+  const limesProximus =
+    limites.reduce(
+      (
+        optimus,
+        limes
+      ) =>
+        Math.abs(
+          limes.positio -
+          positioCursoris
+        ) <
+        Math.abs(
+          optimus.positio -
+          positioCursoris
+        )
+          ? limes
+          : optimus,
+      limites[0]
+    );
+
+  indexSlotusSelecti =
+    limesProximus
+      .indexSlotus;
+
+  positioInsertionisSelectae =
+    limesProximus
+      .positio;
 }
 
 function syllabaePerPedes(
@@ -208,7 +385,8 @@ function creaSlotumVisualem({
   syllaba = null,
   span = 1,
   finisPedis = false,
-  contractus = false
+  contractus = false,
+  potestEsseLonga = false
 }) {
   return {
     typus,
@@ -216,6 +394,7 @@ function creaSlotumVisualem({
     span,
     finisPedis,
     contractus,
+    potestEsseLonga,
     activa: false
   };
 }
@@ -301,8 +480,20 @@ function slotaVisualiaHexametri(
     } else {
       visualia.push(
         creaSlotumVisualem({
-          typus: "brevis",
-          syllaba: secunda
+          typus:
+            "brevis",
+
+          syllaba:
+            secunda,
+
+          /*
+           * An dieser Stelle darf statt
+           * der ersten kurzen Silbe auch
+           * eine lange Silbe stehen:
+           * — ˘ ˘  oder  — —
+           */
+          potestEsseLonga:
+            true
         })
       );
 
@@ -314,17 +505,6 @@ function slotaVisualiaHexametri(
         })
       );
     }
-  }
-
-  const indexPrimiVacui =
-    visualia.findIndex(
-      slotum => !slotum.syllaba
-    );
-
-  if (indexPrimiVacui >= 0) {
-    visualia[
-      indexPrimiVacui
-    ].activa = true;
   }
 
   return visualia;
@@ -345,8 +525,16 @@ function reddeHexameterSlots() {
       syllabae
     );
 
+  slotaVisualiaUltima =
+    slotaVisualia;
+
+  normalizaSlotumSelectum();
+
   slotaVisualia.forEach(
-    function (slotInfo) {
+    function (
+      slotInfo,
+      indexSlotus
+    ) {
       const item =
         document.createElement(
           "div"
@@ -400,6 +588,55 @@ function reddeHexameterSlots() {
       if (slotInfo.contractus) {
         slot.classList.add(
           "hexameter-slot--contractus"
+        );
+      }
+
+            const limesInsertionis =
+        limesInsertionisProSlotu(
+          indexSlotus
+        );
+
+      if (
+        limesInsertionis
+      ) {
+        slot.classList.add(
+          "hexameter-slot--selectabilis"
+        );
+
+        slot.addEventListener(
+          "click",
+          function (
+            event
+          ) {
+            event.stopPropagation();
+
+            indexSlotusSelecti =
+              indexSlotus;
+
+            positioInsertionisSelectae =
+              limesInsertionis
+                .positio;
+
+            campus.focus();
+
+            campus.setSelectionRange(
+              positioInsertionisSelectae,
+              positioInsertionisSelectae
+            );
+
+            reddeHexameterSlots();
+
+            aktualisiereSuggestionesMetricas();
+          }
+        );
+      }
+
+      if (
+        indexSlotus ===
+        indexSlotusSelecti
+      ) {
+        slot.classList.add(
+          "hexameter-slot--activa"
         );
       }
 
@@ -802,8 +1039,23 @@ campus.addEventListener("keydown", async function(event) {
 });
 let suggestionesMetricaeTimer = null;
 
-campus.addEventListener("input", async function () {
-  await ladeDictionariumMetricum();
+campus.addEventListener(
+  "input",
+  async function () {
+    await ladeDictionariumMetricum();
+
+    /*
+     * Nach einer manuellen Eingabe oder
+     * nach dem Einsetzen einer Suggestion
+     * wird die metrische Auswahl anhand
+     * der aktuellen Cursorposition neu
+     * bestimmt.
+     */
+    indexSlotusSelecti =
+      null;
+
+    positioInsertionisSelectae =
+      null;
 
   if (
     !campusIntraLimen(
@@ -830,9 +1082,64 @@ campus.addEventListener("input", async function () {
     }, 120);
 });
 
-function textusCumSuggestione(forma) {
-  const basis = campus.value.trim();
-  return basis === "" ? forma : basis + " " + forma;
+function textusCumSuggestione(
+  forma
+) {
+  const verbum =
+    String(
+      forma ||
+      ""
+    ).trim();
+
+  if (
+    !verbum
+  ) {
+    return campus.value;
+  }
+
+  normalizaSlotumSelectum();
+
+  const positio =
+    Number.isInteger(
+      positioInsertionisSelectae
+    )
+      ? positioInsertionisSelectae
+      : campus.value.length;
+
+  const parsSinistra =
+    campus.value.slice(
+      0,
+      positio
+    );
+
+  const parsDextera =
+    campus.value.slice(
+      positio
+    );
+
+  const spatiumSinistrum =
+    parsSinistra &&
+    !/\s$/.test(
+      parsSinistra
+    )
+      ? " "
+      : "";
+
+  const spatiumDextrum =
+    parsDextera &&
+    !/^\s/.test(
+      parsDextera
+    )
+      ? " "
+      : "";
+
+  return (
+    parsSinistra +
+    spatiumSinistrum +
+    verbum +
+    spatiumDextrum +
+    parsDextera
+  );
 }
 
 function insereVerbumInCampum(
@@ -934,15 +1241,129 @@ function insereVerbumInCampum(
   return true;
 }
 
-function suggestioMetricePossibilis(forma) {
-  try {
-    const analyse = erstelleAnalysezeile(textusCumSuggestione(forma));
+function suggestioInSlotumSelectumCadit(
+  forma
+) {
+  normalizaSlotumSelectum();
 
-    if (analyse.abschickbar) return true;
-    if ((analyse.elemente || []).length <= 17 && !analyse.elemente.some(e => e.problema)) return true;
+  const slotum =
+    slotaVisualiaUltima[
+      indexSlotusSelecti
+    ];
+
+  /*
+   * Vor dem ersten Zeichnen der Slots
+   * ist noch keine grafische Information
+   * vorhanden. Dann greift weiterhin die
+   * allgemeine metrische Prüfung.
+   */
+  if (
+    !slotum
+  ) {
+    return true;
+  }
+
+  if (
+    slotum.typus ===
+      "x" ||
+    slotum.typus ===
+      "anceps"
+  ) {
+    return true;
+  }
+
+  const analyse =
+    erstelleAnalysezeile(
+      String(
+        forma ||
+        ""
+      ).trim()
+    );
+
+  const primaSyllaba =
+    (
+      analyse.elemente ||
+      []
+    )[0];
+
+  if (
+    !primaSyllaba
+  ) {
+    return false;
+  }
+
+  if (
+    slotum.typus ===
+    "longa"
+  ) {
+    return (
+      primaSyllaba.quantitas ===
+      "longa"
+    );
+  }
+
+  if (
+    slotum.typus ===
+    "brevis"
+  ) {
+    return (
+      primaSyllaba.quantitas ===
+        "brevis" ||
+      (
+        slotum
+          .potestEsseLonga &&
+        primaSyllaba.quantitas ===
+          "longa"
+      )
+    );
+  }
+
+  return true;
+}
+
+function suggestioMetricePossibilis(
+  forma
+) {
+  try {
+    if (
+      !suggestioInSlotumSelectumCadit(
+        forma
+      )
+    ) {
+      return false;
+    }
+
+    const analyse =
+      erstelleAnalysezeile(
+        textusCumSuggestione(
+          forma
+        )
+      );
+
+    if (
+      analyse.abschickbar
+    ) {
+      return true;
+    }
+
+    if (
+      (
+        analyse.elemente ||
+        []
+      ).length <=
+        17 &&
+      !analyse.elemente.some(
+        elementum =>
+          elementum.problema
+      )
+    ) {
+      return true;
+    }
 
     return false;
-  } catch (_fehler) {
+  } catch (
+    _fehler
+  ) {
     return false;
   }
 }
@@ -1398,7 +1819,8 @@ suggestiones.forEach(function(item) {
     }
 
     insereVerbumInCampum(
-      item.forma
+      item.forma,
+      positioInsertionisSelectae
     );
   };
 
