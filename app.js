@@ -801,12 +801,28 @@ function eligeVerbumInOpere(
     ""
   );
 
+  /*
+   * Zuerst nur die sichtbare Auswahl
+   * aktualisieren. Dadurch erscheinen
+   * Markierung und Löschknopf sofort.
+   */
   reddeHexameterSlots();
   actualizaInstrumentaVerbiInOpere();
-  aktualisiereSuggestionesMetricas();
 
   campus.focus();
   campus.select();
+
+  /*
+   * Die aufwendigere Neuberechnung der
+   * Suggestiones erfolgt erst danach in
+   * einem neuen Ereignisdurchlauf.
+   */
+  window.setTimeout(
+    function () {
+      aktualisiereSuggestionesMetricas();
+    },
+    0
+  );
 }
 
 function deleVerbumInOpereSelectum() {
