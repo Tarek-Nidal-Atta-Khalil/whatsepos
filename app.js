@@ -2591,30 +2591,36 @@ function suggestioMetricePossibilis(
   try {
     normalizaSlotumSelectum();
 
+    const verbumSelectum =
+      verbumInOpereSelectum();
+
+    const indexInsertionis =
+      verbumSelectum
+        ? verbumSelectum
+            .indexSlotusInitialis
+        : indexSlotusSelecti;
+
     if (
       !Number.isInteger(
-        indexSlotusSelecti
+        indexInsertionis
       )
     ) {
       return false;
     }
 
     const occupata =
-      occupatioVersusInOpere();
+      occupatioVersusInOpere({
+        idVerbiExclusi:
+          verbumSelectum
+            ?.id ||
+          null
+      });
 
     if (
       !condicioElisionisPraecedentisServatur(
         forma,
-        indexSlotusSelecti,
+        indexInsertionis,
         occupata
-      )
-    ) {
-      return false;
-    }
-
-    if (
-      !suggestioInSlotumSelectumCadit(
-        forma
       )
     ) {
       return false;
@@ -2622,7 +2628,7 @@ function suggestioMetricePossibilis(
 
     return tentaPositionemVerbi(
       forma,
-      indexSlotusSelecti,
+      indexInsertionis,
       occupata
     ).bene;
   } catch (
