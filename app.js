@@ -176,6 +176,438 @@ let positioInsertionisSelectae =
 let slotaVisualiaUltima =
   [];
 
+/*
+ * Der noch unfertige Vers besteht nicht mehr
+ * aus einem linearen String im Eingabefeld.
+ *
+ * Jedes bereits gesetzte Wort merkt sich
+ * stattdessen seinen metrischen Anfangsplatz.
+ */
+let verbaVersusInOpere =
+  [];
+
+let numerusVerbiInOpere =
+  0;
+
+function creaIdVerbiInOpere() {
+  numerusVerbiInOpere +=
+    1;
+
+  return (
+    "verbum-" +
+    numerusVerbiInOpere
+  );
+}
+
+function syllabaeFormaeInOpere(
+  forma
+) {
+  return syllabaeCampi(
+    String(
+      forma ||
+      ""
+    ).trim()
+  );
+}
+
+/*
+ * Eine lange Silbe an der ersten Stelle
+ * der beiden Kürzen eines Fußes ersetzt
+ * beide Kürzen: — ˘ ˘  wird zu  — —.
+ */
+function latitudoSyllabaeInSlotis(
+  syllaba,
+  indexSlotus
+) {
+  const slotum =
+    schemaDactylicum[
+      indexSlotus
+    ];
+
+  if (!slotum) {
+    return null;
+  }
+
+  const estPrimaBrevisPedis =
+    slotum.typus ===
+      "brevis" &&
+    indexSlotus >
+      0 &&
+    schemaDactylicum[
+      indexSlotus - 1
+    ]?.typus ===
+      "longa";
+
+  if (
+    estPrimaBrevisPedis &&
+    syllaba?.quantitas ===
+      "longa"
+  ) {
+    return 2;
+  }
+
+  return 1;
+}
+
+function tentaPositionemVerbi(
+  forma,
+  indexSlotusInitialis,
+  occupata =
+    Array(
+      numerusMaximusSilbarum
+    ).fill(
+      null
+    )
+) {
+  if (
+    !Number.isInteger(
+      indexSlotusInitialis
+    )
+  ) {
+    return {
+      bene: false,
+      causa:
+        "Nullus locus syllabae selectus est."
+    };
+  }
+
+  const syllabae =
+    syllabaeFormaeInOpere(
+      forma
+    );
+
+  if (
+    syllabae.length ===
+    0
+  ) {
+    return {
+      bene: false,
+      causa:
+        "Verbum syllabificari non potest."
+    };
+  }
+
+  const partes =
+    [];
+
+  let indexSlotus =
+    indexSlotusInitialis;
+
+  for (
+    const syllaba of
+    syllabae
+  ) {
+    const span =
+      latitudoSyllabaeInSlotis(
+        syllaba,
+        indexSlotus
+      );
+
+    if (
+      !Number.isInteger(
+        span
+      ) ||
+      indexSlotus +
+        span >
+        numerusMaximusSilbarum
+    ) {
+      return {
+        bene: false,
+        causa:
+          "Verbum extra finem versus procederet."
+      };
+    }
+
+    for (
+      let index =
+        indexSlotus;
+      index <
+        indexSlotus +
+          span;
+      index +=
+        1
+    ) {
+      if (
+        occupata[
+          index
+        ]
+      ) {
+        return {
+          bene: false,
+          causa:
+            "Hic locus iam occupatus est."
+        };
+      }
+    }
+
+    partes.push({
+      syllaba,
+      indexSlotus,
+      span
+    });
+
+    indexSlotus +=
+      span;
+  }
+
+  return {
+    bene: true,
+    partes,
+    indexPostVerbum:
+      indexSlotus
+  };
+}
+
+function occupatioVersusInOpere() {
+  const occupata =
+    Array(
+      numerusMaximusSilbarum
+    ).fill(
+      null
+    );
+
+  const verbaOrdinata =
+    verbaVersusInOpere
+      .slice()
+      .sort(
+        (
+          a,
+          b
+        ) =>
+          a.indexSlotusInitialis -
+          b.indexSlotusInitialis
+      );
+
+  verbaOrdinata.forEach(
+    function (
+      verbum
+    ) {
+      const temptamen =
+        tentaPositionemVerbi(
+          verbum.forma,
+          verbum
+            .indexSlotusInitialis,
+          occupata
+        );
+
+      if (
+        !temptamen.bene
+      ) {
+        verbum.problema =
+          temptamen.causa;
+
+        return;
+      }
+
+      verbum.problema =
+        null;
+
+      verbum.partes =
+        temptamen.partes;
+
+      temptamen.partes
+        .forEach(
+          function (
+            pars
+          ) {
+            for (
+              let index =
+                pars.indexSlotus;
+              index <
+                pars.indexSlotus +
+                  pars.span;
+              index +=
+                1
+            ) {
+              occupata[
+                index
+              ] = {
+                verbum,
+                syllaba:
+                  pars.syllaba,
+                span:
+                  pars.span,
+                continuatio:
+                  index !==
+                  pars.indexSlotus
+              };
+            }
+          }
+        );
+    }
+  );
+
+  return occupata;
+}
+
+function indexPrimiSlotusLiberi(
+  occupata =
+    occupatioVersusInOpere()
+) {
+  return occupata.findIndex(
+    occupatio =>
+      !occupatio
+  );
+}
+
+function eligePrimumSlotumLiberum() {
+  const index =
+    indexPrimiSlotusLiberi();
+
+  indexSlotusSelecti =
+    index >=
+      0
+      ? index
+      : null;
+
+  positioInsertionisSelectae =
+    null;
+
+  campus.disabled =
+    index <
+    0;
+}
+
+function textusLinearisVersusInOpere() {
+  return verbaVersusInOpere
+    .slice()
+    .sort(
+      (
+        a,
+        b
+      ) =>
+        a.indexSlotusInitialis -
+        b.indexSlotusInitialis
+    )
+    .map(
+      verbum =>
+        verbum.forma
+    )
+    .join(
+      " "
+    );
+}
+
+function versusInOpereEstPlenus() {
+  const occupata =
+    occupatioVersusInOpere();
+
+  return (
+    verbaVersusInOpere.length >
+      0 &&
+    occupata.every(
+      occupatio =>
+        Boolean(
+          occupatio
+        )
+    ) &&
+    verbaVersusInOpere.every(
+      verbum =>
+        !verbum.problema
+    )
+  );
+}
+
+function fuegeVerbumInVersumOperis(
+  forma
+) {
+  const verbum =
+    String(
+      forma ||
+      ""
+    ).trim();
+
+  if (!verbum) {
+    return false;
+  }
+
+  normalizaSlotumSelectum();
+
+  if (
+    !Number.isInteger(
+      indexSlotusSelecti
+    )
+  ) {
+    setStatus(
+      "Versus iam plenus est."
+    );
+
+    return false;
+  }
+
+  const occupata =
+    occupatioVersusInOpere();
+
+  const temptamen =
+    tentaPositionemVerbi(
+      verbum,
+      indexSlotusSelecti,
+      occupata
+    );
+
+  if (
+    !temptamen.bene
+  ) {
+    setStatus(
+      temptamen.causa
+    );
+
+    return false;
+  }
+
+  verbaVersusInOpere.push({
+    id:
+      creaIdVerbiInOpere(),
+    forma:
+      verbum,
+    indexSlotusInitialis:
+      indexSlotusSelecti
+  });
+
+  campus.value =
+    "";
+
+  setStatus(
+    ""
+  );
+
+  /*
+   * Nach jeder Einfügung wird bewusst
+   * wieder die erste verbleibende Lücke
+   * des Verses ausgewählt.
+   */
+  eligePrimumSlotumLiberum();
+
+  reddeHexameterSlots();
+  aktualisiereHexameterVorschau();
+  aktualisiereSuggestionesMetricas();
+
+  campus.focus();
+
+  return true;
+}
+
+function resettaVersumInOpere() {
+  verbaVersusInOpere =
+    [];
+
+  campus.value =
+    "";
+
+  campus.disabled =
+    false;
+
+  indexSlotusSelecti =
+    0;
+
+  positioInsertionisSelectae =
+    null;
+
+  reddeHexameterSlots();
+  aktualisiereHexameterVorschau();
+  aktualisiereSuggestionesMetricas();
+}
+
 function signumSchematis(
   typus
 ) {
@@ -336,73 +768,21 @@ function limesInsertionisProSlotu(
 }
 
 function normalizaSlotumSelectum() {
-  const limites =
-    limitesInsertionisMetrici();
+  const occupata =
+    occupatioVersusInOpere();
 
   if (
-    !limites.length
-  ) {
-    indexSlotusSelecti =
-      0;
-
-    positioInsertionisSelectae =
-      0;
-
-    return;
-  }
-
-  const limesIamSelectus =
     Number.isInteger(
       indexSlotusSelecti
-    )
-      ? limesInsertionisProSlotu(
-          indexSlotusSelecti
-        )
-      : null;
-
-  if (
-    limesIamSelectus
+    ) &&
+    !occupata[
+      indexSlotusSelecti
+    ]
   ) {
-    positioInsertionisSelectae =
-      limesIamSelectus
-        .positio;
-
     return;
   }
 
-  const positioCursoris =
-    Number.isInteger(
-      campus.selectionStart
-    )
-      ? campus.selectionStart
-      : campus.value.length;
-
-  const limesProximus =
-    limites.reduce(
-      (
-        optimus,
-        limes
-      ) =>
-        Math.abs(
-          limes.positio -
-          positioCursoris
-        ) <
-        Math.abs(
-          optimus.positio -
-          positioCursoris
-        )
-          ? limes
-          : optimus,
-      limites[0]
-    );
-
-  indexSlotusSelecti =
-    limesProximus
-      .indexSlotus;
-
-  positioInsertionisSelectae =
-    limesProximus
-      .positio;
+  eligePrimumSlotumLiberum();
 }
 
 function syllabaePerPedes(
@@ -567,169 +947,245 @@ function slotaVisualiaHexametri(
 }
 
 function reddeHexameterSlots() {
-  if (!hexameterSlots) return;
+  if (
+    !hexameterSlots
+  ) {
+    return;
+  }
 
-  hexameterSlots.innerHTML = "";
+  hexameterSlots.innerHTML =
+    "";
 
-  const syllabae =
-    syllabaeCampi(
-      campus.value.trim()
-    );
-
-  const slotaVisualia =
-    slotaVisualiaHexametri(
-      syllabae
-    );
+  const occupata =
+    occupatioVersusInOpere();
 
   slotaVisualiaUltima =
-    slotaVisualia;
+    schemaDactylicum.map(
+      function (
+        slotum,
+        indexSlotus
+      ) {
+        const occupatio =
+          occupata[
+            indexSlotus
+          ];
+
+        return {
+          ...slotum,
+          syllaba:
+            occupatio
+              ?.syllaba ||
+            null,
+          span:
+            occupatio
+              ?.span ||
+            1,
+          contractus:
+            (
+              occupatio
+                ?.span ||
+              1
+            ) >
+            1,
+          potestEsseLonga:
+            slotum.typus ===
+              "brevis" &&
+            indexSlotus >
+              0 &&
+            schemaDactylicum[
+              indexSlotus -
+              1
+            ]?.typus ===
+              "longa"
+        };
+      }
+    );
 
   normalizaSlotumSelectum();
 
-  slotaVisualia.forEach(
-    function (
-      slotInfo,
-      indexSlotus
+  for (
+    let indexSlotus =
+      0;
+    indexSlotus <
+      schemaDactylicum.length;
+    indexSlotus +=
+      1
+  ) {
+    const occupatio =
+      occupata[
+        indexSlotus
+      ];
+
+    /*
+     * Eine lange zweite Silbe eines
+     * spondeischen Fußes wird nur einmal
+     * dargestellt, nimmt aber zwei
+     * Rasterspalten ein.
+     */
+    if (
+      occupatio
+        ?.continuatio
     ) {
-      const item =
-        document.createElement(
-          "div"
-        );
+      continue;
+    }
 
-      item.className =
-        "hexameter-slot-item";
+    const slotInfo =
+      schemaDactylicum[
+        indexSlotus
+      ];
 
-      if (slotInfo.finisPedis) {
-        item.classList.add(
-          "hexameter-slot-item--finis-pedis"
-        );
-      }
+    const span =
+      occupatio
+        ?.span ||
+      1;
 
-      if (slotInfo.span > 1) {
-        item.classList.add(
-          "hexameter-slot-item--span-2"
-        );
-      }
+    const indexFinis =
+      indexSlotus +
+      span -
+      1;
 
-      const signum =
-        document.createElement(
-          "div"
-        );
+    const finisPedis =
+      schemaDactylicum[
+        indexFinis
+      ]?.finisPedis ||
+      false;
 
-      signum.className =
-        "hexameter-slot-signum";
-
-      signum.classList.add(
-        slotInfo.syllaba
-          ? "hexameter-slot-signum--repertum"
-          : "hexameter-slot-signum--exspectatum"
+    const item =
+      document.createElement(
+        "div"
       );
 
-      signum.textContent =
-        signumSchematis(
-          slotInfo.syllaba
-            ? slotInfo.syllaba
-                .quantitas
-            : slotInfo.typus
-        );
+    item.className =
+      "hexameter-slot-item";
 
-      const slot =
-        document.createElement(
-          "div"
-        );
-
-      slot.className =
-        "hexameter-slot";
-
-      if (slotInfo.contractus) {
-        slot.classList.add(
-          "hexameter-slot--contractus"
-        );
-      }
-
-            const limesInsertionis =
-        limesInsertionisProSlotu(
-          indexSlotus
-        );
-
-      if (
-        limesInsertionis
-      ) {
-        slot.classList.add(
-          "hexameter-slot--selectabilis"
-        );
-
-        slot.addEventListener(
-          "click",
-          function (
-            event
-          ) {
-            event.stopPropagation();
-
-            indexSlotusSelecti =
-              indexSlotus;
-
-            positioInsertionisSelectae =
-              limesInsertionis
-                .positio;
-
-            campus.focus();
-
-            campus.setSelectionRange(
-              positioInsertionisSelectae,
-              positioInsertionisSelectae
-            );
-
-            reddeHexameterSlots();
-
-            aktualisiereSuggestionesMetricas();
-          }
-        );
-      }
-
-      if (
-        indexSlotus ===
-        indexSlotusSelecti
-      ) {
-        slot.classList.add(
-          "hexameter-slot--activa"
-        );
-      }
-
-      if (slotInfo.syllaba) {
-        slot.classList.add(
-          "hexameter-slot--plena"
-        );
-
-        slot.textContent =
-          slotInfo.syllaba
-            .textusSignatus;
-
-        slot.dataset.quantitas =
-          slotInfo.syllaba
-            .quantitas || "";
-      } else {
-        slot.classList.add(
-          "hexameter-slot--vacua"
-        );
-
-        if (slotInfo.activa) {
-          slot.classList.add(
-            "hexameter-slot--activa"
-          );
-        }
-
-        slot.innerHTML = "&nbsp;";
-      }
-
-      item.appendChild(signum);
-      item.appendChild(slot);
-
-      hexameterSlots.appendChild(
-        item
+    if (
+      finisPedis
+    ) {
+      item.classList.add(
+        "hexameter-slot-item--finis-pedis"
       );
     }
-  );
+
+    if (
+      span >
+      1
+    ) {
+      item.classList.add(
+        "hexameter-slot-item--span-2"
+      );
+    }
+
+    const signum =
+      document.createElement(
+        "div"
+      );
+
+    signum.className =
+      "hexameter-slot-signum";
+
+    signum.classList.add(
+      occupatio
+        ? "hexameter-slot-signum--repertum"
+        : "hexameter-slot-signum--exspectatum"
+    );
+
+    signum.textContent =
+      signumSchematis(
+        occupatio
+          ?.syllaba
+          ?.quantitas ||
+        slotInfo.typus
+      );
+
+    const slot =
+      document.createElement(
+        "div"
+      );
+
+    slot.className =
+      "hexameter-slot";
+
+    if (
+      span >
+      1
+    ) {
+      slot.classList.add(
+        "hexameter-slot--contractus"
+      );
+    }
+
+    if (
+      !occupatio
+    ) {
+      slot.classList.add(
+        "hexameter-slot--vacua",
+        "hexameter-slot--selectabilis"
+      );
+
+      slot.addEventListener(
+        "click",
+        function (
+          event
+        ) {
+          event.stopPropagation();
+
+          indexSlotusSelecti =
+            indexSlotus;
+
+          positioInsertionisSelectae =
+            null;
+
+          campus.focus();
+
+          reddeHexameterSlots();
+          aktualisiereSuggestionesMetricas();
+        }
+      );
+    }
+
+    if (
+      indexSlotus ===
+      indexSlotusSelecti
+    ) {
+      slot.classList.add(
+        "hexameter-slot--activa"
+      );
+    }
+
+    if (
+      occupatio
+    ) {
+      slot.classList.add(
+        "hexameter-slot--plena"
+      );
+
+      slot.textContent =
+        occupatio
+          .syllaba
+          .textusSignatus;
+
+      slot.dataset.quantitas =
+        occupatio
+          .syllaba
+          .quantitas ||
+        "";
+    } else {
+      slot.innerHTML =
+        "&nbsp;";
+    }
+
+    item.appendChild(
+      signum
+    );
+
+    item.appendChild(
+      slot
+    );
+
+    hexameterSlots.appendChild(
+      item
+    );
+  }
 }
 
 function positionemInsertionisExAbscissa(
@@ -1019,9 +1475,10 @@ window.starteNeuesGedicht = function () {
   titelEingabe.value = "";
   titelEingabe.focus();
 
-  campus.value = "";
-  campusUltimusValidus = "";
-  reddeHexameterSlots();
+  campusUltimusValidus =
+    "";
+
+  resettaVersumInOpere();
 };
 
 titelEingabe.addEventListener("keydown", async function (event) {
@@ -1087,13 +1544,50 @@ window.zeigeTab = async function(tabName) {
   }
 };
 
-campus.addEventListener("keydown", async function(event) {
-  if (event.key === "Enter" && !event.shiftKey) {
-    event.preventDefault();
-    await fuegeVersHinzu();
+campus.addEventListener(
+  "keydown",
+  async function (
+    event
+  ) {
+    if (
+      event.key ===
+        " " ||
+      event.key ===
+        "Spacebar"
+    ) {
+      event.preventDefault();
+
+      fuegeVerbumInVersumOperis(
+        campus.value
+      );
+
+      return;
+    }
+
+    if (
+      event.key ===
+        "Enter" &&
+      !event.shiftKey
+    ) {
+      event.preventDefault();
+
+      if (
+        campus.value.trim()
+      ) {
+        setStatus(
+          "Verbum prius spatio adde."
+        );
+
+        return;
+      }
+
+      await fuegeVersHinzu();
+    }
   }
-});
-let suggestionesMetricaeTimer = null;
+);
+
+let suggestionesMetricaeTimer =
+  null;
 
 campus.addEventListener(
   "input",
@@ -1101,42 +1595,29 @@ campus.addEventListener(
     await ladeDictionariumMetricum();
 
     /*
-     * Nach einer manuellen Eingabe oder
-     * nach dem Einsetzen einer Suggestion
-     * wird die metrische Auswahl anhand
-     * der aktuellen Cursorposition neu
-     * bestimmt.
+     * Das Feld enthält immer nur genau
+     * ein Wort. Eingefügte Leerzeichen
+     * werden daher entfernt.
      */
-    indexSlotusSelecti =
-      null;
-
-    positioInsertionisSelectae =
-      null;
-
-  if (
-    !campusIntraLimen(
-      campus.value.trim()
-    )
-  ) {
     campus.value =
-      campusUltimusValidus;
-  } else {
-    campusUltimusValidus =
-      campus.value;
+      campus.value.replace(
+        /\s+/g,
+        ""
+      );
+
+    clearTimeout(
+      suggestionesMetricaeTimer
+    );
+
+    suggestionesMetricaeTimer =
+      setTimeout(
+        function () {
+          aktualisiereSuggestionesMetricas();
+        },
+        120
+      );
   }
-
-  aktualisiereHexameterVorschau();
-  reddeHexameterSlots();
-
-  clearTimeout(
-    suggestionesMetricaeTimer
-  );
-
-  suggestionesMetricaeTimer =
-    setTimeout(function () {
-      aktualisiereSuggestionesMetricas();
-    }, 120);
-});
+);
 
 function textusCumSuggestione(
   forma
@@ -1381,6 +1862,16 @@ function suggestioMetricePossibilis(
   forma
 ) {
   try {
+    normalizaSlotumSelectum();
+
+    if (
+      !Number.isInteger(
+        indexSlotusSelecti
+      )
+    ) {
+      return false;
+    }
+
     if (
       !suggestioInSlotumSelectumCadit(
         forma
@@ -1389,57 +1880,11 @@ function suggestioMetricePossibilis(
       return false;
     }
 
-    const limesSelectus =
-      Number.isInteger(
-        indexSlotusSelecti
-      )
-        ? limesInsertionisProSlotu(
-            indexSlotusSelecti
-          )
-        : null;
-
-    /*
-     * Bei einem noch nicht erreichten
-     * leeren Platz genügt vorläufig die
-     * lokale Prüfung der Anfangssilbe.
-     * Die vorangehenden metrischen Plätze
-     * sind schließlich noch unbesetzt.
-     */
-    if (
-      limesSelectus
-        ?.futurus
-    ) {
-      return true;
-    }
-
-    const analyse =
-      erstelleAnalysezeile(
-        textusCumSuggestione(
-          forma
-        )
-      );
-
-    if (
-      analyse.abschickbar
-    ) {
-      return true;
-    }
-
-    if (
-      (
-        analyse.elemente ||
-        []
-      ).length <=
-        17 &&
-      !analyse.elemente.some(
-        elementum =>
-          elementum.problema
-      )
-    ) {
-      return true;
-    }
-
-    return false;
+    return tentaPositionemVerbi(
+      forma,
+      indexSlotusSelecti,
+      occupatioVersusInOpere()
+    ).bene;
   } catch (
     _fehler
   ) {
@@ -2023,7 +2468,11 @@ suggestiones.forEach(function(item) {
     }
   );
 
-  button.draggable = true;
+  /*
+ * Drag-and-drop wird im nächsten Schritt
+ * auf metrische Slots umgestellt.
+ */
+button.draggable = false;
   button.addEventListener(
     "dragstart",
     function (event) {
@@ -2095,18 +2544,17 @@ suggestiones.forEach(function(item) {
     }
   );
 
-  button.onclick = function () {
-    if (
-      suggestioNuperTracta
-    ) {
-      return;
-    }
+button.onclick = function () {
+  if (
+    suggestioNuperTracta
+  ) {
+    return;
+  }
 
-    insereVerbumInCampum(
-      item.forma,
-      positioInsertionisSelectae
-    );
-  };
+  fuegeVerbumInVersumOperis(
+    item.forma
+  );
+};
 
   suggestionesMetricaeLista
     .appendChild(
@@ -2174,7 +2622,8 @@ scriptoriumMarginaliaToggle
 function aktualisiereHexameterVorschau() {
   if (!hexameterVorschau) return;
 
-  const textus = campus.value.trim();
+  const textus =
+    textusLinearisVersusInOpere();
   hexameterVorschau.innerHTML = "";
 
   if (textus === "") return;
@@ -2400,8 +2849,35 @@ function entferneVersEditorSizer(input) {
 async function fuegeVersHinzu() {
   await ladeDictionariumMetricum();
 
-  const vers = campus.value.trim();
-  if (vers === "") return;
+    if (
+    campus.value.trim()
+  ) {
+    setStatus(
+      "Verbum prius spatio adde."
+    );
+
+    return;
+  }
+
+  const vers =
+    textusLinearisVersusInOpere();
+
+  if (
+    vers ===
+    ""
+  ) {
+    return;
+  }
+
+  if (
+    !versusInOpereEstPlenus()
+  ) {
+    setStatus(
+      "Versus nondum plenus est."
+    );
+
+    return;
+  }
 
   if (!aktuellesGedicht) {
     setStatus("Bitte zuerst ein Gedicht anlegen oder öffnen.");
@@ -2435,11 +2911,10 @@ async function fuegeVersHinzu() {
 
   aktuellesGedicht.textus = neuerText;
   zeigeGedicht(neuerText);
-  campus.value = "";
-  campusUltimusValidus = "";
-  reddeHexameterSlots();
-  aktualisiereHexameterVorschau();
-  aktualisiereSuggestionesMetricas();
+    campusUltimusValidus =
+    "";
+
+  resettaVersumInOpere();
   setStatus("");
 }
 
@@ -2548,9 +3023,10 @@ function oeffneGedicht(gedicht) {
   setStatus("");
   campus.focus();
 
-  campus.value = "";
-  campusUltimusValidus = "";
-  reddeHexameterSlots();
+  campusUltimusValidus =
+    "";
+
+  resettaVersumInOpere();
 }
 
 window.loescheAktuellesGedicht = async function() {
