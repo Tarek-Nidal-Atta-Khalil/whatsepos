@@ -390,6 +390,70 @@ body > h1 {
   align-items: end;
 }
 
+#versusInOpereLinea {
+  width: var(--hexameter-centro-latitude);
+  max-width: 100%;
+  min-height: 34px;
+
+  margin: 12px auto 10px;
+
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  gap: 8px;
+
+  box-sizing: border-box;
+
+  color: #475569;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 20px;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.versus-in-opere-verbum {
+  display: inline-block;
+  color: #334155;
+}
+
+.versus-in-opere-vacuum {
+  position: relative;
+
+  display: inline-flex;
+  align-items: flex-end;
+  justify-content: center;
+
+  min-width: 18px;
+  padding-top: 8px;
+
+  color: #94a3b8;
+}
+
+.versus-in-opere-vacuum-signum {
+  position: absolute;
+  top: -2px;
+  left: 50%;
+
+  font-size: 16px;
+  line-height: 1;
+
+  transform:
+    translateX(-50%);
+}
+
+.versus-in-opere-vacuum-linea {
+  display: inline-block;
+
+  font-size: 22px;
+  line-height: 1;
+}
+
 .hexameter-slot-item {
   min-width: 0;
   position: relative;
