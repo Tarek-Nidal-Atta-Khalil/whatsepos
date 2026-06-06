@@ -114,6 +114,10 @@ const hexameterArbeitsbereich =
   document.getElementById("hexameterArbeitsbereich");
 const hexameterSlots =
   document.getElementById("hexameterSlots");
+const versusInOpereLinea =
+  document.getElementById(
+    "versusInOpereLinea"
+  );
 
 let dictionariumMetricum = [];
 let dictionariumIamTentatum = false;
@@ -408,7 +412,8 @@ function occupatioVersusInOpere() {
       temptamen.partes
         .forEach(
           function (
-            pars
+            pars,
+            indexPartis
           ) {
             for (
               let index =
@@ -429,7 +434,12 @@ function occupatioVersusInOpere() {
                   pars.span,
                 continuatio:
                   index !==
-                  pars.indexSlotus
+                  pars.indexSlotus,
+                indexPartis,
+                numerusPartium:
+                  temptamen
+                    .partes
+                    .length
               };
             }
           }
@@ -511,6 +521,201 @@ function eligeSlotumLiberumPostVerbum(
    * zurückspringen.
    */
   eligePrimumSlotumLiberum();
+}
+
+function textusSyllabaeCumLimitibus(
+  occupatio
+) {
+  const textus =
+    occupatio
+      ?.syllaba
+      ?.textusSignatus ||
+    occupatio
+      ?.syllaba
+      ?.textus ||
+    "";
+
+  const habetPartemSinistram =
+    occupatio
+      ?.indexPartis >
+    0;
+
+  const habetPartemDextram =
+    occupatio
+      ?.indexPartis <
+    occupatio
+      ?.numerusPartium -
+      1;
+
+  return (
+    (
+      habetPartemSinistram
+        ? "-"
+        : ""
+    ) +
+    textus +
+    (
+      habetPartemDextram
+        ? "-"
+        : ""
+    )
+  );
+}
+
+function creaLocumVacuumVersusInOpere(
+  typus
+) {
+  const locus =
+    document.createElement(
+      "span"
+    );
+
+  locus.className =
+    "versus-in-opere-vacuum";
+
+  const signum =
+    document.createElement(
+      "span"
+    );
+
+  signum.className =
+    "versus-in-opere-vacuum-signum";
+
+  if (
+    typus ===
+    "longa"
+  ) {
+    signum.textContent =
+      "¯";
+  } else if (
+    typus ===
+    "brevis"
+  ) {
+    signum.textContent =
+      "˘";
+  } else {
+    signum.textContent =
+      "x";
+  }
+
+  const linea =
+    document.createElement(
+      "span"
+    );
+
+  linea.className =
+    "versus-in-opere-vacuum-linea";
+
+  linea.textContent =
+    "_";
+
+  locus.appendChild(
+    signum
+  );
+
+  locus.appendChild(
+    linea
+  );
+
+  return locus;
+}
+
+function reddeVersumInOpereLinearem(
+  occupata =
+    occupatioVersusInOpere()
+) {
+  if (
+    !versusInOpereLinea
+  ) {
+    return;
+  }
+
+  versusInOpereLinea.innerHTML =
+    "";
+
+  let idVerbiUltimi =
+    null;
+
+  for (
+    let index =
+      0;
+    index <
+      schemaDactylicum.length;
+    index +=
+      1
+  ) {
+    const occupatio =
+      occupata[
+        index
+      ];
+
+    /*
+     * Die zweite Hälfte eines spondeischen
+     * Doppelplatzes wird nicht eigens
+     * wiederholt.
+     */
+    if (
+      occupatio
+        ?.continuatio
+    ) {
+      continue;
+    }
+
+    if (
+      !occupatio
+    ) {
+      versusInOpereLinea
+        .appendChild(
+          creaLocumVacuumVersusInOpere(
+            schemaDactylicum[
+              index
+            ].typus
+          )
+        );
+
+      idVerbiUltimi =
+        null;
+
+      continue;
+    }
+
+    /*
+     * In der Zwischenzeile erscheint jedes
+     * bereits gesetzte Wort nur einmal als
+     * zusammenhängende Wortform.
+     */
+    if (
+      occupatio
+        .verbum
+        .id ===
+      idVerbiUltimi
+    ) {
+      continue;
+    }
+
+    const verbum =
+      document.createElement(
+        "span"
+      );
+
+    verbum.className =
+      "versus-in-opere-verbum";
+
+    verbum.textContent =
+      occupatio
+        .verbum
+        .forma;
+
+    versusInOpereLinea
+      .appendChild(
+        verbum
+      );
+
+    idVerbiUltimi =
+      occupatio
+        .verbum
+        .id;
+  }
 }
 
 function textusLinearisVersusInOpere() {
@@ -1207,9 +1412,9 @@ function reddeHexameterSlots() {
       );
 
       slot.textContent =
-        occupatio
-          .syllaba
-          .textusSignatus;
+        textusSyllabaeCumLimitibus(
+          occupatio
+        );
 
       slot.dataset.quantitas =
         occupatio
@@ -1229,10 +1434,14 @@ function reddeHexameterSlots() {
       slot
     );
 
-    hexameterSlots.appendChild(
+        hexameterSlots.appendChild(
       item
     );
   }
+
+  reddeVersumInOpereLinearem(
+    occupata
+  );
 }
 
 function positionemInsertionisExAbscissa(
