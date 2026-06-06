@@ -476,8 +476,8 @@ function eligeSlotumLiberumPostVerbum(
 
   /*
    * Gewöhnlicher Fall:
-   * rechts unmittelbar hinter dem gerade
-   * eingesetzten Wort weiterschreiben.
+   * rechts hinter dem gerade eingesetzten
+   * Wort weiterschreiben.
    */
   for (
     let index =
@@ -505,17 +505,12 @@ function eligeSlotumLiberumPostVerbum(
     }
   }
 
-    /*
-   * Normalerweise wird rechts hinter dem
-   * gerade gesetzten Wort weitergeschrieben.
-   *
-   * Erst wenn rechts kein freier Platz mehr
-   * übrig ist, springt die Auswahl zur
-   * ersten verbleibenden Lücke links zurück.
+  /*
+   * Wenn rechts nichts mehr frei ist,
+   * zur ersten verbliebenen Lücke links
+   * zurückspringen.
    */
-  eligeSlotumLiberumPostVerbum(
-    temptamen.indexPostVerbum
-  );
+  eligePrimumSlotumLiberum();
 }
 
 function textusLinearisVersusInOpere() {
@@ -621,12 +616,14 @@ function fuegeVerbumInVersumOperis(
     ""
   );
 
-  /*
-   * Nach jeder Einfügung wird bewusst
-   * wieder die erste verbleibende Lücke
-   * des Verses ausgewählt.
+    /*
+   * Nach einer Einfügung wird zunächst
+   * rechts hinter dem soeben gesetzten
+   * Wort weitergeschrieben.
    */
-  eligePrimumSlotumLiberum();
+  eligeSlotumLiberumPostVerbum(
+    temptamen.indexPostVerbum
+  );
 
   reddeHexameterSlots();
   aktualisiereHexameterVorschau();
