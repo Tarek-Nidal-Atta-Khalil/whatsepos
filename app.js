@@ -119,6 +119,16 @@ const versusInOpereLinea =
     "versusInOpereLinea"
   );
 
+const campusPurga =
+  document.getElementById(
+    "campusPurga"
+  );
+
+const verbumInOpereDele =
+  document.getElementById(
+    "verbumInOpereDele"
+  );
+
 let dictionariumMetricum = [];
 let dictionariumIamTentatum = false;
 let dictionariumPromissum = null;
@@ -192,6 +202,9 @@ let verbaVersusInOpere =
 
 let numerusVerbiInOpere =
   0;
+
+let idVerbiInOpereSelecti =
+  null;
 
 function creaIdVerbiInOpere() {
   numerusVerbiInOpere +=
@@ -362,7 +375,10 @@ function tentaPositionemVerbi(
   };
 }
 
-function occupatioVersusInOpere() {
+function occupatioVersusInOpere({
+  idVerbiExclusi =
+    null
+} = {}) {
   const occupata =
     Array(
       numerusMaximusSilbarum
@@ -370,8 +386,13 @@ function occupatioVersusInOpere() {
       null
     );
 
-  const verbaOrdinata =
+    const verbaOrdinata =
     verbaVersusInOpere
+      .filter(
+        verbum =>
+          verbum.id !==
+          idVerbiExclusi
+      )
       .slice()
       .sort(
         (
@@ -725,6 +746,137 @@ function condicioElisionisPraecedentisServatur(
   );
 }
 
+function verbumInOpereSelectum() {
+  return verbaVersusInOpere
+    .find(
+      verbum =>
+        verbum.id ===
+        idVerbiInOpereSelecti
+    ) ||
+    null;
+}
+
+function actualizaInstrumentaVerbiInOpere() {
+  if (
+    !verbumInOpereDele
+  ) {
+    return;
+  }
+
+  verbumInOpereDele.hidden =
+    !verbumInOpereSelectum();
+}
+
+function eligeVerbumInOpere(
+  idVerbi
+) {
+  const verbum =
+    verbaVersusInOpere
+      .find(
+        item =>
+          item.id ===
+          idVerbi
+      );
+
+  if (
+    !verbum
+  ) {
+    return;
+  }
+
+  idVerbiInOpereSelecti =
+    verbum.id;
+
+  campus.disabled =
+    false;
+
+  campus.value =
+    verbum.forma;
+
+  indexSlotusSelecti =
+    verbum
+      .indexSlotusInitialis;
+
+  setStatus(
+    ""
+  );
+
+  reddeHexameterSlots();
+  actualizaInstrumentaVerbiInOpere();
+  aktualisiereSuggestionesMetricas();
+
+  campus.focus();
+  campus.select();
+}
+
+function deleVerbumInOpereSelectum() {
+  const verbum =
+    verbumInOpereSelectum();
+
+  if (
+    !verbum
+  ) {
+    return;
+  }
+
+  const indexSlotusInitialis =
+    verbum
+      .indexSlotusInitialis;
+
+  verbaVersusInOpere =
+    verbaVersusInOpere
+      .filter(
+        item =>
+          item.id !==
+          verbum.id
+      );
+
+  idVerbiInOpereSelecti =
+    null;
+
+  campus.value =
+    "";
+
+  campus.disabled =
+    false;
+
+  indexSlotusSelecti =
+    indexSlotusInitialis;
+
+  positioInsertionisSelectae =
+    null;
+
+  setStatus(
+    ""
+  );
+
+  reddeHexameterSlots();
+  actualizaInstrumentaVerbiInOpere();
+  aktualisiereHexameterVorschau();
+  aktualisiereSuggestionesMetricas();
+
+  campus.focus();
+}
+
+campusPurga
+  ?.addEventListener(
+    "click",
+    function () {
+      campus.value =
+        "";
+
+      campus.focus();
+    }
+  );
+
+verbumInOpereDele
+  ?.addEventListener(
+    "click",
+    function () {
+      deleVerbumInOpereSelectum();
+    }
+  );
+
 function textusSyllabaeCumLimitibus(
   occupatio
 ) {
@@ -900,13 +1052,71 @@ function reddeVersumInOpereLinearem(
         "span"
       );
 
-    verbum.className =
+        verbum.className =
       "versus-in-opere-verbum";
+
+    if (
+      occupatio
+        .verbum
+        .id ===
+      idVerbiInOpereSelecti
+    ) {
+      verbum.classList.add(
+        "versus-in-opere-verbum--selectum"
+      );
+    }
 
     verbum.textContent =
       occupatio
         .verbum
         .forma;
+
+    verbum.tabIndex =
+      0;
+
+    verbum.setAttribute(
+      "role",
+      "button"
+    );
+
+    verbum.addEventListener(
+      "click",
+      function (
+        event
+      ) {
+        event.stopPropagation();
+
+        eligeVerbumInOpere(
+          occupatio
+            .verbum
+            .id
+        );
+      }
+    );
+
+    verbum.addEventListener(
+      "keydown",
+      function (
+        event
+      ) {
+        if (
+          event.key !==
+            "Enter" &&
+          event.key !==
+            " "
+        ) {
+          return;
+        }
+
+        event.preventDefault();
+
+        eligeVerbumInOpere(
+          occupatio
+            .verbum
+            .id
+        );
+      }
+    );
 
     versusInOpereLinea
       .appendChild(
@@ -917,7 +1127,9 @@ function reddeVersumInOpereLinearem(
       occupatio
         .verbum
         .id;
-  }
+    }
+
+  actualizaInstrumentaVerbiInOpere();
 }
 
 function textusLinearisVersusInOpere() {
@@ -987,13 +1199,27 @@ function fuegeVerbumInVersumOperis(
     return false;
   }
 
+  const verbumSelectum =
+    verbumInOpereSelectum();
+
+  const indexInsertionis =
+    verbumSelectum
+      ? verbumSelectum
+          .indexSlotusInitialis
+      : indexSlotusSelecti;
+
   const occupata =
-    occupatioVersusInOpere();
+    occupatioVersusInOpere({
+      idVerbiExclusi:
+        verbumSelectum
+          ?.id ||
+        null
+    });
 
   if (
     !condicioElisionisPraecedentisServatur(
       verbum,
-      indexSlotusSelecti,
+      indexInsertionis,
       occupata
     )
   ) {
@@ -1007,7 +1233,7 @@ function fuegeVerbumInVersumOperis(
   const temptamen =
     tentaPositionemVerbi(
       verbum,
-      indexSlotusSelecti,
+      indexInsertionis,
       occupata
     );
 
@@ -1021,14 +1247,28 @@ function fuegeVerbumInVersumOperis(
     return false;
   }
 
-  verbaVersusInOpere.push({
-    id:
-      creaIdVerbiInOpere(),
-    forma:
-      verbum,
-    indexSlotusInitialis:
-      indexSlotusSelecti
-  });
+  if (
+    verbumSelectum
+  ) {
+    verbumSelectum.forma =
+      verbum;
+
+    verbumSelectum
+      .indexSlotusInitialis =
+        indexInsertionis;
+  } else {
+    verbaVersusInOpere.push({
+      id:
+        creaIdVerbiInOpere(),
+      forma:
+        verbum,
+      indexSlotusInitialis:
+        indexInsertionis
+    });
+  }
+
+  idVerbiInOpereSelecti =
+    null;
 
   campus.value =
     "";
@@ -1059,6 +1299,9 @@ function resettaVersumInOpere() {
   verbaVersusInOpere =
     [];
 
+  idVerbiInOpereSelecti =
+    null;
+
   campus.value =
     "";
 
@@ -1074,6 +1317,7 @@ function resettaVersumInOpere() {
   reddeHexameterSlots();
   aktualisiereHexameterVorschau();
   aktualisiereSuggestionesMetricas();
+  actualizaInstrumentaVerbiInOpere();
 }
 
 function signumSchematis(
@@ -1620,12 +1864,23 @@ function reddeHexameterSlots() {
       );
     }
 
-    if (
+        if (
       occupatio
     ) {
       slot.classList.add(
         "hexameter-slot--plena"
       );
+
+      if (
+        occupatio
+          .verbum
+          .id ===
+        idVerbiInOpereSelecti
+      ) {
+        slot.classList.add(
+          "hexameter-slot--verbum-selectum"
+        );
+      }
 
       slot.textContent =
         textusSyllabaeCumLimitibus(
