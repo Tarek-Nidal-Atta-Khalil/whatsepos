@@ -74,8 +74,20 @@ window.whatseposSupabase = supabase;
 const campus = document.getElementById("campus");
 const nuntii = document.getElementById("nuntii");
 const hexameterVorschau = document.getElementById("hexameterVorschau");
-const suggestionesMetricaeLista = document.getElementById("suggestionesMetricaeLista");
-const meineTexteListe = document.getElementById("meineTexteListe");
+const suggestionesMetricaeLista =
+  document.getElementById(
+    "suggestionesMetricaeLista"
+  );
+
+const suggestionesRenova =
+  document.getElementById(
+    "suggestionesRenova"
+  );
+
+const meineTexteListe =
+  document.getElementById(
+    "meineTexteListe"
+  );
 const scriptoriumStart = document.getElementById("scriptoriumStart");
 const titelEingabeBereich = document.getElementById("titelEingabeBereich");
 const titelEingabe = document.getElementById("titelEingabe");
@@ -1396,6 +1408,16 @@ suggestiones.forEach(function(item) {
     );
 });
 }
+
+suggestionesRenova
+  ?.addEventListener(
+    "click",
+    function () {
+      aktualisiereSuggestionesMetricas();
+
+      campus.focus();
+    }
+  );
 
 function aktualisiereHexameterVorschau() {
   if (!hexameterVorschau) return;
