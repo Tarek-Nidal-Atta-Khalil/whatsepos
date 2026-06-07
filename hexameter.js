@@ -1274,47 +1274,271 @@ function notaAnalyseElementum(textus, quantitas) {
     + s.slice(indexVocalis + 1);
 }
 
-function resyllabificaElementeAnalyse(elemente, textus) {
-  const grenzen = wordBoundaries(textus);
-  const resultatum = positioniere(elemente).map(elementum => ({ ...elementum }));
+function insereLiaisones(
+  textus,
+  indices =
+    []
+) {
+  let resultatum =
+    String(
+      textus ||
+      ""
+    );
 
-  for (let i = 0; i < resultatum.length - 1; i += 1) {
-    const links = resultatum[i];
-    const rechts = resultatum[i + 1];
+  [
+    ...new Set(
+      indices
+    )
+  ]
+    .filter(
+      index =>
+        Number.isInteger(
+          index
+        ) &&
+        index >
+          0 &&
+        index <
+          resultatum.length
+    )
+    .sort(
+      (
+        a,
+        b
+      ) =>
+        b - a
+    )
+    .forEach(
+      function (
+        index
+      ) {
+        resultatum =
+          resultatum.slice(
+            0,
+            index
+          ) +
+          "‿" +
+          resultatum.slice(
+            index
+          );
+      }
+    );
 
-    if (!grenzen.has(links.ende)) continue;
-    if (indexPrimiVocalisAnalyse(rechts.textus) !== 0) continue;
+  return resultatum;
+}
 
-    const ultimusVocalis = indexUltimiVocalisAnalyse(links.textus);
+function resyllabificaElementeAnalyse(
+  elemente,
+  textus
+) {
+  const grenzen =
+    wordBoundaries(
+      textus
+    );
 
-    if (ultimusVocalis < 0 || ultimusVocalis >= links.textus.length - 1) {
+  const resultatum =
+    positioniere(
+      elemente
+    ).map(
+      elementum => ({
+        ...elementum,
+
+        /*
+         * Diese beiden Angaben dienen nur
+         * der sichtbaren Silbenzeile.
+         *
+         * Sie sagen, ob eine Silbe am
+         * Anfang bzw. Ende eines Wortes
+         * steht.
+         */
+        initiumVerbi:
+          elementum.start ===
+            0 ||
+          grenzen.has(
+            elementum.start -
+              1
+          ),
+
+        finisVerbi:
+          grenzen.has(
+            elementum.ende
+          ),
+
+        /*
+         * Positionen sichtbarer
+         * Liaisonbögen innerhalb
+         * der Silbe.
+         */
+        indicesLiaisonis:
+          []
+      })
+    );
+
+  for (
+    let index = 0;
+    index <
+      resultatum.length -
+        1;
+    index +=
+      1
+  ) {
+    const links =
+      resultatum[
+        index
+      ];
+
+    const rechts =
+      resultatum[
+        index +
+          1
+      ];
+
+    if (
+      !grenzen.has(
+        links.ende
+      )
+    ) {
       continue;
     }
 
-    const coda = links.textus.slice(ultimusVocalis + 1);
-    const basisLinks = links.textus.slice(0, ultimusVocalis + 1);
+    if (
+      indexPrimiVocalisAnalyse(
+        rechts.textus
+      ) !==
+      0
+    ) {
+      continue;
+    }
 
-    if (!coda) continue;
+    const ultimusVocalis =
+      indexUltimiVocalisAnalyse(
+        links.textus
+      );
 
-    links.textus = basisLinks;
-    rechts.textus = coda + rechts.textus;
+    if (
+      ultimusVocalis <
+        0 ||
+      ultimusVocalis >=
+        links.textus.length -
+          1
+    ) {
+      continue;
+    }
 
-    if (links.quantitas === "longa") {
-      links.quantitas = "brevis";
-      links.signum = signumQuantitatis("brevis");
+    const coda =
+      links.textus.slice(
+        ultimusVocalis +
+          1
+      );
+
+    const basisLinks =
+      links.textus.slice(
+        0,
+        ultimusVocalis +
+          1
+      );
+
+    if (
+      !coda
+    ) {
+      continue;
+    }
+
+    /*
+     * Beispiel:
+     *
+     * mus + ab
+     * wird zu
+     * mu + s‿ab
+     */
+    links.textus =
+      basisLinks;
+
+    links.indicesLiaisonis =
+      (
+        links
+          .indicesLiaisonis ||
+        []
+      ).filter(
+        indexLiaisonis =>
+          indexLiaisonis <
+          basisLinks.length
+      );
+
+    links.finisVerbi =
+      false;
+
+    rechts.textus =
+      coda +
+      rechts.textus;
+
+    rechts.indicesLiaisonis =
+      [
+        coda.length,
+
+        ...(
+          rechts
+            .indicesLiaisonis ||
+          []
+        ).map(
+          indexLiaisonis =>
+            indexLiaisonis +
+            coda.length
+        )
+      ];
+
+    rechts.initiumVerbi =
+      false;
+
+    if (
+      links.quantitas ===
+        "longa"
+    ) {
+      links.quantitas =
+        "brevis";
+
+      links.signum =
+        signumQuantitatis(
+          "brevis"
+        );
     }
   }
 
-  const cumIConsonante = aplicaIConsonansIntervocalicum(resultatum);
+  const cumIConsonante =
+    aplicaIConsonansIntervocalicum(
+      resultatum
+    );
 
-  return positioniere(cumIConsonante).map(elementum => ({
-    ...elementum,
-    textusSignatus: notaAnalyseElementum(
-      elementum.textus,
-      elementum.quantitas
-    ),
-    signum: signumQuantitatis(elementum.quantitas)
-  }));
+  return positioniere(
+    cumIConsonante
+  ).map(
+    function (
+      elementum
+    ) {
+      const textusVisualis =
+        insereLiaisones(
+          elementum.textus,
+          elementum
+            .indicesLiaisonis
+        );
+
+      return {
+        ...elementum,
+
+        textusVisualis,
+
+        textusSignatus:
+          notaAnalyseElementum(
+            textusVisualis,
+            elementum.quantitas
+          ),
+
+        signum:
+          signumQuantitatis(
+            elementum.quantitas
+          )
+      };
+    }
+  );
 }
 
 function quantitasSimplexAnalyseElementi(elementum) {
