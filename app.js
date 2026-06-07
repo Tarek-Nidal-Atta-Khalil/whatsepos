@@ -1976,6 +1976,38 @@ function indexPostVerbumInOpere(
   );
 }
 
+/*
+ * Der intern ausgewählte Slot bleibt während
+ * des Tippens der Anfangsplatz des Wortes.
+ *
+ * Sichtbar markiert wird dagegen der Platz
+ * unmittelbar hinter dem provisorischen Wort:
+ * Dort befindet sich der Schreibcursor
+ * metrisch gesehen als Nächstes.
+ */
+function indexSlotusCursorisVisualis() {
+  const verbumProvisorium =
+    verbumInOpereProvisorium();
+
+  if (
+    !verbumProvisorium
+  ) {
+    return indexSlotusSelecti;
+  }
+
+  const indexPostVerbum =
+    indexPostVerbumInOpere(
+      verbumProvisorium
+    );
+
+  return (
+    indexPostVerbum <
+    numerusMaximusSilbarum
+  )
+    ? indexPostVerbum
+    : null;
+}
+
 function catervaeVerborumContiguorum() {
   const verbaOrdinata =
     verbaVersusInOpere
@@ -2298,6 +2330,9 @@ function reddeHexameterSlots() {
 
   normalizaSlotumSelectum();
 
+  const indexSlotusCursoris =
+    indexSlotusCursorisVisualis();
+
   for (
     let indexSlotus = 0;
     indexSlotus <
@@ -2420,10 +2455,10 @@ function reddeHexameterSlots() {
 
     if (
       Number.isInteger(
-        indexSlotusSelecti
+        indexSlotusCursoris
       ) &&
       indexSlotus ===
-        indexSlotusSelecti
+        indexSlotusCursoris
     ) {
       slot.classList.add(
         "hexameter-slot--selectum"
