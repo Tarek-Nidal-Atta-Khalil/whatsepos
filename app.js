@@ -1393,7 +1393,11 @@ function versusInOpereEstPlenus() {
 }
 
 function fuegeVerbumInVersumOperis(
-  forma
+  forma,
+  {
+    indexSlotusPostConfirmationem =
+      null
+  } = {}
 ) {
   const verbum =
     String(
@@ -1506,14 +1510,39 @@ function fuegeVerbumInVersumOperis(
     ""
   );
 
-    /*
-   * Nach einer Einfügung wird zunächst
-   * rechts hinter dem soeben gesetzten
-   * Wort weitergeschrieben.
+  /*
+   * Gewöhnlich wird rechts hinter dem
+   * bestätigten Wort weitergeschrieben.
+   *
+   * Wurde das Wort jedoch durch den Klick
+   * auf einen anderen freien Silbenplatz
+   * bestätigt, soll anschließend genau
+   * dieser angeklickte Platz aktiv sein.
    */
-  eligeSlotumLiberumPostVerbum(
-    temptamen.indexPostVerbum
-  );
+  const occupataPostConfirmationem =
+    occupatioVersusInOpere();
+
+  if (
+    Number.isInteger(
+      indexSlotusPostConfirmationem
+    ) &&
+    !occupataPostConfirmationem[
+      indexSlotusPostConfirmationem
+    ]
+  ) {
+    indexSlotusSelecti =
+      indexSlotusPostConfirmationem;
+
+    positioInsertionisSelectae =
+      null;
+
+    campus.disabled =
+      false;
+  } else {
+    eligeSlotumLiberumPostVerbum(
+      temptamen.indexPostVerbum
+    );
+  }
 
   reddeHexameterSlots();
   aktualisiereHexameterVorschau();
@@ -2483,6 +2512,37 @@ function reddeHexameterSlots() {
           occupatioVisualis ||
           occupatio
         ) {
+          return;
+        }
+
+        /*
+         * Steht noch ein unfertiges Wort im
+         * Eingabefeld, wird es vor dem Wechsel
+         * des Silbenplatzes bestätigt.
+         *
+         * Der angeklickte Platz wird der
+         * anschließende neue Schreibort.
+         */
+        if (
+          campus.value.trim()
+        ) {
+          cancellaActualizationemProvisoriam();
+
+          const confirmatum =
+            fuegeVerbumInVersumOperis(
+              campus.value,
+              {
+                indexSlotusPostConfirmationem:
+                  indexSlotus
+              }
+            );
+
+          if (
+            !confirmatum
+          ) {
+            campus.focus();
+          }
+
           return;
         }
 
