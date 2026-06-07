@@ -634,8 +634,10 @@ body > h1 {
  * bestehenden Zwischenraum zwischen
  * zwei metrischen Slots.
  */
-.hexameter-slot--coniunctus-dextrorsum::after {
-  content: "";
+.hexameter-slot--coniunctus-dextrorsum::after,
+.hexameter-slot--coniunctus-sinistrorsum::before {
+  content: none;
+}
 
   position: absolute;
 
@@ -685,8 +687,10 @@ body > h1 {
  * Silbenkompartimenten. Sie liegt in
  * der Mitte des vorhandenen Abstands.
  */
+.hexameter-slot--coniunctus-dextrorsum::after,
 .hexameter-slot--coniunctus-sinistrorsum::before {
-  content: "";
+  content: none;
+}
 
   position: absolute;
 
