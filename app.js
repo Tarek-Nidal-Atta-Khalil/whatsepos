@@ -1734,17 +1734,13 @@ function modelumVerbiCompacti(
 }
 
 function reddeHexameterSlots() {
-  if (
-    !hexameterSlots
-  ) {
+  if (!hexameterSlots) {
     return;
   }
 
-  hexameterSlots.innerHTML =
-    "";
+  hexameterSlots.innerHTML = "";
 
-  const occupata =
-    occupatioVersusInOpere();
+  const occupata = occupatioVersusInOpere();
 
   slotaVisualiaUltima =
     schemaDactylicum.map(
@@ -1772,16 +1768,14 @@ function reddeHexameterSlots() {
               occupatio
                 ?.span ||
               1
-            ) >
-            1,
+            ) > 1,
           potestEsseLonga:
             slotum.typus ===
               "brevis" &&
             indexSlotus >
               0 &&
             schemaDactylicum[
-              indexSlotus -
-              1
+              indexSlotus - 1
             ]?.typus ===
               "longa"
         };
@@ -1791,12 +1785,10 @@ function reddeHexameterSlots() {
   normalizaSlotumSelectum();
 
   for (
-    let indexSlotus =
-      0;
+    let indexSlotus = 0;
     indexSlotus <
       schemaDactylicum.length;
-    indexSlotus +=
-      1
+    indexSlotus += 1
   ) {
     const occupatio =
       occupata[
@@ -1804,9 +1796,9 @@ function reddeHexameterSlots() {
       ];
 
     /*
-     * Die zweite Hälfte einer langen
-     * spondeischen Silbe wird weiterhin
-     * nicht eigens gerendert.
+     * Die zweite Hälfte einer
+     * kontrahierten langen Silbe
+     * bleibt unsichtbar.
      */
     if (
       occupatio
@@ -1822,8 +1814,7 @@ function reddeHexameterSlots() {
 
     const span =
       occupatio
-        ?.span ||
-      1;
+        ?.span || 1;
 
     const indexFinis =
       indexSlotus +
@@ -1844,11 +1835,6 @@ function reddeHexameterSlots() {
     item.className =
       "hexameter-slot-item";
 
-    /*
-     * Jeder sichtbare Silbenplatz bleibt
-     * ausdrücklich an seiner bisherigen
-     * metrischen Rasterposition.
-     */
     item.style.gridColumn =
       `${indexSlotus + 1} / span ${span}`;
 
@@ -1861,8 +1847,7 @@ function reddeHexameterSlots() {
     }
 
     if (
-      span >
-      1
+      span > 1
     ) {
       item.classList.add(
         "hexameter-slot-item--span-2"
@@ -1877,74 +1862,23 @@ function reddeHexameterSlots() {
     signum.className =
       "hexameter-slot-signum";
 
-    signum.classList.add(
-      occupatio
-        ? "hexameter-slot-signum--repertum"
-        : "hexameter-slot-signum--exspectatum"
-    );
-
     signum.textContent =
       signumSchematis(
-        occupatio
-          ?.syllaba
-          ?.quantitas ||
         slotInfo.typus
       );
 
+    item.appendChild(
+      signum
+    );
+
     const slot =
       document.createElement(
-        "div"
+        "button"
       );
 
+    slot.type = "button";
     slot.className =
       "hexameter-slot";
-
-    if (
-      span >
-      1
-    ) {
-      slot.classList.add(
-        "hexameter-slot--contractus"
-      );
-    }
-
-    if (
-      !occupatio
-    ) {
-      slot.classList.add(
-        "hexameter-slot--vacua",
-        "hexameter-slot--selectabilis"
-      );
-
-      slot.addEventListener(
-        "click",
-        function (
-          event
-        ) {
-          event.stopPropagation();
-
-          indexSlotusSelecti =
-            indexSlotus;
-
-          positioInsertionisSelectae =
-            null;
-
-          campus.focus();
-
-          reddeHexameterSlots();
-          aktualisiereSuggestionesMetricas();
-        }
-      );
-    }
-
-    if (
-      indexSlotus ===
-      indexSlotusSelecti
-    ) {
-      slot.classList.add(
-        "hexameter-slot--activa"
-      );
-    }
 
     if (
       occupatio
@@ -1952,74 +1886,77 @@ function reddeHexameterSlots() {
       slot.classList.add(
         "hexameter-slot--plena"
       );
+    } else {
+      slot.classList.add(
+        "hexameter-slot--vacua"
+      );
+    }
 
-      if (
-        occupatio
-          .verbum
-          .id ===
-        idVerbiInOpereSelecti
-      ) {
-        slot.classList.add(
-          "hexameter-slot--verbum-selectum"
-        );
-      }
+    if (
+      Number.isInteger(
+        indexSlotusSelecti
+      ) &&
+      indexSlotus ===
+        indexSlotusSelecti
+    ) {
+      slot.classList.add(
+        "hexameter-slot--selectum"
+      );
+    }
 
-      /*
-       * Die Silbenkarten bleiben getrennte
-       * Rasterelemente. Klassen verbinden
-       * sie anschließend lediglich optisch.
-       */
-      if (
-        occupatio.indexPartis >
-        0
-      ) {
-        slot.classList.add(
-          "hexameter-slot--coniunctus-sinistrorsum"
-        );
-      }
+    if (
+      occupatio
+        ?.verbum
+        ?.id ===
+      idVerbiInOpereSelecti
+    ) {
+      slot.classList.add(
+        "hexameter-slot--verbum-selectum"
+      );
+    }
 
-      if (
-        occupatio.indexPartis <
-        occupatio.numerusPartium -
-          1
-      ) {
-        slot.classList.add(
-          "hexameter-slot--coniunctus-dextrorsum"
-        );
-      }
+    slot.textContent =
+      occupatio
+        ? textusSyllabaeCumLimitibus(
+            occupatio
+          )
+        : "";
 
-      slot.textContent =
-        textusSyllabaeCumLimitibus(
+    slot.addEventListener(
+      "click",
+      function () {
+        if (
           occupatio
-        );
-
-      slot.dataset.quantitas =
-        occupatio
-          .syllaba
-          .quantitas ||
-        "";
-
-      slot.addEventListener(
-        "click",
-        function (
-          event
+            ?.verbum
+            ?.id
         ) {
-          event.stopPropagation();
-
           eligeVerbumInOpere(
             occupatio
               .verbum
               .id
           );
+          return;
         }
-      );
-    } else {
-      slot.innerHTML =
-        "&nbsp;";
-    }
 
-    item.appendChild(
-      signum
+        idVerbiInOpereSelecti =
+          null;
+
+        indexSlotusSelecti =
+          indexSlotus;
+
+        positioInsertionisSelectae =
+          null;
+
+        campus.disabled =
+          false;
+
+        setStatus("");
+
+        reddeHexameterSlots();
+        actualizaInstrumentaVerbiInOpere();
+
+        campus.focus();
+      }
     );
 
     item.appendChild(
@@ -2031,9 +1968,7 @@ function reddeHexameterSlots() {
     );
   }
 
-  reddeVersumInOpereLinearem(
-    occupata
-  );
+  actualizaInstrumentaVerbiInOpere();
 }
 
 function positionemInsertionisExAbscissa(
