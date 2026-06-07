@@ -3,7 +3,7 @@ import {
   erstelleAnalysezeile,
   pruefeVersVorlaeufig,
   setzeFormaeMetricas
-} from "./hexameter.js?v=20260607-liaisones-1";
+} from "./hexameter.js?v=20260607-liaisones-2";
 
 const sideMenu = document.getElementById("sideMenu");
 const menuButton = document.getElementById("menuButton");
