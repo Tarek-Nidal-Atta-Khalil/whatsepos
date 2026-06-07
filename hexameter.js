@@ -1326,6 +1326,56 @@ function insereLiaisones(
   return resultatum;
 }
 
+function insereLiaisones(
+  textus,
+  indices = []
+) {
+  let resultatum =
+    String(
+      textus ||
+      ""
+    );
+
+  [
+    ...new Set(
+      indices
+    )
+  ]
+    .filter(
+      index =>
+        Number.isInteger(
+          index
+        ) &&
+        index > 0 &&
+        index <
+          resultatum.length
+    )
+    .sort(
+      (
+        a,
+        b
+      ) =>
+        b - a
+    )
+    .forEach(
+      function (
+        index
+      ) {
+        resultatum =
+          resultatum.slice(
+            0,
+            index
+          ) +
+          "‿" +
+          resultatum.slice(
+            index
+          );
+      }
+    );
+
+  return resultatum;
+}
+
 function resyllabificaElementeAnalyse(
   elemente,
   textus
@@ -1343,12 +1393,9 @@ function resyllabificaElementeAnalyse(
         ...elementum,
 
         /*
-         * Diese beiden Angaben dienen nur
-         * der sichtbaren Silbenzeile.
-         *
-         * Sie sagen, ob eine Silbe am
-         * Anfang bzw. Ende eines Wortes
-         * steht.
+         * Diese Angaben werden später
+         * von der sichtbaren Silbenzeile
+         * benötigt.
          */
         initiumVerbi:
           elementum.start ===
@@ -1364,9 +1411,9 @@ function resyllabificaElementeAnalyse(
           ),
 
         /*
-         * Positionen sichtbarer
-         * Liaisonbögen innerhalb
-         * der Silbe.
+         * Positionen der Wortgrenzen,
+         * die nach einer Resyllabifizierung
+         * innerhalb einer Silbe liegen.
          */
         indicesLiaisonis:
           []
