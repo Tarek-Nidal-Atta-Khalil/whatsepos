@@ -389,6 +389,8 @@ body > h1 {
   grid-template-columns: repeat(17, minmax(42px, 1fr));
   gap: var(--hexameter-grid-gap);
   align-items: end;
+  grid-auto-rows: 0;
+  overflow: visible;
 }
 
 #versusInOpereOrdo {
