@@ -1765,11 +1765,70 @@ function quantitasDeterminata(syllaba) {
   if (syllaba.quantitas === "longa_positione_provisoria") return syllaba;
   if (syllaba.quantitas === "longa_natura_diphthongo") return syllaba;
   if (syllaba.quantitas === "longa_natura_m_coda") return syllaba;
-  if (indexDiphthongiInTextu(syllaba.textus) >= 0) return { ...syllaba, quantitas: "longa_natura_diphthongo" };
-  if (terminaturInMCoda(syllaba.textus)) return { ...syllaba, quantitas: "longa_natura_m_coda" };
 
-  if (indexPrimiVocalisInTextu(syllaba.textus) >= 0) {
-    return { ...syllaba, quantitas: "brevis" };
+  if (
+    indexDiphthongiInTextu(
+      syllaba.textus
+    ) >= 0
+  ) {
+    return {
+      ...syllaba,
+      quantitas:
+        "longa_natura_diphthongo"
+    };
+  }
+
+  if (
+    terminaturInMCoda(
+      syllaba.textus
+    )
+  ) {
+    return {
+      ...syllaba,
+      quantitas:
+        "longa_natura_m_coda"
+    };
+  }
+
+  /*
+   * Nach der Resyllabifizierung gilt:
+   * Steht hinter dem letzten Vokal noch
+   * mindestens ein Konsonant, ist die
+   * Silbe geschlossen und damit lang.
+   *
+   * Beispiele:
+   *   ar-ma  → ar ist lang
+   *   ris    → ris ist lang
+   */
+  const indexUltimiVocalis =
+    indexUltimiVocalisInTextu(
+      syllaba.textus
+    );
+
+  if (
+    indexUltimiVocalis >=
+      0 &&
+    indexUltimiVocalis <
+      syllaba.textus.length -
+        1
+  ) {
+    return {
+      ...syllaba,
+      quantitas:
+        "longa_positione_provisoria"
+    };
+  }
+
+  if (
+    indexPrimiVocalisInTextu(
+      syllaba.textus
+    ) >= 0
+  ) {
+    return {
+      ...syllaba,
+      quantitas:
+        "brevis"
+    };
   }
 
   return syllaba;
