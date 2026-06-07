@@ -274,6 +274,114 @@ function latitudoSyllabaeInSlotis(
   return 1;
 }
 
+/*
+ * Prüft ausschließlich die metrische
+ * Vereinbarkeit einer bereits analysierten
+ * Silbe mit ihrem aktuellen Silbenplatz.
+ *
+ * Eine unklare Quantität wird nicht rot
+ * markiert: Rot bedeutet hier einen sicher
+ * erkannten metrischen Konflikt.
+ */
+function estSyllabaMetriceRectaInSlotu(
+  syllaba,
+  indexSlotus
+) {
+  const slotum =
+    schemaDactylicum[
+      indexSlotus
+    ];
+
+  const quantitas =
+    syllaba
+      ?.quantitas;
+
+  if (
+    !slotum ||
+    !quantitas ||
+    quantitas ===
+      "ambigua"
+  ) {
+    return true;
+  }
+
+  /*
+   * Die letzte Silbe des Hexameters
+   * ist anceps und darf daher lang
+   * oder kurz sein.
+   */
+  if (
+    slotum.typus ===
+      "anceps"
+  ) {
+    return true;
+  }
+
+  /*
+   * Auf der ersten Silbe jedes Fußes
+   * muss eine Länge stehen.
+   */
+  if (
+    slotum.typus ===
+      "longa"
+  ) {
+    return (
+      quantitas ===
+        "longa"
+    );
+  }
+
+  if (
+    slotum.typus ===
+      "brevis"
+  ) {
+    /*
+     * Eine Kürze passt regulär auf
+     * einen Kürzenplatz.
+     */
+    if (
+      quantitas ===
+        "brevis"
+    ) {
+      return true;
+    }
+
+    /*
+     * Andere noch nicht abschließend
+     * eingeordnete Quantitäten werden
+     * zunächst neutral behandelt.
+     */
+    if (
+      quantitas !==
+        "longa"
+    ) {
+      return true;
+    }
+
+    /*
+     * Eine Länge darf nur auf dem ersten
+     * der beiden Kürzenplätze stehen:
+     *
+     * — ˘ ˘  wird dann zu  — —.
+     *
+     * Auf dem zweiten Kürzenplatz wäre
+     * eine Länge dagegen metrisch falsch.
+     */
+    const estPrimaBrevisPedis =
+      indexSlotus >
+        0 &&
+      schemaDactylicum[
+        indexSlotus -
+          1
+      ]?.typus ===
+        "longa";
+
+    return estPrimaBrevisPedis;
+  }
+
+  return true;
+}
+
 function tentaPositionemVerbi(
   forma,
   indexSlotusInitialis,
@@ -2465,19 +2573,39 @@ function reddeHexameterSlots() {
      * weiterhin das erwartete Schemazeichen
      * angezeigt.
      */
-    const typusSigni =
+    const syllabaSigni =
       occupatioVisualis
-        ?.syllaba
-        ?.quantitas ||
+        ?.syllaba ||
       occupatio
-        ?.syllaba
+        ?.syllaba ||
+      null;
+
+    const typusSigni =
+      syllabaSigni
         ?.quantitas ||
       slotInfo.typus;
+
+    const estMetriceErronea =
+      Boolean(
+        syllabaSigni
+      ) &&
+      !estSyllabaMetriceRectaInSlotu(
+        syllabaSigni,
+        indexSlotus
+      );
 
     signum.textContent =
       signumSchematis(
         typusSigni
       );
+
+    if (
+      estMetriceErronea
+    ) {
+      signum.classList.add(
+        "hexameter-slot-signum--erroneum"
+      );
+    }
 
     item.appendChild(
       signum
@@ -2503,6 +2631,14 @@ function reddeHexameterSlots() {
     } else {
       slot.classList.add(
         "hexameter-slot--vacua"
+      );
+    }
+
+    if (
+      estMetriceErronea
+    ) {
+      slot.classList.add(
+        "hexameter-slot--erronea"
       );
     }
 
