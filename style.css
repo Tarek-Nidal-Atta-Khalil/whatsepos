@@ -570,6 +570,7 @@ body > h1 {
   position: relative;
   min-height: 58px;
 
+  white-space: nowrap;
   display: flex;
   align-items: center;
   justify-content: center;
