@@ -589,7 +589,7 @@ function occupatioVersusInOpere({
 
 function indexPrimiSlotusLiberi(
   occupata =
-    occupatioVersusInOpere()
+    occupatioSyllabarumVisualis()
 ) {
   return occupata.findIndex(
     occupatio =>
@@ -616,19 +616,35 @@ function eligePrimumSlotumLiberum() {
 }
 
 function eligeSlotumLiberumPostVerbum(
-  indexPostVerbum
+  verbumConfirmatum,
+  indexPostVerbumFallback
 ) {
   const occupata =
-    occupatioVersusInOpere();
+    occupatioSyllabarumVisualis();
+
+  const caterva =
+    catervaContinensVerbum(
+      verbumConfirmatum
+    );
 
   /*
-   * Gewöhnlicher Fall:
-   * rechts hinter dem gerade eingesetzten
-   * Wort weiterschreiben.
+   * Maßgeblich ist nicht mehr das isolierte
+   * Ende des zuletzt bestätigten Wortes,
+   * sondern das Ende des vollständigen
+   * zusammenhängenden Silbenzugs.
    */
+  const indexPostCatervam =
+    Number.isInteger(
+      caterva
+        ?.indexPostVerbum
+    )
+      ? caterva
+          .indexPostVerbum
+      : indexPostVerbumFallback;
+
   for (
     let index =
-      indexPostVerbum;
+      indexPostCatervam;
     index <
       occupata.length;
     index +=
@@ -1585,6 +1601,8 @@ function fuegeVerbumInVersumOperis(
     return false;
   }
 
+  let verbumConfirmatum;
+
   if (
     verbumSelectum
   ) {
@@ -1594,15 +1612,25 @@ function fuegeVerbumInVersumOperis(
     verbumSelectum
       .indexSlotusInitialis =
         indexInsertionis;
+
+    verbumConfirmatum =
+      verbumSelectum;
   } else {
-    verbaVersusInOpere.push({
+    const novumVerbum = {
       id:
         creaIdVerbiInOpere(),
       forma:
         verbum,
       indexSlotusInitialis:
         indexInsertionis
-    });
+    };
+
+    verbaVersusInOpere.push(
+      novumVerbum
+    );
+
+    verbumConfirmatum =
+      novumVerbum;
   }
 
   idVerbiInOpereSelecti =
@@ -1628,7 +1656,7 @@ function fuegeVerbumInVersumOperis(
    * dieser angeklickte Platz aktiv sein.
    */
   const occupataPostConfirmationem =
-    occupatioVersusInOpere();
+    occupatioSyllabarumVisualis();
 
   if (
     Number.isInteger(
@@ -1648,6 +1676,7 @@ function fuegeVerbumInVersumOperis(
       false;
   } else {
     eligeSlotumLiberumPostVerbum(
+      verbumConfirmatum,
       temptamen.indexPostVerbum
     );
   }
@@ -1881,7 +1910,7 @@ function normalizaSlotumSelectum() {
   }
 
   const occupata =
-    occupatioVersusInOpere();
+    occupatioSyllabarumVisualis();
 
   if (
     Number.isInteger(
@@ -2178,6 +2207,56 @@ function indexSlotusCursorisVisualis() {
   );
 }
 
+/*
+ * Das metrische Ende eines zusammenhängenden
+ * Silbenzugs wird aus seinem vollständigen
+ * Lautstrom berechnet.
+ *
+ * Wortgrenzen beeinflussen weder die
+ * Silbentrennung noch die Slotbreite.
+ * Sie bleiben lediglich als Metadaten für
+ * die sichtbare Liaison erhalten.
+ */
+function indexPostTextumCatervae(
+  textus,
+  indexSlotusInitialis
+) {
+  const syllabae =
+    syllabaeCampi(
+      textus
+    );
+
+  let indexSlotus =
+    indexSlotusInitialis;
+
+  for (
+    const syllaba of
+    syllabae
+  ) {
+    const span =
+      latitudoSyllabaeInSlotis(
+        syllaba,
+        indexSlotus
+      );
+
+    if (
+      !Number.isInteger(
+        span
+      ) ||
+      indexSlotus +
+        span >
+        numerusMaximusSilbarum
+    ) {
+      return null;
+    }
+
+    indexSlotus +=
+      span;
+  }
+
+  return indexSlotus;
+}
+
 function catervaeVerborumContiguorum() {
   const verbaOrdinata =
     verbaVersusInOpere
@@ -2202,11 +2281,6 @@ function catervaeVerborumContiguorum() {
         verbum
           .indexSlotusInitialis;
 
-      const finis =
-        indexPostVerbumInOpere(
-          verbum
-        );
-
       const ultima =
         catervae[
           catervae.length -
@@ -2215,29 +2289,50 @@ function catervaeVerborumContiguorum() {
 
       /*
        * Eine offene Lücke trennt zwei
-       * unabhängige Analysegruppen.
+       * unabhängige Silbenzüge.
        *
-       * Dadurch werden Wörter links und
-       * rechts einer noch freien Stelle
-       * nicht voreilig miteinander
-       * resyllabifiziert.
+       * Innerhalb eines zusammenhängenden
+       * Silbenzugs spielen Wortgrenzen für
+       * die metrische Analyse keine Rolle.
        */
       if (
         !ultima ||
         initium !==
           ultima.indexPostVerbum
       ) {
+        const verba =
+          [
+            verbum
+          ];
+
+        const textus =
+          verba
+            .map(
+              item =>
+                item.forma
+            )
+            .join(
+              " "
+            );
+
+        const finis =
+          indexPostTextumCatervae(
+            textus,
+            initium
+          );
+
         catervae.push({
           indexSlotusInitialis:
             initium,
 
           indexPostVerbum:
-            finis,
+            Number.isInteger(
+              finis
+            )
+              ? finis
+              : initium,
 
-          verba:
-            [
-              verbum
-            ]
+          verba
         });
 
         return;
@@ -2247,12 +2342,76 @@ function catervaeVerborumContiguorum() {
         verbum
       );
 
-      ultima.indexPostVerbum =
-        finis;
+      /*
+       * Sobald ein Wort unmittelbar an einen
+       * vorhandenen Zug anschließt, wird die
+       * gesamte Gruppe neu syllabifiziert.
+       *
+       * Beispiel:
+       *
+       *   primus ab oris
+       *
+       * wird nicht wortweise, sondern als
+       * fortlaufender Lautstrom behandelt.
+       */
+      const textus =
+        ultima.verba
+          .map(
+            item =>
+              item.forma
+          )
+          .join(
+            " "
+          );
+
+      const finis =
+        indexPostTextumCatervae(
+          textus,
+          ultima
+            .indexSlotusInitialis
+        );
+
+      if (
+        Number.isInteger(
+          finis
+        )
+      ) {
+        ultima.indexPostVerbum =
+          finis;
+      }
     }
   );
 
   return catervae;
+}
+
+/*
+ * Liefert die zusammenhängende Analysegruppe,
+ * zu der ein bestimmtes Wort gehört.
+ */
+function catervaContinensVerbum(
+  verbum
+) {
+  if (
+    !verbum
+  ) {
+    return null;
+  }
+
+  return (
+    catervaeVerborumContiguorum()
+      .find(
+        caterva =>
+          caterva
+            .verba
+            .some(
+              item =>
+                item.id ===
+                verbum.id
+            )
+      ) ||
+    null
+  );
 }
 
 function occupatioSyllabarumVisualis() {
