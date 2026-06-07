@@ -1760,7 +1760,11 @@ function schliesseWortgrenzenFlex(silben) {
   return aktualisierePositiones(resultatum);
 }
 
-function quantitasDeterminata(syllaba) {
+function quantitasDeterminata(
+  syllaba,
+  index,
+  silben
+) {
   if (syllaba.quantitas === "longa_natura_lexico") return syllaba;
   if (syllaba.quantitas === "longa_positione_provisoria") return syllaba;
   if (syllaba.quantitas === "longa_natura_diphthongo") return syllaba;
@@ -1791,21 +1795,30 @@ function quantitasDeterminata(syllaba) {
   }
 
   /*
-   * Nach der Resyllabifizierung gilt:
-   * Steht hinter dem letzten Vokal noch
-   * mindestens ein Konsonant, ist die
-   * Silbe geschlossen und damit lang.
+   * Positionslängen innerhalb des Versstroms
+   * wurden bereits zuvor aus dem folgenden
+   * Lautkontext berechnet.
    *
-   * Beispiele:
-   *   ar-ma  → ar ist lang
-   *   ris    → ris ist lang
+   * Nur bei der letzten Silbe fehlt dieser
+   * folgende Kontext. Ist diese Endsilbe
+   * geschlossen, wird sie hier ergänzend
+   * als lang erkannt.
+   *
+   * Beispiel:
+   *   ris → lang
    */
   const indexUltimiVocalis =
     indexUltimiVocalisInTextu(
       syllaba.textus
     );
 
+  const estUltimaSyllaba =
+    index ===
+    silben.length -
+      1;
+
   if (
+    estUltimaSyllaba &&
     indexUltimiVocalis >=
       0 &&
     indexUltimiVocalis <
