@@ -1276,58 +1276,6 @@ function notaAnalyseElementum(textus, quantitas) {
 
 function insereLiaisones(
   textus,
-  indices =
-    []
-) {
-  let resultatum =
-    String(
-      textus ||
-      ""
-    );
-
-  [
-    ...new Set(
-      indices
-    )
-  ]
-    .filter(
-      index =>
-        Number.isInteger(
-          index
-        ) &&
-        index >
-          0 &&
-        index <
-          resultatum.length
-    )
-    .sort(
-      (
-        a,
-        b
-      ) =>
-        b - a
-    )
-    .forEach(
-      function (
-        index
-      ) {
-        resultatum =
-          resultatum.slice(
-            0,
-            index
-          ) +
-          "‿" +
-          resultatum.slice(
-            index
-          );
-      }
-    );
-
-  return resultatum;
-}
-
-function insereLiaisones(
-  textus,
   indices = []
 ) {
   let resultatum =
