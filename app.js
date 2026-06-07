@@ -184,6 +184,24 @@ let positioInsertionisTractae =
 let indexSlotusSelecti =
   null;
 
+/*
+ * Ein vorläufig geschlossener Wortausgang
+ * kann als lange Silbe zwei Kürzenplätze
+ * besetzen.
+ *
+ * Beginnt das nächste Wort mit einem Vokal,
+ * kann sich diese Silbe wieder öffnen:
+ *
+ *   prī | mūs
+ *   prī | mŭ | să
+ *
+ * Dafür darf der nächste Schreibcursor
+ * vorläufig auf dem zweiten Platz der
+ * kontrahierten Länge stehen.
+ */
+let indexSlotusContinuationisSonorae =
+  null;
+
 let positioInsertionisSelectae =
   null;
 
@@ -615,6 +633,60 @@ function eligePrimumSlotumLiberum() {
     0;
 }
 
+/*
+ * Ermittelt den Platz, an dem ein folgendes
+ * Wort weitergeschrieben werden soll.
+ *
+ * Endet der aktuelle Silbenzug mit einer
+ * kontrahierten langen Silbe, wird zunächst
+ * der zweite Platz dieser Länge gewählt.
+ *
+ * Dort kann ein folgender Vokal die bisher
+ * geschlossene Silbe wieder öffnen.
+ */
+function indexContinuationisSonoraePostCatervam(
+  caterva,
+  occupata
+) {
+  const indexPostCatervam =
+    caterva
+      ?.indexPostVerbum;
+
+  if (
+    !Number.isInteger(
+      indexPostCatervam
+    ) ||
+    indexPostCatervam <=
+      0
+  ) {
+    return null;
+  }
+
+  const indexUltimus =
+    indexPostCatervam -
+      1;
+
+  const occupatioUltima =
+    occupata[
+      indexUltimus
+    ];
+
+  if (
+    occupatioUltima
+      ?.continuatio &&
+    (
+      occupatioUltima
+        ?.span ||
+      1
+    ) >
+      1
+  ) {
+    return indexUltimus;
+  }
+
+  return null;
+}
+
 function eligeSlotumLiberumPostVerbum(
   verbumConfirmatum,
   indexPostVerbumFallback
@@ -628,9 +700,7 @@ function eligeSlotumLiberumPostVerbum(
     );
 
   /*
-   * Maßgeblich ist nicht mehr das isolierte
-   * Ende des zuletzt bestätigten Wortes,
-   * sondern das Ende des vollständigen
+   * Maßgeblich ist das Ende des vollständigen
    * zusammenhängenden Silbenzugs.
    */
   const indexPostCatervam =
@@ -641,6 +711,47 @@ function eligeSlotumLiberumPostVerbum(
       ? caterva
           .indexPostVerbum
       : indexPostVerbumFallback;
+
+  /*
+   * Sonderfall:
+   *
+   * Eine am Wortende vorläufig geschlossene
+   * Silbe kann auf einem Kürzenpaar zwei
+   * Plätze belegen.
+   *
+   * Der nächste Wortanfang darf dann zunächst
+   * auf dem zweiten dieser beiden Plätze
+   * beginnen. Sobald ein Vokal folgt, wird
+   * der gesamte Lautstrom neu syllabifiziert.
+   */
+  const indexContinuationis =
+    indexContinuationisSonoraePostCatervam(
+      caterva,
+      occupata
+    );
+
+  if (
+    Number.isInteger(
+      indexContinuationis
+    )
+  ) {
+    indexSlotusContinuationisSonorae =
+      indexContinuationis;
+
+    indexSlotusSelecti =
+      indexContinuationis;
+
+    positioInsertionisSelectae =
+      null;
+
+    campus.disabled =
+      false;
+
+    return;
+  }
+
+  indexSlotusContinuationisSonorae =
+    null;
 
   for (
     let index =
@@ -1044,6 +1155,9 @@ function actualizaVerbumProvisoriumExCampo() {
 
     idVerbiInOpereProvisorii =
       novumVerbum.id;
+
+    indexSlotusContinuationisSonorae =
+      null;
   }
 
   setStatus(
@@ -1678,6 +1792,9 @@ function resettaVersumInOpere() {
   indexSlotusSelecti =
     0;
 
+  indexSlotusContinuationisSonorae =
+    null;
+
   positioInsertionisSelectae =
     null;
 
@@ -1872,6 +1989,27 @@ function normalizaSlotumSelectum() {
     positioInsertionisSelectae =
       null;
 
+    campus.disabled =
+      false;
+
+    return;
+  }
+
+    /*
+   * Der elastische Anschlussplatz ist
+   * absichtlich noch belegt.
+   *
+   * Er darf nicht automatisch durch den
+   * nächsten vollständig freien Platz
+   * ersetzt werden.
+   */
+  if (
+    Number.isInteger(
+      indexSlotusContinuationisSonorae
+    ) &&
+    indexSlotusSelecti ===
+      indexSlotusContinuationisSonorae
+  ) {
     campus.disabled =
       false;
 
@@ -2278,10 +2416,23 @@ function catervaeVerborumContiguorum(
        * Silbenzugs spielen Wortgrenzen für
        * die metrische Analyse keine Rolle.
        */
+      const estContinuatioRegularis =
+        ultima &&
+        initium ===
+          ultima.indexPostVerbum;
+
+      const estContinuatioElastica =
+        ultima &&
+        initium ===
+          ultima.indexPostVerbum -
+            1;
+
       if (
         !ultima ||
-        initium !==
-          ultima.indexPostVerbum
+        (
+          !estContinuatioRegularis &&
+          !estContinuatioElastica
+        )
       ) {
         const verba =
           [
@@ -3059,6 +3210,9 @@ function reddeHexameterSlots() {
 
         indexSlotusSelecti =
           indexSlotus;
+
+        indexSlotusContinuationisSonorae =
+          null;
 
         positioInsertionisSelectae =
           null;
