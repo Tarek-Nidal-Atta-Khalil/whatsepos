@@ -3,7 +3,7 @@ import {
   erstelleAnalysezeile,
   pruefeVersVorlaeufig,
   setzeFormaeMetricas
-} from "./hexameter.js?v=20260604-longae-arrays-pagination-1";
+} from "./hexameter.js?v=20260607-liaisones-1";
 
 const sideMenu = document.getElementById("sideMenu");
 const menuButton = document.getElementById("menuButton");
@@ -1733,14 +1733,306 @@ function modelumVerbiCompacti(
   };
 }
 
+function indexPostVerbumInOpere(
+  verbum
+) {
+  return (
+    verbum
+      ?.partes ||
+    []
+  ).reduce(
+    function (
+      maximum,
+      pars
+    ) {
+      return Math.max(
+        maximum,
+        pars.indexSlotus +
+          (
+            pars.span ||
+            1
+          )
+      );
+    },
+    verbum
+      ?.indexSlotusInitialis ||
+      0
+  );
+}
+
+function catervaeVerborumContiguorum() {
+  const verbaOrdinata =
+    verbaVersusInOpere
+      .slice()
+      .sort(
+        (
+          a,
+          b
+        ) =>
+          a.indexSlotusInitialis -
+          b.indexSlotusInitialis
+      );
+
+  const catervae =
+    [];
+
+  verbaOrdinata.forEach(
+    function (
+      verbum
+    ) {
+      const initium =
+        verbum
+          .indexSlotusInitialis;
+
+      const finis =
+        indexPostVerbumInOpere(
+          verbum
+        );
+
+      const ultima =
+        catervae[
+          catervae.length -
+            1
+        ];
+
+      /*
+       * Eine offene Lücke trennt zwei
+       * unabhängige Analysegruppen.
+       *
+       * Dadurch werden Wörter links und
+       * rechts einer noch freien Stelle
+       * nicht voreilig miteinander
+       * resyllabifiziert.
+       */
+      if (
+        !ultima ||
+        initium !==
+          ultima.indexPostVerbum
+      ) {
+        catervae.push({
+          indexSlotusInitialis:
+            initium,
+
+          indexPostVerbum:
+            finis,
+
+          verba:
+            [
+              verbum
+            ]
+        });
+
+        return;
+      }
+
+      ultima.verba.push(
+        verbum
+      );
+
+      ultima.indexPostVerbum =
+        finis;
+    }
+  );
+
+  return catervae;
+}
+
+function occupatioSyllabarumVisualis() {
+  const occupata =
+    Array(
+      numerusMaximusSilbarum
+    ).fill(
+      null
+    );
+
+  catervaeVerborumContiguorum()
+    .forEach(
+      function (
+        caterva
+      ) {
+        const textus =
+          caterva.verba
+            .map(
+              verbum =>
+                verbum.forma
+            )
+            .join(
+              " "
+            );
+
+        /*
+         * Anders als bei der internen
+         * Wortbelegung wird hier die
+         * ganze zusammenhängende
+         * Wortgruppe gemeinsam analysiert.
+         */
+        const syllabae =
+          syllabaeCampi(
+            textus
+          );
+
+        let indexSlotus =
+          caterva
+            .indexSlotusInitialis;
+
+        for (
+          let indexPartis = 0;
+          indexPartis <
+            syllabae.length;
+          indexPartis +=
+            1
+        ) {
+          const syllaba =
+            syllabae[
+              indexPartis
+            ];
+
+          const span =
+            latitudoSyllabaeInSlotis(
+              syllaba,
+              indexSlotus
+            );
+
+          if (
+            !Number.isInteger(
+              span
+            ) ||
+            indexSlotus +
+              span >
+              numerusMaximusSilbarum
+          ) {
+            break;
+          }
+
+          let locusIamOccupatus =
+            false;
+
+          for (
+            let index =
+              indexSlotus;
+            index <
+              indexSlotus +
+                span;
+            index +=
+              1
+          ) {
+            if (
+              occupata[
+                index
+              ]
+            ) {
+              locusIamOccupatus =
+                true;
+
+              break;
+            }
+          }
+
+          if (
+            locusIamOccupatus
+          ) {
+            break;
+          }
+
+          for (
+            let index =
+              indexSlotus;
+            index <
+              indexSlotus +
+                span;
+            index +=
+              1
+          ) {
+            occupata[
+              index
+            ] = {
+              syllaba,
+
+              span,
+
+              continuatio:
+                index !==
+                indexSlotus,
+
+              indexPartis,
+
+              numerusPartium:
+                syllabae.length
+            };
+          }
+
+          indexSlotus +=
+            span;
+        }
+      }
+    );
+
+  return occupata;
+}
+
+function textusSyllabaeVisualis(
+  occupatio
+) {
+  const syllaba =
+    occupatio
+      ?.syllaba;
+
+  if (
+    !syllaba
+  ) {
+    return "";
+  }
+
+  const textus =
+    syllaba
+      .textusSignatus ||
+    syllaba
+      .textusVisualis ||
+    syllaba
+      .textus ||
+    "";
+
+  return (
+    (
+      syllaba
+        .initiumVerbi
+        ? ""
+        : "-"
+    ) +
+    textus +
+    (
+      syllaba
+        .finisVerbi
+        ? ""
+        : "-"
+    )
+  );
+}
+
 function reddeHexameterSlots() {
-  if (!hexameterSlots) {
+  if (
+    !hexameterSlots
+  ) {
     return;
   }
 
-  hexameterSlots.innerHTML = "";
+  hexameterSlots.innerHTML =
+    "";
 
-  const occupata = occupatioVersusInOpere();
+  /*
+   * Die alte Belegung bleibt für
+   * Wortzeile, Eingabe und Löschung
+   * erhalten.
+   */
+  const occupata =
+    occupatioVersusInOpere();
+
+  /*
+   * Die obere Zeile erhält zusätzlich
+   * eine rein silbenbezogene Belegung.
+   */
+  const occupataVisualia =
+    occupatioSyllabarumVisualis();
 
   slotaVisualiaUltima =
     schemaDactylicum.map(
@@ -1755,27 +2047,33 @@ function reddeHexameterSlots() {
 
         return {
           ...slotum,
+
           syllaba:
             occupatio
               ?.syllaba ||
             null,
+
           span:
             occupatio
               ?.span ||
             1,
+
           contractus:
             (
               occupatio
                 ?.span ||
               1
-            ) > 1,
+            ) >
+            1,
+
           potestEsseLonga:
             slotum.typus ===
               "brevis" &&
             indexSlotus >
               0 &&
             schemaDactylicum[
-              indexSlotus - 1
+              indexSlotus -
+                1
             ]?.typus ===
               "longa"
         };
@@ -1788,10 +2086,16 @@ function reddeHexameterSlots() {
     let indexSlotus = 0;
     indexSlotus <
       schemaDactylicum.length;
-    indexSlotus += 1
+    indexSlotus +=
+      1
   ) {
     const occupatio =
       occupata[
+        indexSlotus
+      ];
+
+    const occupatioVisualis =
+      occupataVisualia[
         indexSlotus
       ];
 
@@ -1801,7 +2105,7 @@ function reddeHexameterSlots() {
      * bleibt unsichtbar.
      */
     if (
-      occupatio
+      occupatioVisualis
         ?.continuatio
     ) {
       continue;
@@ -1813,8 +2117,11 @@ function reddeHexameterSlots() {
       ];
 
     const span =
+      occupatioVisualis
+        ?.span ||
       occupatio
-        ?.span || 1;
+        ?.span ||
+      1;
 
     const indexFinis =
       indexSlotus +
@@ -1847,7 +2154,8 @@ function reddeHexameterSlots() {
     }
 
     if (
-      span > 1
+      span >
+        1
     ) {
       item.classList.add(
         "hexameter-slot-item--span-2"
@@ -1876,12 +2184,14 @@ function reddeHexameterSlots() {
         "button"
       );
 
-    slot.type = "button";
+    slot.type =
+      "button";
+
     slot.className =
       "hexameter-slot";
 
     if (
-      occupatio
+      occupatioVisualis
     ) {
       slot.classList.add(
         "hexameter-slot--plena"
@@ -1904,37 +2214,25 @@ function reddeHexameterSlots() {
       );
     }
 
-    if (
-      occupatio
-        ?.verbum
-        ?.id ===
-      idVerbiInOpereSelecti
-    ) {
-      slot.classList.add(
-        "hexameter-slot--verbum-selectum"
-      );
-    }
-
     slot.textContent =
-      occupatio
-        ? textusSyllabaeCumLimitibus(
-            occupatio
-          )
-        : "";
+      textusSyllabaeVisualis(
+        occupatioVisualis
+      );
 
     slot.addEventListener(
       "click",
       function () {
+        /*
+         * Belegte Silben werden künftig
+         * nicht mehr als Wörter behandelt.
+         *
+         * Zur Auswahl eines Wortes dient
+         * die eigene Wortzeile darunter.
+         */
         if (
+          occupatioVisualis ||
           occupatio
-            ?.verbum
-            ?.id
         ) {
-          eligeVerbumInOpere(
-            occupatio
-              .verbum
-              .id
-          );
           return;
         }
 
@@ -1950,7 +2248,9 @@ function reddeHexameterSlots() {
         campus.disabled =
           false;
 
-        setStatus("");
+        setStatus(
+          ""
+        );
 
         reddeHexameterSlots();
         actualizaInstrumentaVerbiInOpere();
@@ -1966,8 +2266,14 @@ function reddeHexameterSlots() {
     hexameterSlots.appendChild(
       item
     );
-    }
+  }
 
+  /*
+   * Diese Zeile darf nicht wieder
+   * verschwinden: Sie rendert die
+   * anklickbaren ganzen Wörter unterhalb
+   * des Silbenrasters.
+   */
   reddeVersumInOpereLinearem(
     occupata
   );
