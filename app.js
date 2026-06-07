@@ -2449,9 +2449,27 @@ function reddeHexameterSlots() {
     signum.className =
       "hexameter-slot-signum";
 
+    /*
+     * Bei einem besetzten Silbenplatz zeigt
+     * das Zeichen die tatsächlich analysierte
+     * Quantität der Silbe.
+     *
+     * Nur bei einem noch leeren Platz wird
+     * weiterhin das erwartete Schemazeichen
+     * angezeigt.
+     */
+    const typusSigni =
+      occupatioVisualis
+        ?.syllaba
+        ?.quantitas ||
+      occupatio
+        ?.syllaba
+        ?.quantitas ||
+      slotInfo.typus;
+
     signum.textContent =
       signumSchematis(
-        slotInfo.typus
+        typusSigni
       );
 
     item.appendChild(
