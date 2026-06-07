@@ -2005,6 +2005,7 @@ function indexSlotusCursorisVisualis() {
       .indexSlotusInitialis,
     indexPostVerbum - 1
   );
+}
 
 function catervaeVerborumContiguorum() {
   const verbaOrdinata =
