@@ -1333,171 +1333,78 @@ function resyllabificaElementeAnalyse(
       textus
     );
 
+  /*
+   * Die Basisanalyse arbeitet bereits mit
+   * einem fortlaufenden Versstrom ohne
+   * Leerzeichen.
+   *
+   * Beispiel:
+   *
+   * primus ab oris
+   *
+   * wird schon vor diesem Schritt zu:
+   *
+   * pri | mu | sa | bo | ris
+   *
+   * Wir müssen daher keine Konsonanten
+   * mehr verschieben. Wir markieren nur
+   * noch Wortgrenzen, die innerhalb einer
+   * bereits gebildeten Silbe liegen.
+   */
   const resultatum =
     positioniere(
       elemente
     ).map(
-      elementum => ({
-        ...elementum,
+      function (
+        elementum
+      ) {
+        const indicesLiaisonis =
+          [
+            ...grenzen
+          ]
+            .filter(
+              grenze =>
+                grenze >=
+                  elementum.start &&
+                grenze <
+                  elementum.ende
+            )
+            .map(
+              grenze =>
+                grenze -
+                elementum.start +
+                1
+            );
 
-        /*
-         * Diese Angaben werden später
-         * von der sichtbaren Silbenzeile
-         * benötigt.
-         */
-        initiumVerbi:
-          elementum.start ===
-            0 ||
-          grenzen.has(
-            elementum.start -
-              1
-          ),
+        return {
+          ...elementum,
 
-        finisVerbi:
-          grenzen.has(
-            elementum.ende
-          ),
+          initiumVerbi:
+            elementum.start ===
+              0 ||
+            grenzen.has(
+              elementum.start -
+                1
+            ),
 
-        /*
-         * Positionen der Wortgrenzen,
-         * die nach einer Resyllabifizierung
-         * innerhalb einer Silbe liegen.
-         */
-        indicesLiaisonis:
-          []
-      })
+          finisVerbi:
+            grenzen.has(
+              elementum.ende
+            ),
+
+          indicesLiaisonis
+        };
+      }
     );
 
-  for (
-    let index = 0;
-    index <
-      resultatum.length -
-        1;
-    index +=
-      1
-  ) {
-    const links =
-      resultatum[
-        index
-      ];
-
-    const rechts =
-      resultatum[
-        index +
-          1
-      ];
-
-    if (
-      !grenzen.has(
-        links.ende
-      )
-    ) {
-      continue;
-    }
-
-    if (
-      indexPrimiVocalisAnalyse(
-        rechts.textus
-      ) !==
-      0
-    ) {
-      continue;
-    }
-
-    const ultimusVocalis =
-      indexUltimiVocalisAnalyse(
-        links.textus
-      );
-
-    if (
-      ultimusVocalis <
-        0 ||
-      ultimusVocalis >=
-        links.textus.length -
-          1
-    ) {
-      continue;
-    }
-
-    const coda =
-      links.textus.slice(
-        ultimusVocalis +
-          1
-      );
-
-    const basisLinks =
-      links.textus.slice(
-        0,
-        ultimusVocalis +
-          1
-      );
-
-    if (
-      !coda
-    ) {
-      continue;
-    }
-
-    /*
-     * Beispiel:
-     *
-     * mus + ab
-     * wird zu
-     * mu + s‿ab
-     */
-    links.textus =
-      basisLinks;
-
-    links.indicesLiaisonis =
-      (
-        links
-          .indicesLiaisonis ||
-        []
-      ).filter(
-        indexLiaisonis =>
-          indexLiaisonis <
-          basisLinks.length
-      );
-
-    links.finisVerbi =
-      false;
-
-    rechts.textus =
-      coda +
-      rechts.textus;
-
-    rechts.indicesLiaisonis =
-      [
-        coda.length,
-
-        ...(
-          rechts
-            .indicesLiaisonis ||
-          []
-        ).map(
-          indexLiaisonis =>
-            indexLiaisonis +
-            coda.length
-        )
-      ];
-
-    rechts.initiumVerbi =
-      false;
-
-    if (
-      links.quantitas ===
-        "longa"
-    ) {
-      links.quantitas =
-        "brevis";
-
-      links.signum =
-        signumQuantitatis(
-          "brevis"
-        );
-    }
-  }
-
+  /*
+   * Die bereits vorhandene Behandlung
+   * des konsonantischen i bleibt erhalten:
+   *
+   * tro | iae
+   * wird zu
+   * troj | jae
+   */
   const cumIConsonante =
     aplicaIConsonansIntervocalicum(
       resultatum
