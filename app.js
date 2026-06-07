@@ -1416,10 +1416,21 @@ function creaLocumVacuumVersusInOpere(
   return locus;
 }
 
-function reddeVersumInOpereLinearem(
-  occupata =
-    occupatioVersusInOpere()
-) {
+/*
+ * Die Wortzeile wird nicht mehr aus der alten
+ * wortweisen Slotbelegung rekonstruiert.
+ *
+ * Maßgeblich sind die gespeicherten Wörter
+ * innerhalb der zusammenhängenden Silbenzüge.
+ *
+ * Dadurch bleibt die Wortzeile stabil, auch
+ * wenn ein elastischer Anschlussplatz für die
+ * Resyllabifizierung verwendet wird:
+ *
+ *   prī | mūs
+ *   prī | mŭ | să
+ */
+function reddeVersumInOpereLinearem() {
   if (
     !versusInOpereLinea
   ) {
@@ -1429,78 +1440,48 @@ function reddeVersumInOpereLinearem(
   versusInOpereLinea.innerHTML =
     "";
 
-  let idVerbiUltimi =
-    null;
+  const catervae =
+    catervaeVerborumContiguorum();
 
-  for (
-    let index =
-      0;
-    index <
-      schemaDactylicum.length;
-    index +=
-      1
+  let indexSlotus =
+    0;
+
+  function addeLocosVacuosUsqueAd(
+    indexFinis
   ) {
-    const occupatio =
-      occupata[
-        index
-      ];
-
-    /*
-     * Die zweite Hälfte eines spondeischen
-     * Doppelplatzes wird nicht eigens
-     * wiederholt.
-     */
-    if (
-      occupatio
-        ?.continuatio
-    ) {
-      continue;
-    }
-
-    if (
-      !occupatio
+    while (
+      indexSlotus <
+      indexFinis &&
+      indexSlotus <
+      schemaDactylicum.length
     ) {
       versusInOpereLinea
         .appendChild(
           creaLocumVacuumVersusInOpere(
             schemaDactylicum[
-              index
+              indexSlotus
             ].typus
           )
         );
 
-      idVerbiUltimi =
-        null;
-
-      continue;
+      indexSlotus +=
+        1;
     }
+  }
 
-    /*
-     * In der Zwischenzeile erscheint jedes
-     * bereits gesetzte Wort nur einmal als
-     * zusammenhängende Wortform.
-     */
-    if (
-      occupatio
-        .verbum
-        .id ===
-      idVerbiUltimi
-    ) {
-      continue;
-    }
-
+  function addeVerbum(
+    verbumInOpere
+  ) {
     const verbum =
       document.createElement(
         "span"
       );
 
-        verbum.className =
+    verbum.className =
       "versus-in-opere-verbum";
 
     if (
-      occupatio
-        .verbum
-        .id ===
+      verbumInOpere.id ===
       idVerbiInOpereSelecti
     ) {
       verbum.classList.add(
@@ -1509,9 +1490,7 @@ function reddeVersumInOpereLinearem(
     }
 
     verbum.textContent =
-      occupatio
-        .verbum
-        .forma;
+      verbumInOpere.forma;
 
     verbum.tabIndex =
       0;
@@ -1529,9 +1508,7 @@ function reddeVersumInOpereLinearem(
         event.stopPropagation();
 
         eligeVerbumInOpere(
-          occupatio
-            .verbum
-            .id
+          verbumInOpere.id
         );
       }
     );
@@ -1553,9 +1530,7 @@ function reddeVersumInOpereLinearem(
         event.preventDefault();
 
         eligeVerbumInOpere(
-          occupatio
-            .verbum
-            .id
+          verbumInOpere.id
         );
       }
     );
@@ -1564,12 +1539,42 @@ function reddeVersumInOpereLinearem(
       .appendChild(
         verbum
       );
+  }
 
-    idVerbiUltimi =
-      occupatio
-        .verbum
-        .id;
+  catervae.forEach(
+    function (
+      caterva
+    ) {
+      /*
+       * Nur eine echte freie Strecke zwischen
+       * zwei unabhängigen Silbenzügen wird als
+       * Lücke dargestellt.
+       *
+       * Eine elastische Überlappung erzeugt
+       * dagegen keine künstlichen Unterstriche.
+       */
+      addeLocosVacuosUsqueAd(
+        caterva
+          .indexSlotusInitialis
+      );
+
+      caterva.verba
+        .forEach(
+          addeVerbum
+        );
+
+      indexSlotus =
+        Math.max(
+          indexSlotus,
+          caterva
+            .indexPostVerbum
+        );
     }
+  );
+
+  addeLocosVacuosUsqueAd(
+    schemaDactylicum.length
+  );
 
   actualizaInstrumentaVerbiInOpere();
 }
@@ -3241,14 +3246,14 @@ function reddeHexameterSlots() {
   }
 
   /*
-   * Diese Zeile darf nicht wieder
-   * verschwinden: Sie rendert die
-   * anklickbaren ganzen Wörter unterhalb
-   * des Silbenrasters.
+   * Die anklickbare Wortzeile wird getrennt
+   * vom metrischen Silbenraster gerendert.
+   *
+   * Wortgrenzen bleiben hier sichtbar,
+   * beeinflussen aber nicht mehr die
+   * metrische Slotbelegung.
    */
-  reddeVersumInOpereLinearem(
-    occupata
-  );
+  reddeVersumInOpereLinearem();
 
   actualizaInstrumentaVerbiInOpere();
 }
