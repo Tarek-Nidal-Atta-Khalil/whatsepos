@@ -2965,19 +2965,13 @@ function cancellaActualizationemProvisoriam() {
     null;
 }
 
-let suggestionesMetricaeTimer =
-  null;
-
 campus.addEventListener(
   "input",
   function () {
     /*
-     * Das Wörterbuch wird bereits beim
-     * Öffnen des Scriptoriums geladen.
-     *
-     * Eine erneute Abfrage bei jedem
-     * Buchstaben wäre unnötig und bremst
-     * die Eingabe aus.
+     * Das Feld enthält immer nur genau
+     * ein Wort. Eingefügte Leerzeichen
+     * werden daher entfernt.
      */
     campus.value =
       campus.value.replace(
@@ -2986,31 +2980,14 @@ campus.addEventListener(
       );
 
     /*
-     * Die sichtbare Silben- und Wortzeile
-     * folgt weiterhin dem Eingabefeld.
+     * Während des Tippens werden nur
+     * Silbenzeile und Wortzeile aktualisiert.
      *
-     * Mehrere rasch aufeinanderfolgende
-     * Eingaben werden jedoch zu einer
-     * einzigen Berechnung zusammengefasst.
+     * Die aufwendigen Suggestiones werden
+     * erst nach der Bestätigung eines Wortes
+     * neu berechnet.
      */
-    programmaActualizationemProvisoriam();
-
-    clearTimeout(
-      suggestionesMetricaeTimer
-    );
-
-    /*
-     * Suggestiones werden erst aktualisiert,
-     * wenn für einen kurzen Moment nicht
-     * weitergetippt wurde.
-     */
-    suggestionesMetricaeTimer =
-      setTimeout(
-        function () {
-          aktualisiereSuggestionesMetricas();
-        },
-        320
-      );
+    actualizaVerbumProvisoriumExCampo();
   }
 );
 
