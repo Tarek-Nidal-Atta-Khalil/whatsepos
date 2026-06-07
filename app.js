@@ -206,6 +206,14 @@ let numerusVerbiInOpere =
 let idVerbiInOpereSelecti =
   null;
 
+/*
+ * Ein noch nicht durch Leertaste oder
+ * Enter bestätigtes Wort erscheint bereits
+ * während des Tippens in Silben- und Wortzeile.
+ */
+let idVerbiInOpereProvisorii =
+  null;
+
 function creaIdVerbiInOpere() {
   numerusVerbiInOpere +=
     1;
@@ -756,6 +764,189 @@ function verbumInOpereSelectum() {
     null;
 }
 
+function verbumInOpereProvisorium() {
+  return verbaVersusInOpere
+    .find(
+      verbum =>
+        verbum.id ===
+        idVerbiInOpereProvisorii
+    ) ||
+    null;
+}
+
+function removeVerbumInOpereProvisorium() {
+  const verbum =
+    verbumInOpereProvisorium();
+
+  if (
+    !verbum
+  ) {
+    return false;
+  }
+
+  verbaVersusInOpere =
+    verbaVersusInOpere
+      .filter(
+        item =>
+          item.id !==
+          verbum.id
+      );
+
+  idVerbiInOpereProvisorii =
+    null;
+
+  return true;
+}
+
+function actualizaVerbumProvisoriumExCampo() {
+  const forma =
+    String(
+      campus.value ||
+      ""
+    ).trim();
+
+  const verbumSelectum =
+    verbumInOpereSelectum();
+
+  const verbumProvisorium =
+    verbumInOpereProvisorium();
+
+  /*
+   * Beim Leeren des Eingabefeldes wird
+   * ausschließlich ein noch unbestätigtes
+   * Wort entfernt.
+   *
+   * Ein bewusst ausgewähltes bestehendes
+   * Wort bleibt erhalten. Dafür gibt es
+   * weiterhin den Löschknopf.
+   */
+  if (
+    !forma
+  ) {
+    if (
+      removeVerbumInOpereProvisorium()
+    ) {
+      setStatus(
+        ""
+      );
+
+      reddeHexameterSlots();
+      aktualisiereHexameterVorschau();
+    }
+
+    return;
+  }
+
+  /*
+   * Wird ein bereits gesetztes Wort unten
+   * angeklickt und anschließend bearbeitet,
+   * aktualisiert es sich ebenfalls live.
+   *
+   * Andernfalls wird das provisorische Wort
+   * fortlaufend ergänzt.
+   */
+  const verbumMutandum =
+    verbumSelectum ||
+    verbumProvisorium;
+
+  if (
+    !verbumMutandum
+  ) {
+    normalizaSlotumSelectum();
+  }
+
+  const indexInsertionis =
+    verbumMutandum
+      ? verbumMutandum
+          .indexSlotusInitialis
+      : indexSlotusSelecti;
+
+  if (
+    !Number.isInteger(
+      indexInsertionis
+    )
+  ) {
+    return;
+  }
+
+  const occupata =
+    occupatioVersusInOpere({
+      idVerbiExclusi:
+        verbumMutandum
+          ?.id ||
+        null
+    });
+
+  if (
+    !condicioElisionisPraecedentisServatur(
+      forma,
+      indexInsertionis,
+      occupata
+    )
+  ) {
+    setStatus(
+      "Verbum praecedens elisionem postulat: sequens a uocali aut h incipere debet."
+    );
+
+    return;
+  }
+
+  const temptamen =
+    tentaPositionemVerbi(
+      forma,
+      indexInsertionis,
+      occupata
+    );
+
+  if (
+    !temptamen.bene
+  ) {
+    setStatus(
+      temptamen.causa
+    );
+
+    return;
+  }
+
+  if (
+    verbumMutandum
+  ) {
+    verbumMutandum.forma =
+      forma;
+
+    verbumMutandum
+      .indexSlotusInitialis =
+        indexInsertionis;
+  } else {
+    const novumVerbum = {
+      id:
+        creaIdVerbiInOpere(),
+
+      forma,
+
+      indexSlotusInitialis:
+        indexInsertionis,
+
+      provisorium:
+        true
+    };
+
+    verbaVersusInOpere.push(
+      novumVerbum
+    );
+
+    idVerbiInOpereProvisorii =
+      novumVerbum.id;
+  }
+
+  setStatus(
+    ""
+  );
+
+  reddeHexameterSlots();
+  aktualisiereHexameterVorschau();
+}
+
 function actualizaInstrumentaVerbiInOpere() {
   if (
     !verbumInOpereDele
@@ -880,6 +1071,21 @@ campusPurga
     function () {
       campus.value =
         "";
+
+      /*
+       * Das Input-Ereignis entfernt auch
+       * das provisorische Wort aus beiden
+       * sichtbaren Zeilen.
+       */
+      campus.dispatchEvent(
+        new Event(
+          "input",
+          {
+            bubbles:
+              true
+          }
+        )
+      );
 
       campus.focus();
     }
@@ -1215,8 +1421,14 @@ function fuegeVerbumInVersumOperis(
     return false;
   }
 
+  /*
+   * Ein bereits live angezeigtes Wort wird
+   * bei Leertaste oder Enter nicht nochmals
+   * eingefügt, sondern lediglich bestätigt.
+   */
   const verbumSelectum =
-    verbumInOpereSelectum();
+    verbumInOpereSelectum() ||
+    verbumInOpereProvisorium();
 
   const indexInsertionis =
     verbumSelectum
@@ -1286,6 +1498,9 @@ function fuegeVerbumInVersumOperis(
   idVerbiInOpereSelecti =
     null;
 
+  idVerbiInOpereProvisorii =
+    null;
+
   campus.value =
     "";
 
@@ -1316,6 +1531,9 @@ function resettaVersumInOpere() {
     [];
 
   idVerbiInOpereSelecti =
+    null;
+
+  idVerbiInOpereProvisorii =
     null;
 
   campus.value =
@@ -2657,18 +2875,26 @@ campus.addEventListener(
       return;
     }
 
-    if (
+     if (
       event.key ===
         "Enter" &&
       !event.shiftKey
     ) {
       event.preventDefault();
 
+      /*
+       * Ist gerade ein Wort im Feld,
+       * bestätigt Enter zunächst nur dieses
+       * Wort und leert anschließend das Feld.
+       *
+       * Erst ein weiteres Enter bei leerem
+       * Feld schließt den Vers ab.
+       */
       if (
         campus.value.trim()
       ) {
-        setStatus(
-          "Verbum prius spatio adde."
+        fuegeVerbumInVersumOperis(
+          campus.value
         );
 
         return;
@@ -2692,16 +2918,25 @@ campus.addEventListener(
      * ein Wort. Eingefügte Leerzeichen
      * werden daher entfernt.
      */
-    campus.value =
+        campus.value =
       campus.value.replace(
         /\s+/g,
         ""
       );
 
+    /*
+     * Jede Änderung des Eingabefeldes
+     * erscheint sofort oben im Silbenraster
+     * und unten in der Wortzeile.
+     *
+     * Das Feld selbst bleibt dabei gefüllt.
+     */
+    actualizaVerbumProvisoriumExCampo();
+
     clearTimeout(
       suggestionesMetricaeTimer
     );
-
+    
     suggestionesMetricaeTimer =
       setTimeout(
         function () {
