@@ -1849,6 +1849,37 @@ function limesInsertionisProSlotu(
 }
 
 function normalizaSlotumSelectum() {
+  /*
+   * Solange ein provisorisches oder bewusst
+   * ausgewähltes Wort bearbeitet wird, bleibt
+   * sein Anfangsplatz intern ausgewählt.
+   *
+   * Auch wenn dieses Wort den letzten freien
+   * Slot des Verses bereits ausfüllt, darf das
+   * Eingabefeld noch nicht deaktiviert werden:
+   * Das Wort kann sich beim Weiterschreiben
+   * noch verändern, etwa ori → oris.
+   */
+  const verbumActivum =
+    verbumInOpereSelectum() ||
+    verbumInOpereProvisorium();
+
+  if (
+    verbumActivum
+  ) {
+    indexSlotusSelecti =
+      verbumActivum
+        .indexSlotusInitialis;
+
+    positioInsertionisSelectae =
+      null;
+
+    campus.disabled =
+      false;
+
+    return;
+  }
+
   const occupata =
     occupatioVersusInOpere();
 
@@ -1860,6 +1891,9 @@ function normalizaSlotumSelectum() {
       indexSlotusSelecti
     ]
   ) {
+    campus.disabled =
+      false;
+
     return;
   }
 
