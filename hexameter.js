@@ -1144,18 +1144,50 @@ export function formaSupabaseSignata(forma) {
     }).join("");
 }
 
-function wordBoundaries(textus) {
-  const normalisiert = normalisiereLatein(textus);
-  const woerter = normalisiert ? normalisiert.split(" ") : [];
-  const boundaries = new Set();
-  let cursor = 0;
+function wordBoundaries(
+  textus
+) {
+  const vorbereitet =
+    bereiteVersstromVor(
+      textus
+    );
 
-  for (let i = 0; i < woerter.length; i += 1) {
-    cursor += woerter[i].length;
-    boundaries.add(cursor - 1);
-  }
-
-  return boundaries;
+  /*
+   * Die sichtbaren Silben stammen aus dem
+   * vorbereiteten Versstrom.
+   *
+   * Deshalb müssen auch die Wortgrenzen
+   * aus genau demselben Strom übernommen
+   * werden.
+   *
+   * Das ist besonders wichtig bei
+   * intervokalischem i:
+   *
+   * Troiae → trojjae
+   *
+   * Eine bloße Addition der normalen
+   * Wortlängen würde ab dieser Stelle
+   * falsche Grenzpositionen liefern.
+   */
+  return new Set(
+    (
+      vorbereitet
+        ?.wortSegmente ||
+      []
+    )
+      .map(
+        segmentum =>
+          segmentum.ende
+      )
+      .filter(
+        index =>
+          Number.isInteger(
+            index
+          ) &&
+          index >=
+            0
+      )
+  );
 }
 
 function positioniere(elemente) {
