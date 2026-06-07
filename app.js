@@ -992,34 +992,18 @@ function actualizaVerbumProvisoriumExCampo() {
     return;
   }
 
-  const occupata =
-    occupatioVersusInOpere({
-      idVerbiExclusi:
+  const temptamen =
+    tentaMutationemSonoram({
+      forma,
+
+      indexSlotusInitialis:
+        indexInsertionis,
+
+      idVerbiMutandi:
         verbumMutandum
           ?.id ||
         null
     });
-
-  if (
-    !condicioElisionisPraecedentisServatur(
-      forma,
-      indexInsertionis,
-      occupata
-    )
-  ) {
-    setStatus(
-      "Verbum praecedens elisionem postulat: sequens a uocali aut h incipere debet."
-    );
-
-    return;
-  }
-
-  const temptamen =
-    tentaPositionemVerbi(
-      forma,
-      indexInsertionis,
-      occupata
-    );
 
   if (
     !temptamen.bene
@@ -1562,34 +1546,19 @@ function fuegeVerbumInVersumOperis(
           .indexSlotusInitialis
       : indexSlotusSelecti;
 
-  const occupata =
-    occupatioVersusInOpere({
-      idVerbiExclusi:
+  const temptamen =
+    tentaMutationemSonoram({
+      forma:
+        verbum,
+
+      indexSlotusInitialis:
+        indexInsertionis,
+
+      idVerbiMutandi:
         verbumSelectum
           ?.id ||
         null
     });
-
-  if (
-    !condicioElisionisPraecedentisServatur(
-      verbum,
-      indexInsertionis,
-      occupata
-    )
-  ) {
-    setStatus(
-      "Verbum praecedens elisionem postulat: sequens a uocali aut h incipere debet."
-    );
-
-    return false;
-  }
-
-  const temptamen =
-    tentaPositionemVerbi(
-      verbum,
-      indexInsertionis,
-      occupata
-    );
 
   if (
     !temptamen.bene
@@ -2195,10 +2164,21 @@ function indexSlotusCursorisVisualis() {
     return indexSlotusSelecti;
   }
 
-  const indexPostVerbum =
-    indexPostVerbumInOpere(
+  const caterva =
+    catervaContinensVerbum(
       verbumProvisorium
     );
+
+  const indexPostVerbum =
+    Number.isInteger(
+      caterva
+        ?.indexPostVerbum
+    )
+      ? caterva
+          .indexPostVerbum
+      : indexPostVerbumInOpere(
+          verbumProvisorium
+        );
 
   return Math.max(
     verbumProvisorium
@@ -2257,9 +2237,12 @@ function indexPostTextumCatervae(
   return indexSlotus;
 }
 
-function catervaeVerborumContiguorum() {
-  const verbaOrdinata =
+function catervaeVerborumContiguorum(
+  verba =
     verbaVersusInOpere
+) {
+  const verbaOrdinata =
+    verba
       .slice()
       .sort(
         (
@@ -2412,6 +2395,177 @@ function catervaContinensVerbum(
       ) ||
     null
   );
+}
+
+/*
+ * Prüft eine geplante Wortänderung nicht mehr
+ * isoliert, sondern innerhalb des vollständigen
+ * zusammenhängenden Silbenzugs.
+ *
+ * Wortgrenzen bleiben ausschließlich für die
+ * Darstellung der Liaison erhalten.
+ */
+function tentaMutationemSonoram({
+  forma,
+  indexSlotusInitialis,
+  idVerbiMutandi =
+    null
+}) {
+  const idTentaminis =
+    idVerbiMutandi ||
+    "__verbum-tentamen-sonorum__";
+
+  const verbaTentaminis =
+    verbaVersusInOpere
+      .filter(
+        verbum =>
+          verbum.id !==
+          idVerbiMutandi
+      )
+      .map(
+        verbum => ({
+          ...verbum
+        })
+      );
+
+  verbaTentaminis.push({
+    id:
+      idTentaminis,
+
+    forma,
+
+    indexSlotusInitialis
+  });
+
+  const occupata =
+    Array(
+      numerusMaximusSilbarum
+    ).fill(
+      null
+    );
+
+  const catervae =
+    catervaeVerborumContiguorum(
+      verbaTentaminis
+    );
+
+  for (
+    const caterva of
+    catervae
+  ) {
+    const textus =
+      caterva.verba
+        .map(
+          verbum =>
+            verbum.forma
+        )
+        .join(
+          " "
+        );
+
+    const syllabae =
+      syllabaeCampi(
+        textus
+      );
+
+    let indexSlotus =
+      caterva
+        .indexSlotusInitialis;
+
+    for (
+      const syllaba of
+      syllabae
+    ) {
+      const span =
+        latitudoSyllabaeInSlotis(
+          syllaba,
+          indexSlotus
+        );
+
+      if (
+        !Number.isInteger(
+          span
+        ) ||
+        indexSlotus +
+          span >
+          numerusMaximusSilbarum
+      ) {
+        return {
+          bene:
+            false,
+
+          causa:
+            "Verbum extra finem versus procederet."
+        };
+      }
+
+      for (
+        let index =
+          indexSlotus;
+        index <
+          indexSlotus +
+            span;
+        index +=
+          1
+      ) {
+        if (
+          occupata[
+            index
+          ]
+        ) {
+          return {
+            bene:
+              false,
+
+            causa:
+              "Hic locus iam occupatus est."
+          };
+        }
+      }
+
+      for (
+        let index =
+          indexSlotus;
+        index <
+          indexSlotus +
+            span;
+        index +=
+          1
+      ) {
+        occupata[
+          index
+        ] =
+          true;
+      }
+
+      indexSlotus +=
+        span;
+    }
+
+    caterva.indexPostVerbum =
+      indexSlotus;
+  }
+
+  const catervaTentaminis =
+    catervae.find(
+      caterva =>
+        caterva.verba
+          .some(
+            verbum =>
+              verbum.id ===
+              idTentaminis
+          )
+    );
+
+  return {
+    bene:
+      true,
+
+    indexPostVerbum:
+      catervaTentaminis
+        ?.indexPostVerbum ??
+      indexSlotusInitialis
+  };
 }
 
 function occupatioSyllabarumVisualis() {
