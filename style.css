@@ -561,6 +561,16 @@ body > h1 {
   font-weight: 400;
 }
 
+/*
+ * Sicher erkannter metrischer Konflikt:
+ * Auch das Breve oder Makron oberhalb
+ * des Silbenplatzes wird rot.
+ */
+.hexameter-slot-signum--erroneum {
+  color: #dc2626;
+  font-weight: 700;
+}
+
 .hexameter-slot--contractus {
   width: 100%;
 }
@@ -618,6 +628,48 @@ body > h1 {
 .hexameter-slot--plena {
   border-style: solid;
   border-color: #cbd5e1;
+}
+
+/*
+ * Ein belegter, aber metrisch nicht
+ * passender Silbenplatz bleibt sichtbar,
+ * erhält jedoch einen roten Rahmen.
+ */
+.hexameter-slot--erronea {
+  border-style: solid;
+  border-color: #dc2626;
+  box-shadow:
+    0 0 0 4px
+    rgba(
+      220,
+      38,
+      38,
+      0.16
+    );
+}
+
+/*
+ * Ist der fehlerhafte Slot zugleich der
+ * aktuelle Cursor-Slot, soll auch die
+ * äußere Markierung rot statt blau sein.
+ */
+.hexameter-slot--selectum.hexameter-slot--erronea {
+  border-color: #dc2626;
+  outline-color:
+    rgba(
+      220,
+      38,
+      38,
+      0.30
+    );
+  box-shadow:
+    0 0 0 5px
+    rgba(
+      220,
+      38,
+      38,
+      0.18
+    );
 }
 
 /*
