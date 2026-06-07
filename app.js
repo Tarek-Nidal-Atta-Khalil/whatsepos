@@ -1966,7 +1966,11 @@ function reddeHexameterSlots() {
     hexameterSlots.appendChild(
       item
     );
-  }
+    }
+
+  reddeVersumInOpereLinearem(
+    occupata
+  );
 
   actualizaInstrumentaVerbiInOpere();
 }
