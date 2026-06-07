@@ -3808,7 +3808,7 @@ function aktualisiereSuggestionesMetricas() {
 
     if (
       suggestiones.length >=
-      30
+      10
     ) {
       break;
     }
