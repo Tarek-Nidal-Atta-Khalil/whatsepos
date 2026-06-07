@@ -830,8 +830,7 @@ function actualizaVerbumProvisoriumExCampo() {
         ""
       );
 
-      reddeHexameterSlots();
-      aktualisiereHexameterVorschau();
+    reddeHexameterSlots();
     }
 
     return;
@@ -944,7 +943,6 @@ function actualizaVerbumProvisoriumExCampo() {
   );
 
   reddeHexameterSlots();
-  aktualisiereHexameterVorschau();
 }
 
 function actualizaInstrumentaVerbiInOpere() {
@@ -2868,6 +2866,13 @@ campus.addEventListener(
     ) {
       event.preventDefault();
 
+      /*
+       * Eine noch geplante Live-Vorschau
+       * darf nicht nachträglich auf das
+       * bereits geleerte Feld zugreifen.
+       */
+      cancellaActualizationemProvisoriam();
+
       fuegeVerbumInVersumOperis(
         campus.value
       );
@@ -2893,6 +2898,13 @@ campus.addEventListener(
       if (
         campus.value.trim()
       ) {
+        /*
+         * Enter bestätigt das aktuelle Wort.
+         * Eine geplante Zwischenberechnung
+         * wird deshalb verworfen.
+         */
+        cancellaActualizationemProvisoriam();
+
         fuegeVerbumInVersumOperis(
           campus.value
         );
@@ -2905,44 +2917,99 @@ campus.addEventListener(
   }
 );
 
+/*
+ * Während raschen Tippens können mehrere
+ * Input-Ereignisse eintreffen, bevor der
+ * Browser das nächste Bild zeichnet.
+ *
+ * Wir führen die metrische Neuberechnung
+ * daher höchstens einmal pro Bildschirmbild
+ * aus. Die Funktion liest beim Ausführen
+ * stets den neuesten Inhalt des Feldes.
+ */
+let actualizatioProvisoriaFrame =
+  null;
+
+function programmaActualizationemProvisoriam() {
+  if (
+    actualizatioProvisoriaFrame !==
+      null
+  ) {
+    return;
+  }
+
+  actualizatioProvisoriaFrame =
+    window.requestAnimationFrame(
+      function () {
+        actualizatioProvisoriaFrame =
+          null;
+
+        actualizaVerbumProvisoriumExCampo();
+      }
+    );
+}
+
+function cancellaActualizationemProvisoriam() {
+  if (
+    actualizatioProvisoriaFrame ===
+      null
+  ) {
+    return;
+  }
+
+  window.cancelAnimationFrame(
+    actualizatioProvisoriaFrame
+  );
+
+  actualizatioProvisoriaFrame =
+    null;
+}
+
 let suggestionesMetricaeTimer =
   null;
 
 campus.addEventListener(
   "input",
-  async function () {
-    await ladeDictionariumMetricum();
-
+  function () {
     /*
-     * Das Feld enthält immer nur genau
-     * ein Wort. Eingefügte Leerzeichen
-     * werden daher entfernt.
+     * Das Wörterbuch wird bereits beim
+     * Öffnen des Scriptoriums geladen.
+     *
+     * Eine erneute Abfrage bei jedem
+     * Buchstaben wäre unnötig und bremst
+     * die Eingabe aus.
      */
-        campus.value =
+    campus.value =
       campus.value.replace(
         /\s+/g,
         ""
       );
 
     /*
-     * Jede Änderung des Eingabefeldes
-     * erscheint sofort oben im Silbenraster
-     * und unten in der Wortzeile.
+     * Die sichtbare Silben- und Wortzeile
+     * folgt weiterhin dem Eingabefeld.
      *
-     * Das Feld selbst bleibt dabei gefüllt.
+     * Mehrere rasch aufeinanderfolgende
+     * Eingaben werden jedoch zu einer
+     * einzigen Berechnung zusammengefasst.
      */
-    actualizaVerbumProvisoriumExCampo();
+    programmaActualizationemProvisoriam();
 
     clearTimeout(
       suggestionesMetricaeTimer
     );
-    
+
+    /*
+     * Suggestiones werden erst aktualisiert,
+     * wenn für einen kurzen Moment nicht
+     * weitergetippt wurde.
+     */
     suggestionesMetricaeTimer =
       setTimeout(
         function () {
           aktualisiereSuggestionesMetricas();
         },
-        120
+        320
       );
   }
 );
