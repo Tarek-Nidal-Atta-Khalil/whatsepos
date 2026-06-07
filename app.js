@@ -2382,9 +2382,16 @@ function reddeHexameterSlots() {
      * Die zweite Hälfte einer
      * kontrahierten langen Silbe
      * bleibt unsichtbar.
+     *
+     * Bei einem vorläufigen Kollisionszustand
+     * können interne und visuelle Belegung
+     * kurzzeitig voneinander abweichen.
+     * Deshalb müssen beide geprüft werden.
      */
     if (
       occupatioVisualis
+        ?.continuatio ||
+      occupatio
         ?.continuatio
     ) {
       continue;
