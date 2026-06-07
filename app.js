@@ -1980,10 +1980,10 @@ function indexPostVerbumInOpere(
  * Der intern ausgewählte Slot bleibt während
  * des Tippens der Anfangsplatz des Wortes.
  *
- * Sichtbar markiert wird dagegen der Platz
- * unmittelbar hinter dem provisorischen Wort:
- * Dort befindet sich der Schreibcursor
- * metrisch gesehen als Nächstes.
+ * Sichtbar markiert wird dagegen die zuletzt
+ * erreichte Silbe des provisorischen Wortes.
+ * Dadurch wandert die Markierung mit dem
+ * Schreibcursor mit, ohne ihm vorauszulaufen.
  */
 function indexSlotusCursorisVisualis() {
   const verbumProvisorium =
@@ -2000,13 +2000,11 @@ function indexSlotusCursorisVisualis() {
       verbumProvisorium
     );
 
-  return (
-    indexPostVerbum <
-    numerusMaximusSilbarum
-  )
-    ? indexPostVerbum
-    : null;
-}
+  return Math.max(
+    verbumProvisorium
+      .indexSlotusInitialis,
+    indexPostVerbum - 1
+  );
 
 function catervaeVerborumContiguorum() {
   const verbaOrdinata =
